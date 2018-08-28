@@ -1,0 +1,14 @@
+<package xmlns="http://expath.org/ns/pkg"
+         name="ETF TopoX"
+         abbrev="topox"
+         version="@@libVersion@@"
+         spec="1.0">
+
+    <title>ETF TopoX</title>
+    <dependency processor="basex"/>
+    <xquery>
+        <namespace>https://modules.etf-validator.net/topox</namespace>
+        <file>TopoX.xq</file>
+    </xquery>
+
+</package>

@@ -1,0 +1,121 @@
+///////////////////////////////////////////////////////////////////////////////////////
+//
+// ETF-TopoX
+//
+///////////////////////////////////////////////////////////////////////////////////////
+
+buildscript {
+	repositories {
+		maven {
+			url "http://services.interactive-instruments.de/etfdev-af/plugins-releases-local"
+			credentials {
+				username 'ii-bda'
+				password '6ozhS683'
+			}}
+	}
+	dependencies {
+		classpath group: 'de.interactive_instruments.bda', name: 'etf-bda', version:'1.0.26'
+	}
+	dependencies {
+		ant.unjar src: configurations.classpath.files.find {it.path.contains('etf')}, dest: 'build/gradle'
+	}
+}
+apply from: 'build/gradle/ii-bda.gradle'
+
+///////////////////////////////////////////////////////////////////////////////////////
+
+group = 'de.interactive_instruments.etf.testdriver.bsxm'
+description = "Extension module for the ETF Basex testdriver to create topological graph structures"
+
+ext.basexVersion = '9.0.2'
+
+configurations {
+	umlDoclet
+    runtime.exclude group: "org.slf4j", module: "slf4j-nop"
+}
+
+repositories {
+    maven {
+        url 'https://jetbrains.bintray.com/intellij-third-party-dependencies/'
+    }
+}
+
+dependencies {
+	compile group: 'de.interactive_instruments', name: 'ii-commons-util', version: '3.0.0' + project.snapshotSuffix
+	compile group: 'org.jetbrains.intellij.deps', name: 'trove4j', version: '1.0.20160824'
+
+  testCompile group: 'junit', name: 'junit', version: etf_junitTestVersion
+	testCompile group: 'ch.qos.logback', name: 'logback-classic', version: etf_logbackVersion
+	testCompile group: 'de.interactive_instruments', name: 'ii-commons-util', version:'3.0.0'+project.snapshotSuffix
+
+	umlDoclet "nl.talsmasoftware:umldoclet:1.0.16"
+
+	compileOnly "org.basex:basex:$basexVersion"
+	testCompile "org.basex:basex:$basexVersion"
+	compileOnly "org.basex:basex-api:$basexVersion"
+	testCompile "org.basex:basex-api:$basexVersion"
+}
+
+sourceSets {
+  test {
+    resources {
+      srcDir 'src/test/resources'
+      srcDir 'src/main/resources'
+    }
+  }
+}
+
+def dependencyLibs =
+		configurations.compile.filter { it.name.startsWith('trove') } +
+		configurations.compile.filter { it.name.startsWith('ii-commons-util') }
+
+jar {
+	doFirst {
+        manifest {
+            attributes(
+                    // Other manifest attributes are added by ii-bda
+                    'Main-Class': 'de.interactive_instruments.etf.bsxm.TopoX',
+            )
+        }
+    }
+	archiveName = "topox.jar"
+}
+
+javadoc {
+	source = sourceSets.main.allJava
+	options.docletpath = configurations.umlDoclet.files.asType(List)
+	options.doclet = "nl.talsmasoftware.umldoclet.UMLDoclet"
+	options.addStringOption "umlImageFormat", "SVG"
+	options.addStringOption "umlIncludeHyperlinks", "true"
+	options.addStringOption "umlBasePath", "docs/javadoc"
+	destinationDir = file("$projectDir/docs/javadoc")
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+	classifier = 'sources'
+	from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	classifier = 'javadoc'
+	from javadoc.destinationDir
+}
+
+artifacts {
+	archives sourcesJar
+}
+
+task xar(type: Zip, dependsOn: jar) {
+	archiveName = "TopoX.xar"
+	into('topox') {
+		from jar
+		from dependencyLibs
+		from file("$projectDir/src/main/xquery/TopoX.xq")
+	}
+
+	into('') {
+		from file("$projectDir/src/packaging/expath-pkg.xml")
+		filter{ it.replaceAll('@@libVersion@@', project.version)}
+	}
+	from file("$projectDir/src/packaging/basex.xml")
+}

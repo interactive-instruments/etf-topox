@@ -1,0 +1,8 @@
+<package xmlns="http://www.basex.org/modules/pkg">
+
+    <jar>topox.jar</jar>
+    <jar>trove4j-1.0.20160824.jar</jar>
+    <jar>ii-commons-util-3.0.0-SNAPSHOT.jar</jar>
+    <class>de.interactive_instruments.etf.bsxm.TopoX</class>
+
+</package>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ETF TopoX - Intersections</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.5.0/proj4.js"></script>
+    <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.1.3/build/ol.js"></script>
+    <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.1.3/css/ol.css">
+
+    <script src="https://unpkg.com/ol-layerswitcher@3.0.0"></script>
+    <link rel="stylesheet" href="https://unpkg.com/ol-layerswitcher@3.0.0/src/ol-layerswitcher.css" />
+
+    <script src="https://unpkg.com/ol-popup@4.0.0"></script>
+    <link rel="stylesheet" href="https://unpkg.com/ol-popup@4.0.0/src/ol-popup.css" />
+
+
+    <style>
+        html, body, .map {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
+        }
+        .mouse-position-wrapper {
+            height: 29px;
+            color: #000;
+            position: absolute;
+            left: 10px;
+            bottom: 0px;
+            z-index: 999;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .ol-scale-line {
+            left: 10px;
+            bottom: 35px;
+        }
+        .ol-popup-content {
+            min-width: 200px;
+            max-height: 350px;
+        }
+    </style>
+
+</head>
+<body>
+
+<div id="map" class="map"></div>
+
+<script>
+    var attachmentPath = 'out.js';
+    var projectionName = 'EPSG:25832';
+    proj4.defs(projectionName, "+proj=utm +zone=32 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
+    ol.proj.proj4.register(proj4);
+    var projection = new ol.proj.Projection({
+        code: projectionName,
+        extent: [272743.436039, 5257140.753723, 909787.383634, 6099785.965455]
+    });
+
+    var markerSource = new ol.source.Vector({
+        format: new ol.format.GeoJSON({
+            projection: 'EPSG:25832'
+        })
+    });
+
+    var topoXSource = new ol.source.Vector({
+        format: new ol.format.GeoJSON({
+            projection: 'EPSG:25832'
+        })
+    });
+
+    var errorCircle = new ol.style.Style({
+        image: new ol.style.Circle({
+            radius: 10,
+            stroke: new ol.style.Stroke({
+                color: 'red',
+                width: 2
+            })
+        })
+    });
+
+    var markerLayer = new ol.layer.Vector({
+        title: "Fehlermarkierungen",
+        source: markerSource,
+        style: errorCircle
+    });
+
+    var topoxStyles = [
+        new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: 'rgba(0, 0, 255, 0.4)',
+                width: 2
+            }),
+            fill: new ol.style.Fill({
+                color: 'rgba(0, 0, 255, 0.1)'
+            })
+        }),
+        new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 6,
+                fill: new ol.style.Fill({
+                    color: 'rgba(255, 128, 0, 0.6)'
+                })
+            }),
+            geometry: function(feature) {
+                var coordinates = feature.getGeometry().getCoordinates()[0];
+                return new ol.geom.MultiPoint(coordinates);
+            }
+        })
+    ];
+
+
+    var orientationHelpFunction = function(feature) {
+        var geometry = feature.getGeometry();
+        var styles = [
+            // linestring
+            new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: '#ffcc33',
+                    width: 2
+                })
+            })
+        ];
+        var coordinates = geometry.getCoordinates()[0];
+        for(var i=0; i+1<coordinates.length; i++) {
+            var start = coordinates[i];
+            var end = coordinates[i+1];
+            var dx = end[0] - start[0];
+            var dy = end[1] - start[1];
+            var rotation = Math.atan2(dy, dx);
+            // arrows
+            styles.push(new ol.style.Style({
+                geometry: new ol.geom.Point(end),
+                image: new ol.style.Icon({
+                    src: 'https://openlayers.org/en/latest/examples/data/arrow.png',
+                    anchor: [0.75, 0.5],
+                    rotateWithView: true,
+                    rotation: -rotation,
+                    scale: 1.5
+                })
+            }));
+        }
+        return styles;
+    };
+
+    var topoxLayer = new ol.layer.Vector({
+        title: "Betroffene Objekte",
+        id: "topox",
+        visible: false,
+        source: topoXSource,
+        style: topoxStyles
+    });
+
+
+    var boundaryLayer = new ol.layer.Vector({
+        title: "Grenzen der Bundesl&auml;nder",
+        source: new ol.source.Vector({
+            url: 'http://jherrmann.org/bundeslaender.json',
+            format: new ol.format.GeoJSON({
+                projection: 'EPSG:4326'
+            })
+        })
+    });
+
+
+    var detailLayer = new ol.layer.Image({
+        title: "Hausumringe",
+        source: new ol.source.ImageWMS({
+            url: 'https://www.wms.nrw.de/geobasis/wms_nw_hu',
+            params: {
+                'LAYERS': 'WMS_NW_HU',
+                'SRS': projectionName
+            },
+            projection: projectionName,
+            ratio: 1,
+        })
+    });
+
+    var map = new ol.Map({
+        controls: ol.control.defaults().extend([
+            new ol.control.ScaleLine(),
+            new ol.control.FullScreen(),
+            new ol.control.LayerSwitcher()
+        ]),
+        target: document.getElementById('map'),
+        loadTilesWhileAnimating: true,
+        view: new ol.View({
+            projection: projection,
+            // center: center,
+            zoom: 10,
+            minZoom: 2,
+            maxZoom: 30
+        }),
+        layers: [
+            new ol.layer.Group({
+                title: 'Overlays',
+                layers: [
+                    boundaryLayer,
+                    detailLayer,
+                ]
+            }),
+
+            new ol.layer.Group({
+                title: 'Topologische Fehler',
+                layers: [
+                    markerLayer,
+                    topoxLayer,
+                ]
+            }),
+        ]
+    });
+
+    var mouse_position = new ol.control.MousePosition({
+        coordinateFormat: ol.coordinate.createStringXY(3),
+        className: 'mouse-position-wrapper',
+        projection: projectionName
+    });
+    map.addControl(mouse_position);
+
+
+    var infoOverlay = document.createElement('div');
+    var featureInfo = document.createElement('div');
+    var errorInfo = document.createElement('div');
+    infoOverlay.appendChild(featureInfo);
+    infoOverlay.appendChild(errorInfo);
+
+    var featureOverlay = new ol.layer.Vector({
+        source: new ol.source.Vector(),
+        map: map,
+        style: orientationHelpFunction
+    });
+
+    var overlay = new ol.Overlay({
+        element: infoOverlay,
+        offset: [1,20],
+    });
+    map.addOverlay(overlay);
+
+    map.on('pointermove', function(evt) {
+        if (evt.dragging) {
+            return;
+        }
+        var pixel = map.getEventPixel(evt.originalEvent);
+        var id = map.forEachFeatureAtPixel(pixel, function (feature) {
+            return feature.get('id');
+        });
+        featureInfo.style.display = id ? '' : 'none';
+        featureInfo.innerHTML = id;
+
+        var error = map.forEachFeatureAtPixel(pixel, function (feature) {
+            return feature.get('e');
+        });
+        errorInfo.style.display = error ? '' : 'none';
+        errorInfo.innerHTML = error;
+        overlay.setPosition(evt.coordinate);
+
+        // Polygon orientation help
+        if (map.getView().getZoom() >= 12) {
+            featureOverlay.getSource().clear();
+            map.forEachFeatureAtPixel(pixel, function (feature) {
+                var geometry = feature.getGeometry();
+                if (geometry.getType() === 'Polygon') {
+                    featureOverlay.getSource().addFeature(feature);
+                }
+            }, {
+                layerFilter: function (layer) {
+                    return layer.get('id') === 'topox';
+                }
+            });
+        }
+    });
+
+    var errorI=0;
+    window.onkeyup = function(e){
+        console.log("Recenter to error"+errorI);
+        if(e.shiftKey && e.keyCode==39){
+            errorI++;
+            if(errorI>=geoJsonErrorPoints.length) {
+                errorI=0;
+            }
+            map.getView().setCenter(
+                geoJsonErrorPoints[errorI].getGeometry().getFirstCoordinate()
+            );
+        }
+    }
+
+    function filterGeometry(collection,type){
+        var selectedFeatures = [];
+        for(var i = 0;i<collection.length;i++){
+            if(collection[i].getGeometry() instanceof ol.geom[type]){
+                selectedFeatures.push(collection[i]);
+            }
+        }
+        return selectedFeatures;
+    }
+
+    var xmlhttp = new XMLHttpRequest();
+    var geoJsonErrorPoints;
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var json = JSON.parse(this.responseText);
+            var geoJson = (new ol.format.GeoJSON()).readFeatures(json);
+            topoXSource.addFeatures(filterGeometry(geoJson, "Polygon"));
+            geoJsonErrorPoints = filterGeometry(geoJson, "Point");
+            markerSource.addFeatures(geoJsonErrorPoints);
+
+            map.getView().setCenter(
+                geoJsonErrorPoints[errorI].getGeometry().getFirstCoordinate()
+            );
+        }
+    };
+
+    // var sAttachmentPath = unescape(attachmentPath).replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>{}\[\]\\\/]/gi, '');
+    var sAttachmentPath = attachmentPath;
+    xmlhttp.open("GET", "./"+sAttachmentPath, true);
+    xmlhttp.send();
+
+    function simpleDistance( x1, y1, x2, y2 ) {
+        var xs = x2 - x1, ys = y2 - y1;
+        xs *= xs;
+        ys *= ys;
+        return Math.sqrt( xs + ys );
+    }
+
+    function getClosestPointInGeometry(point, geometry) {
+        var flatCoordinates = geometry.getFlatCoordinates();
+        var stride = geometry.getStride();
+        var distance=Infinity;
+        var pos=-1;
+        for(var i=0; i+stride<=flatCoordinates.length; i+=stride) {
+            var d = simpleDistance(point[0], point[1], flatCoordinates[i],flatCoordinates[i+1]);
+            if(d<0.00000001) {
+                var coord = [flatCoordinates[i], flatCoordinates[i+1]]
+                return coord;
+            }
+            if(d<distance) {
+                distance=d;
+                pos=i;
+            }
+        }
+        if(pos!==-1) {
+            var coord = [flatCoordinates[pos], flatCoordinates[pos+1]]
+            return coord;
+        }
+        return null;
+    }
+
+    map.on('singleclick', function(evt) {
+        var popup = new Popup({insertFirst: false});
+        map.addOverlay(popup);
+        var prettyCoord = ol.coordinate.toStringXY(evt.coordinate, 3);
+
+        var pixel = map.getEventPixel(evt.originalEvent);
+        var features = [];
+        var issues = [];
+        var point;
+        var pointStrs = [];
+        map.forEachFeatureAtPixel(pixel,function(feature) {
+            var id = feature.get('id');
+            if(id !== undefined && !features.includes(id)) {
+                features.push(id);
+                // handle inaccuracies
+                var closestPoint = feature.getGeometry().getClosestPoint(
+                    map.getCoordinateFromPixel(pixel));
+                var closestPointInGeometry = getClosestPointInGeometry(
+                    map.getCoordinateFromPixel(pixel),
+                    feature.getGeometry());
+                pointStrs.push(
+                    '<li>'+
+                        ol.coordinate.toStringXY(closestPointInGeometry, 3)+
+                    '</li>'
+                );
+                if(point === undefined) {
+                    point = closestPoint;
+                }else if(point[0]!==closestPoint[0] && point[1]!==closestPoint[1]) {
+                    issues.push(
+                        '<li>&Uumlberlappung oder Schnitt von Objekt </br><b>'+id+
+                        '</b><br/> mit Objekt <br/><b>'+ features[0]+
+                        '</b></li>');
+                }
+            }
+        }, {
+            layerFilter: function (layer) {
+                return layer.get('id') === 'topox';
+            }
+        });
+
+        var coordinatesHtml = '<h3>Koordinaten:</h3><p>' + prettyCoord + '</p>';
+        var featureHtml
+        if(features.length>0) {
+            var featureList = ''
+            for (var i=0; i<features.length; i++) {
+                featureList += '<li>'+features[i]+'</li>';
+            }
+            featureHtml = '<h3>Feature: </h3><ol>'+featureList+'</ol>';
+        }else{
+            featureHtml = ''
+        }
+        var pointHtml = pointStrs.length>0 ? '<h3>N&auml;chster St&uuml;tzpunkt:</h3><ol>'+pointStrs.join('')+'</ol>' : '';
+
+        var issuesHtml;
+        if(issues.length>0) {
+            if(map.getView().getZoom()>=15) {
+                issuesHtml = '<h3>Fehler : </h3><ol>'+issues.join('')+'</ol>';
+            }else{
+                issuesHtml = '<p>Fehler k&ouml;nnen in dieser Zoomstufe nicht markiert werden</p>';
+            }
+        }else{
+            issuesHtml = '';
+        }
+
+        popup.show(evt.coordinate, '<div>'+issuesHtml+coordinatesHtml+featureHtml+pointHtml+'</div>');
+
+    });
+
+</script>
+
+</body>
+</html>
