@@ -27,10 +27,7 @@ import org.basex.query.value.node.DBNode;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Scanner;
 
 import static de.interactive_instruments.etf.bsxm.topox.TopologyBuilder.compress;
@@ -133,7 +130,7 @@ public class TopoX {
 				final File errorOutputFile = new File(errorOutputDir, theme.getName()+".xml");
 				this.errorFiles[tc] = errorOutputFile.toString();
 
-				final XMLStreamWriter streamWriter = xof.createXMLStreamWriter(new FileWriter(errorOutputFile));
+				final XMLStreamWriter streamWriter = xof.createXMLStreamWriter(new FileOutputStream(errorOutputFile), "UTF-8");
 				topologyErrorCollector[tc] = new TopologyErrorXmlWriter(theme, streamWriter);
 
 				topologyBuilders[tc] = new TopologyBuilder(theme, topologyErrorCollector[tc], initialEdgeCapacity);
