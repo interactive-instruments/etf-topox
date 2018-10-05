@@ -23,7 +23,7 @@
  : @author  Jon Herrmann ( herrmann aT interactive-instruments doT de )
  
  :)
-module namespace topox = 'https://modules.etf-validator.net/topox';
+module namespace topox = 'https://modules.etf-validator.net/topox/1';
 
 import module namespace java = 'java:de.interactive_instruments.etf.bsxm.TopoX';
 

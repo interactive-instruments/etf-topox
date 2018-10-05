@@ -7,7 +7,7 @@
     <title>ETF TopoX</title>
     <dependency processor="basex"/>
     <xquery>
-        <namespace>https://modules.etf-validator.net/topox</namespace>
+        <namespace>https://modules.etf-validator.net/topox/1</namespace>
         <file>TopoX.xq</file>
     </xquery>
 
