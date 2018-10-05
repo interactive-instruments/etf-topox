@@ -19,6 +19,8 @@ package de.interactive_instruments.etf.bsxm.topox;
 import de.interactive_instruments.Releasable;
 
 /**
+ * Object for persisting topological errors
+ *
  * @author Jon Herrmann ( herrmann aT interactive-instruments doT de )
  */
 public interface TopologyErrorCollector extends Releasable {

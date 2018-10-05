@@ -100,6 +100,7 @@ declare function topox:parse-surface($objects as node()*, $path as xs:string, $t
  : @return TopologicalErrors node
  :)
 declare function topox:topological-errors($topologyId as xs:int) as node() {
+    (: Todo: we will probably have to make some improvements here :)
     doc(java:errorFile($topologyId))/ete:TopologicalErrors
 };
 
@@ -123,6 +124,20 @@ declare function topox:feature($compressedValue as xs:long) as node() {
     db:open-pre(java:dbname($compressedValue), java:preObject($compressedValue))
 };
 
+(:~
+ : Exports features that are part of a topological problem to a GeoJson file
+ :
+ : @param  $topologyId ID of the topology
+ : @return nothing
+ :)
+declare function topox:export-erroneous-features-to-geojson($topologyId as xs:int, $attachmentId as xs:string) as empty-sequence() {
+        let $topoErrors := topox:topological-errors($topologyId)/e[@t = "RING_INTERSECTION"]
+        return (
+            topox:export-error-points($topologyId, $topoErrors),
+            topox:export-features($topologyId, $topoErrors),
+            java:attachIssueMap($topologyId, $attachmentId)
+        )
+};
 
 declare %private function topox:error-message($error as node()) as xs:string {
     let $is := topox:geometric-object( $error/IS[1]/text() )
@@ -157,21 +172,6 @@ declare %private function topox:error-message($error as node()) as xs:string {
                 "' <br/> mit Geometrie  '" || $ccwGmlId || "'"
         else ""
     return $mesg1 || $mesg2 || $mesg3
-};
-
-(:~
- : Exports features that are part of a topological problem to a GeoJson file
- :
- : @param  $topologyId ID of the topology
- : @return nothing
- :)
-declare function topox:export-erroneous-features-to-geojson($topologyId as xs:int, $attachmentId as xs:string) as empty-sequence() {
-        let $topoErrors := topox:topological-errors($topologyId)/e[@t = "RING_INTERSECTION"]
-        return (
-            topox:export-error-points($topologyId, $topoErrors),
-            topox:export-features($topologyId, $topoErrors),
-            java:attachIssueMap($topologyId, $attachmentId)
-        )
 };
 
 declare %private function topox:export-error-points($topologyId as xs:int, $topoErrors as item()*) as empty-sequence() {

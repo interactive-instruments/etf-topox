@@ -17,26 +17,66 @@
 package de.interactive_instruments.etf.bsxm.topox;
 
 /**
+ * Todo: discuss error types and document it
+ *
  * @author Jon Herrmann ( herrmann aT interactive-instruments doT de )
  */
 enum TopologyErrorType {
 
-	RING_INTERSECTION_CONGRUENT_EDGES,
+	/**
+	 * Duplicate edges in two features
+	 */
+	RING_OVERLAPPING_EDGES,
 
+	/**
+	 * 	Ring intersection in general
+	 * 	Todo describe cases
+ 	 */
 	RING_INTERSECTION,
 
+	/**
+	 * The curve orientation of the outer ring is invalid
+	 */
 	OUTER_RING_INVALID_CURVE_ORIENTATION,
 
+	/**
+	 * Self intersection of the inner ring
+	 */
 	INNER_RING_SELF_INTERSECTION,
 
+	/**
+	 * The inner ring orientation is invalid or intersects with the outer ring
+	 */
 	INVALID_INTERIOR_ORIENTATION_OR_OUTSIDE_EXTERIOR,
 
+	/**
+	 * Innter ring intersection in general
+	 * Todo describe cases
+	 */
 	INTERIOR_INTERSECTION,
 
-	// Subsequent errors that may occur due to previous errors
-	// -or generally errors that indicate invalid data
 
+	// Subsequent errors that may occur due to previous errors
+	// -or generally errors that indicate invalid data.
+	//
+	// In general, these errors can be ignored if errors have previously
+	// been reported with the error codes from above.
+	//
+	// If only the error codes from below are reported , this can
+	// be considered as an internal error!
+	//////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * The edge cannot be found. This most likely
+	 * will happen if there are previous errors in the geometric object.
+	 */
 	EDGE_NOT_FOUND,
-	
+
+	/**
+	 * Calculated edges of a node are invalid. This most likely
+	 * will happen if previous edges of the geometric object are invalid.
+	 */
 	INVALID_ANGLE
+
+	//////////////////////////////////////////////////////////////////////////
 }

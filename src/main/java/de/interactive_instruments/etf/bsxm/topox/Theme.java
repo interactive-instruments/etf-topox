@@ -17,6 +17,8 @@
 package de.interactive_instruments.etf.bsxm.topox;
 
 /**
+ * Todo: refactor/remove
+ *
  * @author Jon Herrmann ( herrmann aT interactive-instruments doT de )
  */
 public class Theme {

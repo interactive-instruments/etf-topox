@@ -716,7 +716,7 @@ public class TopologyBuilder implements HashingSegmentHandler {
 						"o", String.valueOf(topology.getQuick(reqIndex+LEFT_LOCATION_INDEX)));
 			}else if(rightObj!=0){
 				// there is also inner or outer ring on the the right side
-				errorCollector.collectError(RING_INTERSECTION_CONGRUENT_EDGES,
+				errorCollector.collectError(RING_OVERLAPPING_EDGES,
 						"t", String.valueOf(compressedLocation),
 						"o", String.valueOf(topology.getQuick(reqIndex+RIGHT_LOCATION_INDEX)));
 			}else{
@@ -729,12 +729,12 @@ public class TopologyBuilder implements HashingSegmentHandler {
 			if(!this.exterior && previousEdgeIndex<0) {
 				// the negative previousEdgeIndex indicates that the edge has been created
 				// by the inner ring on the left side.
-				errorCollector.collectError(RING_INTERSECTION_CONGRUENT_EDGES,
+				errorCollector.collectError(RING_OVERLAPPING_EDGES,
 						"t", String.valueOf(compressedLocation),
 						"o", String.valueOf(topology.getQuick(reqIndex+LEFT_LOCATION_INDEX)));
 			}else if(rightObj!=0) {
 				// there is also inner or outer ring on the the right side
-				errorCollector.collectError(RING_INTERSECTION_CONGRUENT_EDGES,
+				errorCollector.collectError(RING_OVERLAPPING_EDGES,
 						"t", String.valueOf(compressedLocation),
 						"o", String.valueOf(topology.getQuick(reqIndex + RIGHT_LOCATION_INDEX)));
 			}else{

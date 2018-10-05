@@ -23,7 +23,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 /**
- *
+ * Object for persisting topological errors in a XML file
  *
  * @author Jon Herrmann ( herrmann aT interactive-instruments doT de )
  */
