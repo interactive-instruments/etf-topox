@@ -11,16 +11,16 @@ Or create an update XQuery script with
 
 ```XQuery
 
-	
-  import module namespace repo = 'http://basex.org/modules/repo';
-  
-  let $d :=
-  try { repo:delete('ETF TopoX') ||  prof:dump('Uninstalled') }catch * { () }
-  return repo:install('https://github.com/jonherrmann/etf-topox/releases/download/0.9.0/TopoX-0.9.0.xar?access_token=GITHUB_TOKEN'), 
-  repo:list()
-  
-  ```
-  
+
+import module namespace repo = 'http://basex.org/modules/repo';
+
+let $d :=
+try { repo:delete('ETF TopoX') ||  prof:dump('Uninstalled') }catch * { () }
+return repo:install('https://github.com/jonherrmann/etf-topox/releases/download/0.9.0/TopoX-0.9.0.xar?access_token=GITHUB_TOKEN'),
+repo:list()
+
+```
+
 where GITHUB_TOKEN is your private GITHUB access token.
 
 # Develop

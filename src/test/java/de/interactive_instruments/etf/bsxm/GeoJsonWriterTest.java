@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2010-2018 interactive instruments GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.interactive_instruments.etf.bsxm;
 
-import de.interactive_instruments.IFile;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 
-import static junit.framework.TestCase.assertEquals;
+import org.junit.jupiter.api.Test;
+
+import de.interactive_instruments.IFile;
 
 /**
  * @author Jon Herrmann ( herrmann aT interactive-instruments doT de )
@@ -43,10 +43,10 @@ public class GeoJsonWriterTest {
 		writer.close();
 
 		assertEquals(
-		"{\"type\":\"FeatureCollection\",\"features\":[{\"type\":"
-				+ "\"Feature\",\"properties\":{\"id\":\"ID.1\"},\"geometry\":"
-				+ "{\"type\":\"Polygon\",\"coordinates\":[[[9,9],[2,2],[1,1],[123,4123],[1,1],[2,2],[9,9]]]}}]}",
-		tmpFile.readContent().toString());
+				"{\"type\":\"FeatureCollection\",\"features\":[{\"type\":"
+						+ "\"Feature\",\"properties\":{\"id\":\"ID.1\"},\"geometry\":"
+						+ "{\"type\":\"Polygon\",\"coordinates\":[[[9,9],[2,2],[1,1],[123,4123],[1,1],[2,2],[9,9]]]}}]}",
+				tmpFile.readContent().toString());
 	}
 
 	@Test
@@ -55,7 +55,7 @@ public class GeoJsonWriterTest {
 		final GeoJsonWriter writer = new GeoJsonWriter(tmpFile);
 		writer.init();
 
-		writer.writePointFeature("ID.1","error", "1", "2");
+		writer.writePointFeature("ID.1", "error", "1", "2");
 
 		writer.close();
 
@@ -72,7 +72,7 @@ public class GeoJsonWriterTest {
 		final GeoJsonWriter writer = new GeoJsonWriter(tmpFile);
 		writer.init();
 
-		writer.writePointFeature("ID.0","error", "1", "2");
+		writer.writePointFeature("ID.0", "error", "1", "2");
 
 		writer.startFeature("ID.1");
 		writer.addCoordinates("11414 2134214 431 4123".getBytes());
@@ -100,21 +100,21 @@ public class GeoJsonWriterTest {
 		writer.close();
 
 		assertEquals("{\"type\":\"FeatureCollection\",\"features\":[{"
-						+ "\"type\":\"Feature\",\"properties\":{\"id\":\"ID.0\",\"e\":\"error\"},"
-						+ "\"geometry\":{\"type\":\"Point\",\"coordinates\":[1,2]}},"
-						+ "{\"type\":\"Feature\",\"properties\":{\"id\":\"ID.1\"},"
-						+ "\"geometry\":{\"type\":\"Polygon\",\"coordinates\":"
-						+ "[[[11414,2134214],[431,4123]]]}},{\"type\":\"Feature\","
-						+ "\"properties\":{\"id\":\"ID.2\"},\"geometry\":{\"type\":"
-						+ "\"Polygon\",\"coordinates\":[[[11414,2134214],[431,4123],"
-						+ "[11414,2134214],[431,4123]]]}},{\"type\":\"Feature\","
-						+ "\"properties\":{\"id\":\"ID.3\"},\"geometry\":{\"type\":\"Polygon\","
-						+ "\"coordinates\":[[[11414,2134214],[431,4123],[11414,2134214],[431,4123]],"
-						+ "[[11414,2134214],[431,4123]]]}},{\"type\":\"Feature\",\"properties\":{"
-						+ "\"id\":\"ID.4\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":"
-						+ "[[[11414,2134214],[431,4123],[11414,2134214],[431,4123]],[[11414,2134214],"
-						+ "[431,4123],[11414,2134214],[431,4123]],[[11414,2134214],[431,4123],"
-						+ "[11414,2134214],[431,4123]]]}}]}",
+				+ "\"type\":\"Feature\",\"properties\":{\"id\":\"ID.0\",\"e\":\"error\"},"
+				+ "\"geometry\":{\"type\":\"Point\",\"coordinates\":[1,2]}},"
+				+ "{\"type\":\"Feature\",\"properties\":{\"id\":\"ID.1\"},"
+				+ "\"geometry\":{\"type\":\"Polygon\",\"coordinates\":"
+				+ "[[[11414,2134214],[431,4123]]]}},{\"type\":\"Feature\","
+				+ "\"properties\":{\"id\":\"ID.2\"},\"geometry\":{\"type\":"
+				+ "\"Polygon\",\"coordinates\":[[[11414,2134214],[431,4123],"
+				+ "[11414,2134214],[431,4123]]]}},{\"type\":\"Feature\","
+				+ "\"properties\":{\"id\":\"ID.3\"},\"geometry\":{\"type\":\"Polygon\","
+				+ "\"coordinates\":[[[11414,2134214],[431,4123],[11414,2134214],[431,4123]],"
+				+ "[[11414,2134214],[431,4123]]]}},{\"type\":\"Feature\",\"properties\":{"
+				+ "\"id\":\"ID.4\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":"
+				+ "[[[11414,2134214],[431,4123],[11414,2134214],[431,4123]],[[11414,2134214],"
+				+ "[431,4123],[11414,2134214],[431,4123]],[[11414,2134214],[431,4123],"
+				+ "[11414,2134214],[431,4123]]]}}]}",
 				tmpFile.readContent().toString());
 	}
 }

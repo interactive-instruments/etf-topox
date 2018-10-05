@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2010-2018 interactive instruments GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.interactive_instruments.etf.bsxm.topox;
 
 /**
@@ -50,7 +49,8 @@ public interface PosListParser {
 	 * @param location location information of the direct positions, e.g. an ID
 	 * @param geoType Geometry type
 	 */
-	void parseDirectPositions(final byte[] byteSequence, final boolean threeDCoordinates, final long location, final int geoType);
+	void parseDirectPositions(final byte[] byteSequence, final boolean threeDCoordinates, final long location,
+			final int geoType);
 
 	/**
 	 * Parse the direct positions of a byte array. The second argument overrides a
@@ -61,7 +61,8 @@ public interface PosListParser {
 	 * @param location location information of the direct positions, e.g. an ID
 	 * @param geoType Geometry type
 	 */
-	void parseDirectPositions(final CharSequence sequence, final boolean threeDCoordinates, final long location, final int geoType);
+	void parseDirectPositions(final CharSequence sequence, final boolean threeDCoordinates, final long location,
+			final int geoType);
 
 	/**
 	 * Set the dimension of the next parsed coordinates.

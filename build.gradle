@@ -44,14 +44,15 @@ dependencies {
 	compile group: 'de.interactive_instruments', name: 'ii-commons-util', version: '3.0.0' + project.snapshotSuffix
 	compile group: 'org.jetbrains.intellij.deps', name: 'trove4j', version: '1.0.20160824'
 
-  testCompile group: 'junit', name: 'junit', version: etf_junitTestVersion
+  	testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.3.1'
+	testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.3.1'
 	testCompile group: 'ch.qos.logback', name: 'logback-classic', version: etf_logbackVersion
 	testCompile group: 'de.interactive_instruments', name: 'ii-commons-util', version:'3.0.0'+project.snapshotSuffix
 
 	umlDoclet "nl.talsmasoftware:umldoclet:1.0.16"
-
-	compileOnly "org.basex:basex:$basexVersion"
+	
 	testCompile "org.basex:basex:$basexVersion"
+	testRuntime "org.basex:basex:$basexVersion"
 	compileOnly "org.basex:basex-api:$basexVersion"
 	testCompile "org.basex:basex-api:$basexVersion"
 }

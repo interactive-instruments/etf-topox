@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2010-2018 interactive instruments GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.interactive_instruments.etf.bsxm.topox;
-
-import de.interactive_instruments.SUtils;
-import de.interactive_instruments.exceptions.ExcUtils;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+
+import de.interactive_instruments.SUtils;
+import de.interactive_instruments.exceptions.ExcUtils;
 
 /**
  * Object for persisting topological errors in a XML file
@@ -33,7 +32,7 @@ public class TopologyErrorXmlWriter implements TopologyErrorCollector {
 	private static final String TOPOX_ERROR_NS_PREFIX = "ete";
 	private final Theme theme;
 	private final XMLStreamWriter writer;
-	private int counter=0;
+	private int counter = 0;
 
 	public TopologyErrorXmlWriter(final Theme theme, final XMLStreamWriter writer) {
 		this.theme = theme;
@@ -51,18 +50,18 @@ public class TopologyErrorXmlWriter implements TopologyErrorCollector {
 			writer.writeAttribute("theme", theme.getName());
 			writer.writeAttribute("geometry", theme.getGeometry());
 			writer.writeAttribute("selection", theme.getSelection());
-		}catch (final XMLStreamException e) {
+		} catch (final XMLStreamException e) {
 			throw new IllegalStateException("Initialization failed: ", e);
 		}
 	}
 
 	@Override
-	public void collectError(final TopologyErrorType topologyErrorType, final String...parameter) {
+	public void collectError(final TopologyErrorType topologyErrorType, final String... parameter) {
 		try {
 			writer.writeStartElement("e");
 			writer.writeAttribute("i", Integer.toString(++counter));
 			writer.writeAttribute("t", topologyErrorType.toString());
-			if(parameter!=null) {
+			if (parameter != null) {
 				for (int i = 0; i < parameter.length; i++) {
 					writer.writeStartElement(parameter[i]);
 					writer.writeCharacters(parameter[++i]);
@@ -70,10 +69,10 @@ public class TopologyErrorXmlWriter implements TopologyErrorCollector {
 				}
 			}
 			writer.writeEndElement();
-		}catch (final XMLStreamException e) {
+		} catch (final XMLStreamException e) {
 			final String message = theme.getName() + " " +
 					topologyErrorType.toString() + " : " + SUtils.concatStr(" ", parameter);
-			throw new IllegalStateException("Error writing topological error: "+message, e);
+			throw new IllegalStateException("Error writing topological error: " + message, e);
 		}
 	}
 

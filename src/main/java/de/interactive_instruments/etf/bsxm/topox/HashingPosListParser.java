@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2010-2018 interactive instruments GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.interactive_instruments.etf.bsxm.topox;
 
 /**
@@ -26,7 +25,7 @@ public class HashingPosListParser implements PosListParser {
 
 	private double previousOrdinate;
 	private long previousCoordinateHash;
-	private boolean threeDCoordinates=false;
+	private boolean threeDCoordinates = false;
 
 	private static final long FNV_64_INIT = 0xcbf29ce484222325L;
 	private static final long FNV_64_PRIME = 0x100000001b3L;
@@ -46,7 +45,7 @@ public class HashingPosListParser implements PosListParser {
 
 	private static double pow10(final int exp) {
 		if (exp > -PRECALC_POW_SIZE) {
-			if(exp <= 0) {
+			if (exp <= 0) {
 				return PRECALC_NEG_EXPS[-exp];
 			} else if (exp < PRECALC_POW_SIZE) {
 				return PRECALC_POS_EXPS[exp];
@@ -68,23 +67,26 @@ public class HashingPosListParser implements PosListParser {
 			hashesAndLocationsBuffer = new long[6];
 		}
 
-		@Override public void coordinate2d(final double x, final double y, final long hash, final long location, final int type) {
-			coordinateBuffer[i]=x;
-			coordinateBuffer[i+1]=y;
-			hashesAndLocationsBuffer[i]=hash;
-			hashesAndLocationsBuffer[++i]=location;
-			if(++i>4) {
-				i=0;
-				handler.coordinates2d(coordinateBuffer,hashesAndLocationsBuffer,type);
+		@Override
+		public void coordinate2d(final double x, final double y, final long hash, final long location, final int type) {
+			coordinateBuffer[i] = x;
+			coordinateBuffer[i + 1] = y;
+			hashesAndLocationsBuffer[i] = hash;
+			hashesAndLocationsBuffer[++i] = location;
+			if (++i > 4) {
+				i = 0;
+				handler.coordinates2d(coordinateBuffer, hashesAndLocationsBuffer, type);
 			}
 		}
 
-		@Override public void coordinates2d(final double[] coordinates, final long[] hashesAndLocations, final int type) {
+		@Override
+		public void coordinates2d(final double[] coordinates, final long[] hashesAndLocations, final int type) {
 			throw new IllegalAccessError("Invalid call");
 		}
 
-		@Override public void nextGeometricObject() {
-			i=0;
+		@Override
+		public void nextGeometricObject() {
+			i = 0;
 			handler.nextGeometricObject();
 		}
 	}
@@ -97,25 +99,28 @@ public class HashingPosListParser implements PosListParser {
 			this.handler = handler;
 		}
 
-		@Override public void coordinate2d(final double x, final double y, final long hash, final long location, final int type) {
-			handler.coordinate2d(x,y,hash,location,type);
+		@Override
+		public void coordinate2d(final double x, final double y, final long hash, final long location, final int type) {
+			handler.coordinate2d(x, y, hash, location, type);
 		}
 
-		@Override public void coordinates2d(final double[] coordinates, final long[] hashesAndLocations, final int type) {
+		@Override
+		public void coordinates2d(final double[] coordinates, final long[] hashesAndLocations, final int type) {
 			throw new IllegalAccessError("Invalid call");
 		}
 
-		@Override public void nextGeometricObject() {
+		@Override
+		public void nextGeometricObject() {
 			handler.nextGeometricObject();
 		}
 	}
 
 	public HashingPosListParser(final HashingSegmentHandler hashingSegmentHandler) {
 		geoTypeHandlerStrategies = new HashingSegmentHandler[3];
-		geoTypeHandlerStrategies[0]= hashingSegmentHandler;
+		geoTypeHandlerStrategies[0] = hashingSegmentHandler;
 		// geoTypeHandlerStrategies[1]= new BufferedGeoArcHandlerStrategy(hashingSegmentHandler);
-		geoTypeHandlerStrategies[1]= new PassThroughHandlerStrategy(hashingSegmentHandler);
-		geoTypeHandlerStrategies[2]= new PassThroughHandlerStrategy(hashingSegmentHandler);
+		geoTypeHandlerStrategies[1] = new PassThroughHandlerStrategy(hashingSegmentHandler);
+		geoTypeHandlerStrategies[2] = new PassThroughHandlerStrategy(hashingSegmentHandler);
 	}
 
 	@Override
@@ -129,7 +134,8 @@ public class HashingPosListParser implements PosListParser {
 	}
 
 	@Override
-	public void parseDirectPositions(final byte[] bytes, final boolean threeDCoordinates, final long location, final int geoType) {
+	public void parseDirectPositions(final byte[] bytes, final boolean threeDCoordinates, final long location,
+			final int geoType) {
 
 		final HashingSegmentHandler segmentHandler = this.geoTypeHandlerStrategies[geoType];
 
@@ -138,14 +144,14 @@ public class HashingPosListParser implements PosListParser {
 
 		// skip leading whitespaces
 		byte b = bytes[pos];
-		while(length>0 && Character.isWhitespace(b)) {
+		while (length > 0 && Character.isWhitespace(b)) {
 			b = bytes[++pos];
 			length--;
 		}
 		int ordinateCounter = 0;
 		long hash = FNV_64_INIT;
 
-		while(length>0) {
+		while (length > 0) {
 			boolean positiveSign = true;
 			if (b == '+') {
 				pos++;
@@ -158,11 +164,10 @@ public class HashingPosListParser implements PosListParser {
 			hash ^= b;
 			hash *= FNV_64_PRIME;
 
-
 			boolean err = true;
 			int startOffset = pos;
 			double d;
-			for (d = 0d; (length > 0) && ((b = bytes[pos]) >= '0') && (b <= '9'); ) {
+			for (d = 0d; (length > 0) && ((b = bytes[pos]) >= '0') && (b <= '9');) {
 				d *= 10d;
 				d += b - '0';
 				hash ^= b;
@@ -205,20 +210,20 @@ public class HashingPosListParser implements PosListParser {
 				throw new NumberFormatException("Invalid Double : " + new String(bytes));
 			}
 
-			while(--length>0) {
+			while (--length > 0) {
 				b = bytes[++pos];
-				if(!Character.isWhitespace(b)) {
+				if (!Character.isWhitespace(b)) {
 					break;
 				}
 			}
 
-			if(++ordinateCounter%2==0) {
-				if(hash!=previousCoordinateHash) {
+			if (++ordinateCounter % 2 == 0) {
+				if (hash != previousCoordinateHash) {
 					segmentHandler.coordinate2d(previousOrdinate, positiveSign ? number : -number, hash, location, geoType);
 					previousCoordinateHash = hash;
 				}
 				hash = FNV_64_INIT;
-			}else{
+			} else {
 				previousOrdinate = positiveSign ? number : -number;
 				hash *= FNV_64_PRIME;
 			}
@@ -226,7 +231,8 @@ public class HashingPosListParser implements PosListParser {
 	}
 
 	@Override
-	public void parseDirectPositions(final CharSequence csq, final boolean threeDCoordinates, final long location, final int geoType) {
+	public void parseDirectPositions(final CharSequence csq, final boolean threeDCoordinates, final long location,
+			final int geoType) {
 
 		final HashingSegmentHandler segmentHandler = this.geoTypeHandlerStrategies[geoType];
 		int pos = 0;
@@ -234,14 +240,14 @@ public class HashingPosListParser implements PosListParser {
 
 		// skip leading whitespaces
 		char ch = csq.charAt(pos);
-		while(length>0 && Character.isWhitespace(ch)) {
+		while (length > 0 && Character.isWhitespace(ch)) {
 			ch = csq.charAt(++pos);
 			length--;
 		}
 		int ordinateCounter = 0;
 		long hash = FNV_64_INIT;
 
-		while(length>0) {
+		while (length > 0) {
 			boolean positiveSign = true;
 			if (ch == '+') {
 				pos++;
@@ -254,11 +260,10 @@ public class HashingPosListParser implements PosListParser {
 			hash ^= ch;
 			hash *= FNV_64_PRIME;
 
-
 			boolean err = true;
 			int startOffset = pos;
 			double d;
-			for (d = 0d; (length > 0) && ((ch = csq.charAt(pos)) >= '0') && (ch <= '9'); ) {
+			for (d = 0d; (length > 0) && ((ch = csq.charAt(pos)) >= '0') && (ch <= '9');) {
 				d *= 10d;
 				d += ch - '0';
 				hash ^= ch;
@@ -300,34 +305,35 @@ public class HashingPosListParser implements PosListParser {
 				throw new NumberFormatException("Invalid Double : " + csq);
 			}
 
-			while(--length>0) {
+			while (--length > 0) {
 				ch = csq.charAt(++pos);
-				if(!Character.isWhitespace(ch)) {
+				if (!Character.isWhitespace(ch)) {
 					break;
 				}
 			}
 
-			if(++ordinateCounter%2==0) {
-				if(hash!=previousCoordinateHash) {
+			if (++ordinateCounter % 2 == 0) {
+				if (hash != previousCoordinateHash) {
 					segmentHandler.coordinate2d(previousOrdinate, positiveSign ? number : -number, hash, location, geoType);
 					previousCoordinateHash = hash;
 				}
 				hash = FNV_64_INIT;
-			}else{
+			} else {
 				previousOrdinate = positiveSign ? number : -number;
 				hash *= FNV_64_PRIME;
 			}
 		}
 	}
 
-	@Override public void dimension(final boolean threeDCoordinates) {
-		this.threeDCoordinates=threeDCoordinates;
+	@Override
+	public void dimension(final boolean threeDCoordinates) {
+		this.threeDCoordinates = threeDCoordinates;
 	}
 
 	@Override
 	public void nextGeometricObject() {
-		previousCoordinateHash=Long.MAX_VALUE;
-		previousOrdinate=Double.NaN;
+		previousCoordinateHash = Long.MAX_VALUE;
+		previousOrdinate = Double.NaN;
 		geoTypeHandlerStrategies[0].nextGeometricObject();
 	}
 }

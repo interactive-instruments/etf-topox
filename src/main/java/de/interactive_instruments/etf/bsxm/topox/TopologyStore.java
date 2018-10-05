@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2010-2018 interactive instruments GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.interactive_instruments.etf.bsxm.topox;
 
-import de.interactive_instruments.SUtils;
+import static de.interactive_instruments.etf.bsxm.topox.TopologyBuilder.*;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import static de.interactive_instruments.etf.bsxm.topox.TopologyBuilder.*;
+import de.interactive_instruments.SUtils;
 
 /**
  * Immutable access to topology data
@@ -32,70 +31,82 @@ import static de.interactive_instruments.etf.bsxm.topox.TopologyBuilder.*;
 class TopologyStore implements Topology {
 
 	private int getLeftOrRightByIndex(final int index, final int propertyOffset) {
-		if(index>0) {
+		if (index > 0) {
 			return getLeft(builder.topology.getQuick(index + propertyOffset));
-		}else{
+		} else {
 			return getRight(builder.topology.getQuick((-index) + propertyOffset));
 		}
 	}
 
 	private final class FlyweightEdge implements Topology.Edge {
 		private final int i;
+
 		private FlyweightEdge(final int i) {
 			this.i = i;
 		}
 
-		@Override public Node source() {
+		@Override
+		public Node source() {
 			return new FlyweightNode(i);
 		}
 
-		@Override public Node target() {
+		@Override
+		public Node target() {
 			return new FlyweightNode(-i);
 		}
 
-		@Override public double sourceAngle() {
-			if(i>0) {
-				return TopologyBuilder.getSourceAngle(builder.topology,i);
-			}else{
-				return TopologyBuilder.getTargetAngle(builder.topology,-i);
+		@Override
+		public double sourceAngle() {
+			if (i > 0) {
+				return TopologyBuilder.getSourceAngle(builder.topology, i);
+			} else {
+				return TopologyBuilder.getTargetAngle(builder.topology, -i);
 			}
 		}
 
-		@Override public double targetAngle() {
-			if(i>0) {
-				return TopologyBuilder.getTargetAngle(builder.topology,i);
-			}else{
-				return TopologyBuilder.getSourceAngle(builder.topology,-i);
+		@Override
+		public double targetAngle() {
+			if (i > 0) {
+				return TopologyBuilder.getTargetAngle(builder.topology, i);
+			} else {
+				return TopologyBuilder.getSourceAngle(builder.topology, -i);
 			}
 		}
 
-		@Override public int leftObject() {
-			return getLeftOrRightByIndex(i,OBJ_OFFSET);
+		@Override
+		public int leftObject() {
+			return getLeftOrRightByIndex(i, OBJ_OFFSET);
 		}
 
-		@Override public int rightObject() {
-			return getLeftOrRightByIndex(-i,OBJ_OFFSET);
+		@Override
+		public int rightObject() {
+			return getLeftOrRightByIndex(-i, OBJ_OFFSET);
 		}
 
-		@Override public int object() {
+		@Override
+		public int object() {
 			return 0;
 		}
 
-		@Override public Edge sourceCcwNext() {
-			return new FlyweightEdge(getLeftOrRightByIndex(i,CCWI_OFFSET));
+		@Override
+		public Edge sourceCcwNext() {
+			return new FlyweightEdge(getLeftOrRightByIndex(i, CCWI_OFFSET));
 		}
 
-		@Override public Edge targetCcwNext() {
-			return new FlyweightEdge(getLeftOrRightByIndex(-i,CCWI_OFFSET));
+		@Override
+		public Edge targetCcwNext() {
+			return new FlyweightEdge(getLeftOrRightByIndex(-i, CCWI_OFFSET));
 		}
 
-		@Override public String toString() {
-			return source().toString()+" -> "+target().toString()+" @ "+i;
+		@Override
+		public String toString() {
+			return source().toString() + " -> " + target().toString() + " @ " + i;
 		}
 	}
 
 	private final class FlyweightNode implements Topology.Node {
 		private final int i;
+
 		private FlyweightNode(final int i) {
 			this.i = i;
 		}
@@ -107,17 +118,17 @@ class TopologyStore implements Topology {
 
 		@Override
 		public double x() {
-			return builder.coordinates.getQuick(getLeftOrRightByIndex(i,COORDINATE_OFFSET));
+			return builder.coordinates.getQuick(getLeftOrRightByIndex(i, COORDINATE_OFFSET));
 		}
 
 		@Override
 		public double y() {
-			return builder.coordinates.getQuick(getLeftOrRightByIndex(i,COORDINATE_OFFSET)+1);
+			return builder.coordinates.getQuick(getLeftOrRightByIndex(i, COORDINATE_OFFSET) + 1);
 		}
 
 		@Override
 		public String toString() {
-			return Double.toString(x())+" "+Double.toString(y());
+			return Double.toString(x()) + " " + Double.toString(y());
 		}
 	}
 
@@ -127,9 +138,8 @@ class TopologyStore implements Topology {
 		this.builder = builder;
 	}
 
-
 	int size() {
-		return (builder.topology.size()-TopologyBuilder.TOPOLOGY_FIELDS_SIZE)/TopologyBuilder.TOPOLOGY_FIELDS_SIZE;
+		return (builder.topology.size() - TopologyBuilder.TOPOLOGY_FIELDS_SIZE) / TopologyBuilder.TOPOLOGY_FIELDS_SIZE;
 	}
 
 	@Override
@@ -156,15 +166,18 @@ class TopologyStore implements Topology {
 		return bbox;
 	}
 
-	@Override public Edge edge(final double xSource, final double ySource, final double xTarget, final double yTarget) {
+	@Override
+	public Edge edge(final double xSource, final double ySource, final double xTarget, final double yTarget) {
 		throw new IllegalStateException("Not implemented yet");
 	}
 
-	@Override public Node node(final double x, final double y) {
-		return new FlyweightNode(builder.getTargetEdge(x,y));
+	@Override
+	public Node node(final double x, final double y) {
+		return new FlyweightNode(builder.getTargetEdge(x, y));
 	}
 
-	@Override public Iterable<Edge> borders() {
+	@Override
+	public Iterable<Edge> borders() {
 		return null;
 	}
 
@@ -174,14 +187,14 @@ class TopologyStore implements Topology {
 		sb.append("edges=");
 		sb.append(size());
 		sb.append(", coordinates=");
-		sb.append((builder.coordinates.size()-2)/2);
+		sb.append((builder.coordinates.size() - 2) / 2);
 		sb.append('}');
 		return sb.toString();
 	}
 
 	void exportCsv(final File destination) throws IOException {
 		final FileWriter writer = new FileWriter(destination);
-		final String endlSeperator = ""+SUtils.ENDL;
+		final String endlSeperator = "" + SUtils.ENDL;
 		final String seperator = ";";
 		writer.append("Edge");
 		writer.append(seperator);
@@ -218,7 +231,7 @@ class TopologyStore implements Topology {
 			writer.append(' ');
 
 			// Source Y Coordinate
-			writer.append(Double.toString(builder.coordinates.getQuick(sourceCoordIndex+1)));
+			writer.append(Double.toString(builder.coordinates.getQuick(sourceCoordIndex + 1)));
 			writer.append(seperator);
 
 			// Target X Coordinate
@@ -227,7 +240,7 @@ class TopologyStore implements Topology {
 			writer.append(' ');
 
 			// Target Y Coordinate
-			writer.append(Double.toString(builder.coordinates.getQuick(targetCoordIndex+1)));
+			writer.append(Double.toString(builder.coordinates.getQuick(targetCoordIndex + 1)));
 			writer.append(seperator);
 			++i;
 

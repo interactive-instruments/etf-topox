@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2010-2018 interactive instruments GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.interactive_instruments.etf.bsxm;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
 
 import de.interactive_instruments.SUtils;
 import de.interactive_instruments.container.Pair;
 import de.interactive_instruments.etf.bsxm.topox.HashingPosListParser;
 import de.interactive_instruments.etf.bsxm.topox.HashingSegmentHandler;
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static junit.framework.TestCase.assertEquals;
 
 /**
  * @author Jon Herrmann ( herrmann aT interactive-instruments doT de )
@@ -34,34 +34,35 @@ public class SegmentLineParser {
 
 	private class TestHashingSegmentHandler implements HashingSegmentHandler {
 
-		private List<Pair<Double,Double>> coordinates = new ArrayList<>();
+		private List<Pair<Double, Double>> coordinates = new ArrayList<>();
 
-
-		@Override public void coordinate2d(final double x, final double y, final long hash, final long location, final int type) {
-			this.coordinates.add(new Pair<>(x,y));
+		@Override
+		public void coordinate2d(final double x, final double y, final long hash, final long location, final int type) {
+			this.coordinates.add(new Pair<>(x, y));
 		}
 
-		@Override public void coordinates2d(final double[] coordinates, final long[] hashesAndLocations, final int type) {
+		@Override
+		public void coordinates2d(final double[] coordinates, final long[] hashesAndLocations, final int type) {
 
 		}
 
-		@Override public void nextGeometricObject() {
+		@Override
+		public void nextGeometricObject() {
 
 		}
 
 		double getLastX() {
-			return coordinates.get(coordinates.size()-1).getLeft();
+			return coordinates.get(coordinates.size() - 1).getLeft();
 		}
 
 		double getLastY() {
-			return coordinates.get(coordinates.size()-1).getRight();
+			return coordinates.get(coordinates.size() - 1).getRight();
 		}
 
-		List<Pair<Double,Double>> getCoordinates() {
+		List<Pair<Double, Double>> getCoordinates() {
 			return this.coordinates;
 		}
 	}
-
 
 	@Test
 	public void testParsing1() {
@@ -72,12 +73,12 @@ public class SegmentLineParser {
 		final String x = "311432.345";
 		final String y = "218549.999";
 
-		final String str = x+" "+y;
+		final String str = x + " " + y;
 
-		parser.parseDirectPositions(str, false, 1,2);
+		parser.parseDirectPositions(str, false, 1, 2);
 
-		assertEquals(Double.valueOf(x), testLineSegmentHandler.getLastX());
-		assertEquals(Double.valueOf(y), testLineSegmentHandler.getLastY());
+		assertEquals(Double.valueOf(x), testLineSegmentHandler.getLastX(), 0);
+		assertEquals(Double.valueOf(y), testLineSegmentHandler.getLastY(), 0);
 	}
 
 	@Test
@@ -89,12 +90,12 @@ public class SegmentLineParser {
 		final String x = "1";
 		final String y = "2";
 
-		final String str = x+" "+y;
+		final String str = x + " " + y;
 
 		parser.parseDirectPositions(str, false, 1, 2);
 
-		assertEquals(Double.valueOf(x), testLineSegmentHandler.getLastX());
-		assertEquals(Double.valueOf(y), testLineSegmentHandler.getLastY());
+		assertEquals(Double.valueOf(x), testLineSegmentHandler.getLastX(), 0);
+		assertEquals(Double.valueOf(y), testLineSegmentHandler.getLastY(), 0);
 	}
 
 	@Test
@@ -107,8 +108,8 @@ public class SegmentLineParser {
 
 		final List<Pair<Double, Double>> coord = testLineSegmentHandler.getCoordinates();
 
-		assertEquals(Double.valueOf("3.3"), testLineSegmentHandler.getLastX());
-		assertEquals(Double.valueOf("3.4567"), testLineSegmentHandler.getLastY());
+		assertEquals(Double.valueOf("3.3"), testLineSegmentHandler.getLastX(), 0);
+		assertEquals(Double.valueOf("3.4567"), testLineSegmentHandler.getLastY(), 0);
 	}
 
 	@Test
@@ -120,12 +121,12 @@ public class SegmentLineParser {
 		final String x = "    311432.345  ";
 		final String y = "218549.999   ";
 
-		final String str = x+" "+y;
+		final String str = x + " " + y;
 
 		parser.parseDirectPositions(str, false, 1, 2);
 
-		assertEquals(Double.valueOf(x), testLineSegmentHandler.getLastX());
-		assertEquals(Double.valueOf(y), testLineSegmentHandler.getLastY());
+		assertEquals(Double.valueOf(x), testLineSegmentHandler.getLastX(), 0);
+		assertEquals(Double.valueOf(y), testLineSegmentHandler.getLastY(), 0);
 	}
 
 	@Test
@@ -149,12 +150,12 @@ public class SegmentLineParser {
 
 		};
 
-		final String str = SUtils.concatStr(" ",coordinates);
+		final String str = SUtils.concatStr(" ", coordinates);
 		parser.parseDirectPositions(str, false, 1, 2);
 		assertEquals(4, testLineSegmentHandler.getCoordinates().size());
-		for(int i=0; i<coordinates.length; i+=2) {
-			assertEquals(Double.valueOf(coordinates[i]), testLineSegmentHandler.getCoordinates().get(i/2).getLeft());
-			assertEquals(Double.valueOf(coordinates[i+1]), testLineSegmentHandler.getCoordinates().get(i/2).getRight());
+		for (int i = 0; i < coordinates.length; i += 2) {
+			assertEquals(Double.valueOf(coordinates[i]), testLineSegmentHandler.getCoordinates().get(i / 2).getLeft());
+			assertEquals(Double.valueOf(coordinates[i + 1]), testLineSegmentHandler.getCoordinates().get(i / 2).getRight());
 		}
 	}
 
@@ -185,7 +186,7 @@ public class SegmentLineParser {
 
 		};
 
-		final String str = SUtils.concatStr(" ",coordinates);
+		final String str = SUtils.concatStr(" ", coordinates);
 		parser.parseDirectPositions(str, false, 1, 2);
 		assertEquals(4, testLineSegmentHandler.getCoordinates().size());
 		assertEquals(Double.valueOf(coordinates[0]), testLineSegmentHandler.getCoordinates().get(0).getLeft());

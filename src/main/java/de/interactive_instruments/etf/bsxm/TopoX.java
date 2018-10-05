@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2010-2018 interactive instruments GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,23 +15,25 @@
  */
 package de.interactive_instruments.etf.bsxm;
 
-import de.interactive_instruments.IFile;
-import de.interactive_instruments.etf.bsxm.topox.*;
-import de.interactive_instruments.exceptions.ExcUtils;
+import static de.interactive_instruments.etf.bsxm.topox.TopologyBuilder.compress;
+import static de.interactive_instruments.etf.bsxm.topox.TopologyBuilder.getRight;
+
+import java.io.*;
+import java.util.Scanner;
+
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.basex.core.BaseXException;
 import org.basex.query.QueryModule.Deterministic;
 import org.basex.query.QueryModule.Permission;
 import org.basex.query.QueryModule.Requires;
 import org.basex.query.value.node.DBNode;
 
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-import java.io.*;
-import java.util.Scanner;
-
-import static de.interactive_instruments.etf.bsxm.topox.TopologyBuilder.compress;
-import static de.interactive_instruments.etf.bsxm.topox.TopologyBuilder.getRight;
+import de.interactive_instruments.IFile;
+import de.interactive_instruments.etf.bsxm.topox.*;
+import de.interactive_instruments.exceptions.ExcUtils;
 
 /**
  * TopoX facade
@@ -46,7 +48,7 @@ public class TopoX {
 	private final TopologyBuilder[] topologyBuilders = new TopologyBuilder[5];
 	private final PosListParser[] parsers = new HashingPosListParser[5];
 	private int tc = 0;
-	private int dbNameLength=0;
+	private int dbNameLength = 0;
 	private String dbnamePrefix;
 	private int currentObjectPre;
 
@@ -62,19 +64,19 @@ public class TopoX {
 	 */
 	@Requires(Permission.READ)
 	public String initDb(final String name, final short dbCount) throws BaseXException {
-		if(name==null || name.length()<4) {
-			throw new BaseXException("Invalid database name: '"+name+"'. "
+		if (name == null || name.length() < 4) {
+			throw new BaseXException("Invalid database name: '" + name + "'. "
 					+ "Database names must be suffixed with a three digits index, i.e. DB-000");
 		}
 		final int length = name.length();
-		for(int i = length - 1; i >= length-3; i--) {
-			if(name.charAt(i)< '0'|| name.charAt(i) > '9') {
-				throw new BaseXException("Invalid database name: '"+name+"'. "
+		for (int i = length - 1; i >= length - 3; i--) {
+			if (name.charAt(i) < '0' || name.charAt(i) > '9') {
+				throw new BaseXException("Invalid database name: '" + name + "'. "
 						+ "Database names must be suffixed with a three digits index, i.e. DB-000");
 			}
 		}
-		this.dbnamePrefix = name.substring(0, length-3);
-		this.dbNameLength=length;
+		this.dbnamePrefix = name.substring(0, length - 3);
+		this.dbNameLength = length;
 		return name;
 	}
 
@@ -84,18 +86,19 @@ public class TopoX {
 	 */
 	@Requires(Permission.CREATE)
 	public int devTopologyBuilder(final String name, final String path,
-			final String identifier, final String geometry, final int initialEdgeCapacity, final String outputDir) throws BaseXException {
-		if(tc<2) {
+			final String identifier, final String geometry, final int initialEdgeCapacity, final String outputDir)
+			throws BaseXException {
+		if (tc < 2) {
 			try {
 				final Theme theme = new Theme(name, path, identifier, geometry);
 				final File errorOutputDir = new File(outputDir);
 
-				final IFile geoJsonOutputFile = new IFile(errorOutputDir, theme.getName()+".js");
+				final IFile geoJsonOutputFile = new IFile(errorOutputDir, theme.getName() + ".js");
 				final GeoJsonWriter writer = new GeoJsonWriter(geoJsonOutputFile);
 				writer.init();
 				this.geoJsonWriters[tc] = writer;
 
-				final File errorOutputFile = new File(errorOutputDir, theme.getName()+".xml");
+				final File errorOutputFile = new File(errorOutputDir, theme.getName() + ".xml");
 				this.errorFiles[tc] = errorOutputFile.toString();
 
 				topologyBuilders[tc] = new TopologyBuilder(theme, topologyErrorCollector[tc], 16);
@@ -115,19 +118,20 @@ public class TopoX {
 	 */
 	@Requires(Permission.CREATE)
 	public int newTopologyBuilder(final String name, final String path,
-			final String identifier, final String geometry, final int initialEdgeCapacity, final String tmpOutputDir) throws BaseXException {
-		if(tc<5) {
+			final String identifier, final String geometry, final int initialEdgeCapacity, final String tmpOutputDir)
+			throws BaseXException {
+		if (tc < 5) {
 			try {
 				final Theme theme = new Theme(name, path, identifier, geometry);
 				final XMLOutputFactory xof = XMLOutputFactory.newInstance();
 				final File errorOutputDir = new File(tmpOutputDir);
 
-				final IFile geoJsonOutputFile = new IFile(errorOutputDir, theme.getName()+".js");
+				final IFile geoJsonOutputFile = new IFile(errorOutputDir, theme.getName() + ".js");
 				final GeoJsonWriter writer = new GeoJsonWriter(geoJsonOutputFile);
 				writer.init();
 				this.geoJsonWriters[tc] = writer;
 
-				final File errorOutputFile = new File(errorOutputDir, theme.getName()+".xml");
+				final File errorOutputFile = new File(errorOutputDir, theme.getName() + ".xml");
 				this.errorFiles[tc] = errorOutputFile.toString();
 
 				final XMLStreamWriter streamWriter = xof.createXMLStreamWriter(new FileOutputStream(errorOutputFile), "UTF-8");
@@ -136,7 +140,7 @@ public class TopoX {
 				topologyBuilders[tc] = new TopologyBuilder(theme, topologyErrorCollector[tc], initialEdgeCapacity);
 				parsers[tc] = new HashingPosListParser(topologyBuilders[tc]);
 				topologyErrorCollector[tc].init();
-			return tc++;
+				return tc++;
 			} catch (final IOException | XMLStreamException e) {
 				throw new BaseXException(e);
 			}
@@ -165,7 +169,7 @@ public class TopoX {
 	@Deterministic
 	@Requires(Permission.NONE)
 	public int preObject(final long compressedIndex) {
-		return getRight(compressedIndex)-
+		return getRight(compressedIndex) -
 				objectIndex(compressedIndex);
 	}
 
@@ -180,8 +184,8 @@ public class TopoX {
 	@Deterministic
 	@Requires(Permission.NONE)
 	public String dbname(final long compressedIndex) {
-		final String dbIndexStr=Integer.toString(dbIndex(compressedIndex));
-		final StringBuilder sb = new StringBuilder(this.dbnamePrefix.length()+3);
+		final String dbIndexStr = Integer.toString(dbIndex(compressedIndex));
+		final StringBuilder sb = new StringBuilder(this.dbnamePrefix.length() + 3);
 		sb.append(this.dbnamePrefix);
 		final int pads = 3 - dbIndexStr.length();
 		if (pads > 0) {
@@ -205,11 +209,9 @@ public class TopoX {
 	public long objPreAsGeoPre(final long compressedIndex) {
 		return compress(
 				dbIndex(compressedIndex) << 24,
-		getRight(compressedIndex)-
-				objectIndex(compressedIndex));
+				getRight(compressedIndex) -
+						objectIndex(compressedIndex));
 	}
-
-
 
 	/**
 	 * Switch the Topology Builder to the next interior
@@ -241,13 +243,13 @@ public class TopoX {
 	 */
 	@Requires(Permission.NONE)
 	public DBNode nextFeature(final int id, final DBNode object) {
-		currentObjectPre=object.pre();
+		currentObjectPre = object.pre();
 		return object;
 	}
 
 	@Requires(Permission.READ)
 	public void parseSegment(final int id, final DBNode posList, final int type) {
-		parsers[id].parseDirectPositions(posList.data().text(posList.pre(),true),false, genIndex(posList), type);
+		parsers[id].parseDirectPositions(posList.data().text(posList.pre(), true), false, genIndex(posList), type);
 	}
 
 	@Requires(Permission.NONE)
@@ -258,8 +260,9 @@ public class TopoX {
 	}
 
 	@Requires(Permission.NONE)
-	public void writeGeoJsonPointFeature(final int id, final String errorId, final String error, final String x, final String y) throws IOException {
-		geoJsonWriters[id].writePointFeature(errorId, error, x,y);
+	public void writeGeoJsonPointFeature(final int id, final String errorId, final String error, final String x, final String y)
+			throws IOException {
+		geoJsonWriters[id].writePointFeature(errorId, error, x, y);
 	}
 
 	@Requires(Permission.NONE)
@@ -269,7 +272,7 @@ public class TopoX {
 
 	@Requires(Permission.NONE)
 	public void addGeoJsonCoordinates(final int id, final DBNode coordinateNode) throws IOException {
-		geoJsonWriters[id].addCoordinates(coordinateNode.data().text(coordinateNode.pre(),true));
+		geoJsonWriters[id].addCoordinates(coordinateNode.data().text(coordinateNode.pre(), true));
 	}
 
 	@Requires(Permission.NONE)
@@ -279,7 +282,7 @@ public class TopoX {
 
 	@Requires(Permission.NONE)
 	public void addGeoJsonInteriorCoordinates(final int id, final DBNode coordinateNode) throws IOException {
-		geoJsonWriters[id].addCoordinatesInterior(coordinateNode.data().text(coordinateNode.pre(),true));
+		geoJsonWriters[id].addCoordinatesInterior(coordinateNode.data().text(coordinateNode.pre(), true));
 	}
 
 	@Requires(Permission.CREATE)
@@ -292,7 +295,7 @@ public class TopoX {
 		}
 
 		final File dir = geoJsonWriters[id].getFile().getParentFile();
-		final IFile attachmentMapFile = new IFile(dir, attachmentId+".html");
+		final IFile attachmentMapFile = new IFile(dir, attachmentId + ".html");
 
 		final InputStream cStream = this.getClass().getResourceAsStream("/html/IssueMap.html");
 		final InputStream stream;
@@ -305,8 +308,7 @@ public class TopoX {
 		final Scanner s = new Scanner(stream).useDelimiter("\\A");
 		final String result = s.hasNext() ? s.next() : "";
 		attachmentMapFile.writeContent(new StringBuffer(
-				result.replaceAll("'out.js'", "'"+geoJsonWriters[id].getFile().getName()+"'")
-		));
+				result.replaceAll("'out.js'", "'" + geoJsonWriters[id].getFile().getName() + "'")));
 	}
 
 	private static int makeCompressedNodeIndex(final byte dbIndex, final int objectGeoDiffIndex) {
@@ -314,22 +316,21 @@ public class TopoX {
 	}
 
 	static int dbIndex(final long compressedIndex) {
-		return (int)(compressedIndex >>> 56);
+		return (int) (compressedIndex >>> 56);
 	}
 
 	static int objectIndex(final long compressedIndex) {
-		return ((int)(compressedIndex >>> 32) & 0xFFFFFF);
+		return ((int) (compressedIndex >>> 32) & 0xFFFFFF);
 	}
 
 	private long genIndex(final DBNode node) {
 		final String name = node.data().meta.name;
-		final byte dbIndex = (byte) ((name.charAt(dbNameLength-1)-'0')+
-				(name.charAt(dbNameLength-2)-'0')*10+
-				(name.charAt(dbNameLength-3)-'0')*100);
+		final byte dbIndex = (byte) ((name.charAt(dbNameLength - 1) - '0') +
+				(name.charAt(dbNameLength - 2) - '0') * 10 +
+				(name.charAt(dbNameLength - 3) - '0') * 100);
 		return compress(
-				makeCompressedNodeIndex(dbIndex, node.pre()-this.currentObjectPre),
-				node.pre()
-		);
+				makeCompressedNodeIndex(dbIndex, node.pre() - this.currentObjectPre),
+				node.pre());
 	}
 
 }
