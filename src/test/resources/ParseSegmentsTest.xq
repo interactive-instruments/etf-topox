@@ -2,7 +2,7 @@ declare namespace adv='http://www.adv-online.de/namespaces/adv/gid/6.0';
 declare namespace wfsAdv='http://www.adv-online.de/namespaces/adv/gid/wfs';
 declare namespace gml='http://www.opengis.net/gml/3.2';
 
-import module namespace topox = 'https://modules.etf-validator.net/topox';
+import module namespace topox = 'https://modules.etf-validator.net/topox/1';
 
 
 declare function local:log($text as xs:string) as empty-sequence()
