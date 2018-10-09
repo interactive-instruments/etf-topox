@@ -62,6 +62,13 @@
         })
     });
 
+	var basemapLayer = new ol.layer.Tile({
+		source: new ol.source.XYZ({
+			attributions: '&copy; <a href="http://www.bkg.bund.de" class="link0" target="_new">Bundesamt f&uuml;r Kartographie und Geod&auml;sie</a> 2017, <a href="http://sg.geodatenzentrum.de/web_public/Datenquellen_TopPlus_Open.pdf" class="link0" target="_new">Datenquellen</a>',
+			url: 'http://sgx.geodatenzentrum.de/wmts_topplus_web_open/tile/1.0.0/web_grau/default/WEBMERCATOR/{z}/{y}/{x}.png'
+		})
+	});
+
     var topoXSource = new ol.source.Vector({
         format: new ol.format.GeoJSON({
             projection: 'EPSG:25832'
@@ -202,6 +209,7 @@
             new ol.layer.Group({
                 title: 'Topologische Fehler',
                 layers: [
+                    basemapLayer,
                     markerLayer,
                     topoxLayer,
                 ]
