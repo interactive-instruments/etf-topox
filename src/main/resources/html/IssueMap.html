@@ -62,12 +62,13 @@
         })
     });
 
-	var basemapLayer = new ol.layer.Tile({
-		source: new ol.source.XYZ({
-			attributions: '&copy; <a href="http://www.bkg.bund.de" class="link0" target="_new">Bundesamt f&uuml;r Kartographie und Geod&auml;sie</a> 2017, <a href="http://sg.geodatenzentrum.de/web_public/Datenquellen_TopPlus_Open.pdf" class="link0" target="_new">Datenquellen</a>',
-			url: 'http://sgx.geodatenzentrum.de/wmts_topplus_web_open/tile/1.0.0/web_grau/default/WEBMERCATOR/{z}/{y}/{x}.png'
-		})
-	});
+    var basemapLayer = new ol.layer.Tile({
+        title: "TopPlusOpen",
+        source: new ol.source.XYZ({
+            attributions: '&copy; <a href="http://www.bkg.bund.de" class="link0" target="_new">Bundesamt f&uuml;r Kartographie und Geod&auml;sie</a> 2017, <a href="http://sg.geodatenzentrum.de/web_public/Datenquellen_TopPlus_Open.pdf" class="link0" target="_new">Datenquellen</a>',
+            url: 'http://sgx.geodatenzentrum.de/wmts_topplus_web_open/tile/1.0.0/web_grau/default/WEBMERCATOR/{z}/{y}/{x}.png'
+        })
+    });
 
     var topoXSource = new ol.source.Vector({
         format: new ol.format.GeoJSON({
@@ -158,29 +159,6 @@
     });
 
 
-    var boundaryLayer = new ol.layer.Vector({
-        title: "Grenzen der Bundesl&auml;nder",
-        source: new ol.source.Vector({
-            url: 'http://jherrmann.org/bundeslaender.json',
-            format: new ol.format.GeoJSON({
-                projection: 'EPSG:4326'
-            })
-        })
-    });
-
-
-    var detailLayer = new ol.layer.Image({
-        title: "Hausumringe",
-        source: new ol.source.ImageWMS({
-            url: 'https://www.wms.nrw.de/geobasis/wms_nw_hu',
-            params: {
-                'LAYERS': 'WMS_NW_HU',
-                'SRS': projectionName
-            },
-            projection: projectionName,
-            ratio: 1,
-        })
-    });
 
     var map = new ol.Map({
         controls: ol.control.defaults().extend([
@@ -201,19 +179,17 @@
             new ol.layer.Group({
                 title: 'Overlays',
                 layers: [
-                    boundaryLayer,
-                    detailLayer,
+                    basemapLayer
                 ]
             }),
 
             new ol.layer.Group({
                 title: 'Topologische Fehler',
                 layers: [
-                    basemapLayer,
                     markerLayer,
-                    topoxLayer,
+                    topoxLayer
                 ]
-            }),
+            })
         ]
     });
 
@@ -374,7 +350,7 @@
                     feature.getGeometry());
                 pointStrs.push(
                     '<li>'+
-                        ol.coordinate.toStringXY(closestPointInGeometry, 3)+
+                    ol.coordinate.toStringXY(closestPointInGeometry, 3)+
                     '</li>'
                 );
                 if(point === undefined) {
