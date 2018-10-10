@@ -30,7 +30,7 @@ import de.interactive_instruments.etf.bsxm.topox.HashingSegmentHandler;
 /**
  * @author Jon Herrmann ( herrmann aT interactive-instruments doT de )
  */
-public class SegmentLineParser {
+public class SegmentLineParserTest {
 
 	private class TestHashingSegmentHandler implements HashingSegmentHandler {
 

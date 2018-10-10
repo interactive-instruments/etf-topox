@@ -44,13 +44,14 @@ dependencies {
 	compile group: 'de.interactive_instruments', name: 'ii-commons-util', version: '3.0.0' + project.snapshotSuffix
 	compile group: 'org.jetbrains.intellij.deps', name: 'trove4j', version: '1.0.20160824'
 
+	umlDoclet "nl.talsmasoftware:umldoclet:1.0.16"
+
   	testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.3.1'
 	testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.3.1'
 	testCompile group: 'ch.qos.logback', name: 'logback-classic', version: etf_logbackVersion
 	testCompile group: 'de.interactive_instruments', name: 'ii-commons-util', version:'3.0.0'+project.snapshotSuffix
 
-	umlDoclet "nl.talsmasoftware:umldoclet:1.0.16"
-	
+	testCompile "org.xmlunit:xmlunit-core:2.6.2"
 	testCompile "org.basex:basex:$basexVersion"
 	testRuntime "org.basex:basex:$basexVersion"
 	compileOnly "org.basex:basex-api:$basexVersion"
@@ -71,14 +72,6 @@ def dependencyLibs =
 		configurations.compile.filter { it.name.startsWith('ii-commons-util') }
 
 jar {
-	doFirst {
-        manifest {
-            attributes(
-                    // Other manifest attributes are added by ii-bda
-                    'Main-Class': 'de.interactive_instruments.etf.bsxm.TopoX',
-            )
-        }
-    }
 	archiveName = "topox.jar"
 }
 
@@ -102,13 +95,18 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 	from javadoc.destinationDir
 }
 
-artifacts {
-	archives sourcesJar
-}
 
-task xar(type: Zip, dependsOn: jar) {
+task xar(type: Jar, dependsOn: jar) {
+	doFirst {
+		manifest {
+			attributes(
+					jar.manifest.getAttributes()
+			)
+		}
+	}
 	group = 'build'
-	archiveName = "TopoX.xar"
+	archiveName = 'TopoX.xar'
+	extension = 'xar'
 	into('topox') {
 		from jar
 		from dependencyLibs
@@ -121,3 +119,11 @@ task xar(type: Zip, dependsOn: jar) {
 	}
 	from file("$projectDir/src/packaging/basex.xml")
 }
+
+
+artifacts {
+	archives sourcesJar
+	archives xar
+}
+
+test.dependsOn = ['xar']
