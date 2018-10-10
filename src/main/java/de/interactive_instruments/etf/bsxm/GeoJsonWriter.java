@@ -168,7 +168,9 @@ class GeoJsonWriter implements Closeable {
 		case FEATURE:
 		case FEATURE_POINT:
 		case COORDINATES_ORIENTATION_SWITCH:
-			throw new IllegalStateException();
+			/**
+			 * No exterior boundary, in this case all boundaries shall be listed as interior boundaries.
+			 */
 		case COORDINATES:
 		case COORDINATES_INTERIOR:
 			writer.write("],[");
