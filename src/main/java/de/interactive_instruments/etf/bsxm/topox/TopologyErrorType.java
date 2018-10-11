@@ -24,15 +24,32 @@ enum TopologyErrorType {
 
 	/**
 	 * Duplicate edges in two features
+	 *
+	 * Outputs:
+	 * - X, Y for the point of failure
+	 * - IS for the existing object that is on the edge
+	 * - N for the object that collides with the existing one
+	 *
+	 * TODO rename to OVERLAPPING_EDGES
 	 */
 	RING_OVERLAPPING_EDGES,
 
 	/**
-	 * 	Ring intersection in general
-	 * 	Todo describe cases
+	 * 	Ring intersection
+	 *
+	 * 	Outputs:
+	 * 	- X, Y for the point of failure
+	 * 	- IS for the object where the intersection has been detected
+	 * 	- CW for the object which is clockwise from the error
+	 * 	- CCW for the object which is counter-clockwise from the error
+	 *
+	 * 	TODO rename to INTERSECTION
 	 */
 	RING_INTERSECTION,
 
+
+	//////////////////////////////////////////////////////////////////////////
+	// Deprecated and removed later
 	/**
 	 * The curve orientation of the outer ring is invalid
 	 */
@@ -50,9 +67,11 @@ enum TopologyErrorType {
 
 	/**
 	 * Innter ring intersection in general
-	 * Todo describe cases
 	 */
 	INTERIOR_INTERSECTION,
+	//////////////////////////////////////////////////////////////////////////
+
+
 
 	// Subsequent errors that may occur due to previous errors
 	// -or generally errors that indicate invalid data.
