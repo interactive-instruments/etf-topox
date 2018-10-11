@@ -45,7 +45,7 @@ public class TopoXTest {
 	private final static IFile ddtDirectory = new IFile("src/test/resources/ddt");
 	private final static IFile outputDirectory = new IFile("build/tmp/ddt/results");
 	private final static IFile tmpOutputDirectory = new IFile("build/tmp/ddt/tmp_outputs");
-	private final static String TOPOX_INSTALL_PATH = "build/distributions/TopoX.xar";
+	private final static String TOPOX_INSTALL_PATH = "build/libs/TopoX.xar";
 	private final static String DB_NAME = "TOPOX-JUNIT-TEST-DB-000";
 
 	@BeforeAll
