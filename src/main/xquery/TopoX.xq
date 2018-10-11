@@ -1,7 +1,7 @@
 (:~
 
  : ---------------------------------------
- : TopoX XQuery Function Library Wrapper
+ : TopoX XQuery Function Library Facade
  : ---------------------------------------
 
  : Copyright (C) 2018 interactive instruments GmbH
@@ -131,7 +131,7 @@ declare function topox:feature($compressedValue as xs:long) as node() {
  : @return nothing
  :)
 declare function topox:export-erroneous-features-to-geojson($topologyId as xs:int, $attachmentId as xs:string) as empty-sequence() {
-        let $topoErrors := topox:topological-errors($topologyId)/e[@t = "RING_INTERSECTION"]
+        let $topoErrors := topox:topological-errors($topologyId)/e[not(@t = "EDGE_NOT_FOUND" or @t = "INVALID_ANGLE")]
         return (
             topox:export-error-points($topologyId, $topoErrors),
             topox:export-features($topologyId, $topoErrors),
@@ -144,34 +144,63 @@ declare %private function topox:error-message($error as node()) as xs:string {
     let $isFeature := topox:feature($error/IS[1]/text())
     let $isGmlId := string($is/../../../../@gml:id)
     let $isFeatureId := xs:string($isFeature/@gml:id)
-    let $mesg1 := "\u00DCberlappung oder \u00DCberschneidung bei Punkt <br/>" || $error/X || " " || $error/Y ||
-        "<br/> am Objekt '" || 
-        $isFeatureId || "' <br/> bei Geometrie <br/> '" || $isGmlId  || "' aufgetreten : "
 
-    let $mesg2 :=
-    if ($error/CW[1]/text() != 0)
-        then
-            let $cwFeature := topox:feature($error/CW[1]/text())
-            return
-                let $cw := topox:geometric-object( $error/CW[1]/text() )
-                let $cwGmlId := string($cw/../../../../@gml:id)
-                let $cwFeatureId := xs:string($cwFeature/@gml:id)
-                return " <br/> angrenzendes Objekt '" || $cwFeatureId ||
-                "' <br/> mit Geometrie  '" || $cwGmlId || "'"
-        else ""
+    return if( $error/@t = 'RING_OVERLAPPING_EDGES') then
+        let $mesg1 := "\u00DCberlappung im Linienverlauf zu Punkt <br/>" || $error/X || " " || $error/Y ||
+            "<br/> am Objekt '" ||
+            $isFeatureId || "' <br/> bei Geometrie <br/> '" || $isGmlId  || "' mit dem "
+        let $mesg2 :=
+                if ($error/O[1]/text() != 0)
+                    then
+                        let $overlappingFeature := topox:feature($error/O[1]/text())
+                        return
+                            let $overlapping := topox:geometric-object( $error/O[1]/text() )
+                            let $overlappingGmlId := string($overlapping/../../../../@gml:id)
+                            let $overlappingFeatureId := xs:string($overlappingFeature/@gml:id)
+                            return " <br/> Objekt '" || $overlappingFeatureId ||
+                            "' <br/> mit Geometrie  '" || $overlappingGmlId || "' aufgetreten"
+                    else ""
+        return $mesg1 || $mesg2
+    else if( $error/@t = 'INNER_RING_SELF_INTERSECTION') then
+                 let $mesg1 := "Selbstschnitt im Linienverlauf zu Punkt <br/>" || $error/X || " " || $error/Y ||
+                     "<br/> am Objekt '" ||
+                     $isFeatureId || "' <br/> bei Geometrie <br/> '" || $isGmlId  || "' mit "
+                 let $mesg2 :=
+                         if ($error/O[1]/text() != 0)
+                             then
+                                 let $overlapping := topox:geometric-object( $error/O[1]/text() )
+                                 let $overlappingGmlId := string($overlapping/../../../../@gml:id)
+                                 return "' <br/> mit Geometrie  '" || $overlappingGmlId || "' aufgetreten"
+                             else ""
+                 return $mesg1 || $mesg2
+    else
+        let $mesg1 := "\u00DCberlappung oder \u00DCberschneidung im Linienverlauf zu Punkt <br/>" || $error/X || " " || $error/Y ||
+            "<br/> am Objekt '" ||
+            $isFeatureId || "' <br/> bei Geometrie <br/> '" || $isGmlId  || "' aufgetreten : "
+        let $mesg2 :=
+        if ($error/CW[1]/text() != 0)
+            then
+                let $cwFeature := topox:feature($error/CW[1]/text())
+                return
+                    let $cw := topox:geometric-object( $error/CW[1]/text() )
+                    let $cwGmlId := string($cw/../../../../@gml:id)
+                    let $cwFeatureId := xs:string($cwFeature/@gml:id)
+                    return " <br/> angrenzendes Objekt '" || $cwFeatureId ||
+                    "' <br/> mit Geometrie  '" || $cwGmlId || "'"
+            else ""
 
-    let $mesg3 :=
-    if ($error/CCW[1]/text() != 0)
-        then
-            let $ccwFeature := topox:feature($error/CCW[1]/text())
-            return
-                let $ccw := topox:geometric-object($error/CCW[1]/text())
-                let $ccwGmlId := string($ccw/../../../../@gml:id)
-                let $ccwFeatureId := xs:string($ccwFeature/@gml:id)
-                return " <br/> angrenzendes Objekt '" || $ccwFeatureId ||
-                "' <br/> mit Geometrie  '" || $ccwGmlId || "'"
-        else ""
-    return $mesg1 || $mesg2 || $mesg3
+        let $mesg3 :=
+        if ($error/CCW[1]/text() != 0)
+            then
+                let $ccwFeature := topox:feature($error/CCW[1]/text())
+                return
+                    let $ccw := topox:geometric-object($error/CCW[1]/text())
+                    let $ccwGmlId := string($ccw/../../../../@gml:id)
+                    let $ccwFeatureId := xs:string($ccwFeature/@gml:id)
+                    return " <br/> angrenzendes Objekt '" || $ccwFeatureId ||
+                    "' <br/> mit Geometrie  '" || $ccwGmlId || "'"
+            else ""
+        return $mesg1 || $mesg2 || $mesg3
 };
 
 declare %private function topox:export-error-points($topologyId as xs:int, $topoErrors as item()*) as empty-sequence() {
@@ -183,7 +212,7 @@ declare %private function topox:export-error-points($topologyId as xs:int, $topo
 declare %private function topox:export-features($topologyId as xs:int, $topoErrors as item()*) as empty-sequence() {
     
     let $objectMap := map:merge(
-            for $errObj in $topoErrors/*[local-name() = ('IS', 'CW', 'CCW')]/text()
+            for $errObj in $topoErrors/*[local-name() = ('IS', 'CW', 'CCW', 'O')]/text()
             where $errObj != 0
         return map:entry(java:objPreAsGeoPre(xs:long($errObj)),()))
     let $objects := map:for-each($objectMap, function($pre, $o) { topox:geometric-object($pre) } )
