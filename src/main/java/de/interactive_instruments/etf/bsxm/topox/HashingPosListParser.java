@@ -24,7 +24,6 @@ package de.interactive_instruments.etf.bsxm.topox;
 public class HashingPosListParser implements PosListParser {
 
 	private double previousOrdinate;
-	private long previousCoordinateHash;
 	private boolean threeDCoordinates = false;
 
 	private static final long FNV_64_INIT = 0xcbf29ce484222325L;
@@ -87,21 +86,24 @@ public class HashingPosListParser implements PosListParser {
 		@Override
 		public void nextGeometricObject() {
 			i = 0;
-			handler.nextGeometricObject();
 		}
 	}
 
-	private static class PassThroughHandlerStrategy implements HashingSegmentHandler {
+	private static class HashingPassThroughHandlerStrategy implements HashingSegmentHandler {
 
 		private final HashingSegmentHandler handler;
+		private long previousCoordinateHash;
 
-		private PassThroughHandlerStrategy(final HashingSegmentHandler handler) {
+		private HashingPassThroughHandlerStrategy(final HashingSegmentHandler handler) {
 			this.handler = handler;
 		}
 
 		@Override
 		public void coordinate2d(final double x, final double y, final long hash, final long location, final int type) {
-			handler.coordinate2d(x, y, hash, location, type);
+			if (hash != previousCoordinateHash) {
+				handler.coordinate2d(x, y, hash, location, type);
+				previousCoordinateHash = hash;
+			}
 		}
 
 		@Override
@@ -111,16 +113,16 @@ public class HashingPosListParser implements PosListParser {
 
 		@Override
 		public void nextGeometricObject() {
-			handler.nextGeometricObject();
+			previousCoordinateHash = Long.MAX_VALUE;
 		}
 	}
 
 	public HashingPosListParser(final HashingSegmentHandler hashingSegmentHandler) {
 		geoTypeHandlerStrategies = new HashingSegmentHandler[3];
 		geoTypeHandlerStrategies[0] = hashingSegmentHandler;
-		// geoTypeHandlerStrategies[1]= new BufferedGeoArcHandlerStrategy(hashingSegmentHandler);
-		geoTypeHandlerStrategies[1] = new PassThroughHandlerStrategy(hashingSegmentHandler);
-		geoTypeHandlerStrategies[2] = new PassThroughHandlerStrategy(hashingSegmentHandler);
+		geoTypeHandlerStrategies[1]= new BufferedGeoArcHandlerStrategy(hashingSegmentHandler);
+		// geoTypeHandlerStrategies[1] = new HashingPassThroughHandlerStrategy(hashingSegmentHandler);
+		geoTypeHandlerStrategies[2] = new HashingPassThroughHandlerStrategy(hashingSegmentHandler);
 	}
 
 	@Override
@@ -218,10 +220,7 @@ public class HashingPosListParser implements PosListParser {
 			}
 
 			if (++ordinateCounter % 2 == 0) {
-				if (hash != previousCoordinateHash) {
-					segmentHandler.coordinate2d(previousOrdinate, positiveSign ? number : -number, hash, location, geoType);
-					previousCoordinateHash = hash;
-				}
+				segmentHandler.coordinate2d(previousOrdinate, positiveSign ? number : -number, hash, location, geoType);
 				hash = FNV_64_INIT;
 			} else {
 				previousOrdinate = positiveSign ? number : -number;
@@ -313,10 +312,7 @@ public class HashingPosListParser implements PosListParser {
 			}
 
 			if (++ordinateCounter % 2 == 0) {
-				if (hash != previousCoordinateHash) {
-					segmentHandler.coordinate2d(previousOrdinate, positiveSign ? number : -number, hash, location, geoType);
-					previousCoordinateHash = hash;
-				}
+				segmentHandler.coordinate2d(previousOrdinate, positiveSign ? number : -number, hash, location, geoType);
 				hash = FNV_64_INIT;
 			} else {
 				previousOrdinate = positiveSign ? number : -number;
@@ -332,8 +328,9 @@ public class HashingPosListParser implements PosListParser {
 
 	@Override
 	public void nextGeometricObject() {
-		previousCoordinateHash = Long.MAX_VALUE;
 		previousOrdinate = Double.NaN;
 		geoTypeHandlerStrategies[0].nextGeometricObject();
+		geoTypeHandlerStrategies[1].nextGeometricObject();
+		geoTypeHandlerStrategies[2].nextGeometricObject();
 	}
 }
