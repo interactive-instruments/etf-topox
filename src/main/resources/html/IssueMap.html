@@ -12,6 +12,7 @@
     <script src="https://unpkg.com/ol-popup@4.0.0"></script>
     <link rel="stylesheet" href="https://unpkg.com/ol-popup@4.0.0/src/ol-popup.css" />
 
+    <meta charset="utf-8"/>
 
     <style>
         html, body, .map {
@@ -219,6 +220,14 @@
     });
     map.addOverlay(overlay);
 
+    var idCopyContent = 'none';
+
+    document.addEventListener('copy', function(e) {
+        console.log('Copied id: '+idCopyContent);
+        e.clipboardData.setData('text/plain', idCopyContent);
+        e.preventDefault();
+    });
+
     map.on('pointermove', function(evt) {
         if (evt.dragging) {
             return;
@@ -229,6 +238,7 @@
         });
         featureInfo.style.display = id ? '' : 'none';
         featureInfo.innerHTML = id;
+        idCopyContent = id;
 
         var error = map.forEachFeatureAtPixel(pixel, function (feature) {
             return feature.get('e');
