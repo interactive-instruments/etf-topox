@@ -30,12 +30,12 @@ public class TopologyErrorXmlWriter implements TopologyErrorCollector {
 
 	private static final String TOPOX_ERROR_NS = "http://www.interactive-instruments.de/etf/topology-error/1.0";
 	private static final String TOPOX_ERROR_NS_PREFIX = "ete";
-	private final Theme theme;
+	private final String themeName;
 	private final XMLStreamWriter writer;
 	private int counter = 0;
 
-	public TopologyErrorXmlWriter(final Theme theme, final XMLStreamWriter writer) {
-		this.theme = theme;
+	public TopologyErrorXmlWriter(final String themeName, final XMLStreamWriter writer) {
+		this.themeName = themeName;
 		this.writer = writer;
 	}
 
@@ -46,10 +46,7 @@ public class TopologyErrorXmlWriter implements TopologyErrorCollector {
 			writer.writeStartElement(TOPOX_ERROR_NS_PREFIX, "TopologicalErrors", TOPOX_ERROR_NS);
 			writer.setPrefix(TOPOX_ERROR_NS_PREFIX, TOPOX_ERROR_NS);
 			writer.writeNamespace(TOPOX_ERROR_NS_PREFIX, TOPOX_ERROR_NS);
-			writer.writeAttribute("id", theme.getIdentifier());
-			writer.writeAttribute("theme", theme.getName());
-			writer.writeAttribute("geometry", theme.getGeometry());
-			writer.writeAttribute("selection", theme.getSelection());
+			writer.writeAttribute("theme", themeName);
 		} catch (final XMLStreamException e) {
 			throw new IllegalStateException("Initialization failed: ", e);
 		}
@@ -70,7 +67,7 @@ public class TopologyErrorXmlWriter implements TopologyErrorCollector {
 			}
 			writer.writeEndElement();
 		} catch (final XMLStreamException e) {
-			final String message = theme.getName() + " " +
+			final String message = themeName + " " +
 					topologyErrorType.toString() + " : " + SUtils.concatStr(" ", parameter);
 			throw new IllegalStateException("Error writing topological error: " + message, e);
 		}

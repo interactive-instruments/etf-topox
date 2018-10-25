@@ -94,7 +94,6 @@ class BsxDataDrivenTest {
 					.ignoreElementContentWhitespace()
 					.build();
 
-
 			if (diff.hasDifferences()) {
 				final Difference difference = diff.getDifferences().iterator().next();
 				assertEquals(formatter.getControlDetailDescription(difference.getComparison()),
