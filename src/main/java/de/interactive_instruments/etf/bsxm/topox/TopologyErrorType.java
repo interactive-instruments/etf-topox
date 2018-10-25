@@ -47,7 +47,6 @@ enum TopologyErrorType {
 	 */
 	RING_INTERSECTION,
 
-
 	//////////////////////////////////////////////////////////////////////////
 	// Deprecated and removed later
 	/**
@@ -70,8 +69,6 @@ enum TopologyErrorType {
 	 */
 	INTERIOR_INTERSECTION,
 	//////////////////////////////////////////////////////////////////////////
-
-
 
 	// Subsequent errors that may occur due to previous errors
 	// -or generally errors that indicate invalid data.

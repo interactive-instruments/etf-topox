@@ -39,91 +39,92 @@ class TopologyStore implements Topology {
 	}
 
 	private final class FlyweightEdge implements Topology.Edge {
-		private final int i;
+		private final int edgeIndex;
 
-		private FlyweightEdge(final int i) {
-			this.i = i;
+		private FlyweightEdge(final int edgeIndex) {
+			this.edgeIndex = edgeIndex;
 		}
 
 		@Override
 		public Node source() {
-			return new FlyweightNode(i);
+			return new FlyweightNode(edgeIndex);
 		}
 
 		@Override
 		public Node target() {
-			return new FlyweightNode(-i);
+			return new FlyweightNode(-edgeIndex);
 		}
 
 		@Override
 		public double sourceAngle() {
-			if (i > 0) {
-				return TopologyBuilder.getSourceAngle(builder.topology, i);
+			if (edgeIndex > 0) {
+				return TopologyBuilder.getSourceAngle(builder.topology, edgeIndex);
 			} else {
-				return TopologyBuilder.getTargetAngle(builder.topology, -i);
+				return TopologyBuilder.getTargetAngle(builder.topology, -edgeIndex);
 			}
 		}
 
 		@Override
 		public double targetAngle() {
-			if (i > 0) {
-				return TopologyBuilder.getTargetAngle(builder.topology, i);
+			if (edgeIndex > 0) {
+				return TopologyBuilder.getTargetAngle(builder.topology, edgeIndex);
 			} else {
-				return TopologyBuilder.getSourceAngle(builder.topology, -i);
+				return TopologyBuilder.getSourceAngle(builder.topology, -edgeIndex);
 			}
 		}
 
 		@Override
 		public int leftObject() {
-			return getLeftOrRightByIndex(i, OBJ_OFFSET);
+			return getLeftOrRightByIndex(edgeIndex, OBJ_OFFSET);
 		}
 
 		@Override
 		public int rightObject() {
-			return getLeftOrRightByIndex(-i, OBJ_OFFSET);
-		}
-
-		@Override
-		public int object() {
-			return 0;
+			return getLeftOrRightByIndex(-edgeIndex, OBJ_OFFSET);
 		}
 
 		@Override
 		public Edge sourceCcwNext() {
-			return new FlyweightEdge(getLeftOrRightByIndex(i, CCWI_OFFSET));
+			return new FlyweightEdge(getLeftOrRightByIndex(edgeIndex, CCWI_OFFSET));
 		}
 
 		@Override
 		public Edge targetCcwNext() {
-			return new FlyweightEdge(getLeftOrRightByIndex(-i, CCWI_OFFSET));
+			return new FlyweightEdge(getLeftOrRightByIndex(-edgeIndex, CCWI_OFFSET));
+		}
+
+		@Override
+		public Edge edge(Topology.Node node) {
+			final int targetEdgeIndex = ((FlyweightNode) node).edgeIndex;
+			return edgeByIndex(edgeIndex, targetEdgeIndex);
 		}
 
 		@Override
 		public String toString() {
-			return source().toString() + " -> " + target().toString() + " @ " + i;
+			return source().toString() + " -> " + target().toString() + " @ " + edgeIndex;
 		}
 	}
 
 	private final class FlyweightNode implements Topology.Node {
-		private final int i;
+		private final int edgeIndex;
 
-		private FlyweightNode(final int i) {
-			this.i = i;
+		private FlyweightNode(final int edgeIndex) {
+			this.edgeIndex = edgeIndex;
 		}
 
 		@Override
 		public Edge anEdge() {
-			return new FlyweightEdge(i);
+			return new FlyweightEdge(edgeIndex);
 		}
 
 		@Override
 		public double x() {
-			return builder.coordinates.getQuick(getLeftOrRightByIndex(i, COORDINATE_OFFSET));
+			return builder.coordinates.getQuick(getLeftOrRightByIndex(edgeIndex, COORDINATE_OFFSET));
 		}
 
 		@Override
 		public double y() {
-			return builder.coordinates.getQuick(getLeftOrRightByIndex(i, COORDINATE_OFFSET) + 1);
+			return builder.coordinates.getQuick(getLeftOrRightByIndex(edgeIndex, COORDINATE_OFFSET) + 1);
 		}
 
 		@Override
@@ -139,12 +140,12 @@ class TopologyStore implements Topology {
 	}
 
 	int size() {
-		return (builder.topology.size() - TopologyBuilder.TOPOLOGY_FIELDS_SIZE) / TopologyBuilder.TOPOLOGY_FIELDS_SIZE;
+		return builder.size();
 	}
 
 	@Override
 	public String getName() {
-		return builder.theme.getName();
+		return builder.themeName;
 	}
 
 	public double[] bbox() {
@@ -168,7 +169,39 @@ class TopologyStore implements Topology {
 
 	@Override
 	public Edge edge(final double xSource, final double ySource, final double xTarget, final double yTarget) {
-		throw new IllegalStateException("Not implemented yet");
+		final int sourceEdgeIndex = builder.getTargetEdge(xSource, ySource);
+		final int targetEdgeIndex = builder.getTargetEdge(xTarget, yTarget);
+		return edgeByIndex(sourceEdgeIndex, targetEdgeIndex);
+	}
+
+	private Edge edgeByIndex(final int sourceEdgeIndex, final int targetEdgeIndex) {
+		if (sourceEdgeIndex == -targetEdgeIndex) {
+			return new FlyweightEdge(targetEdgeIndex);
+		} else {
+			// Use the coordinate indices for comparison
+			final int sourceCoordIndex = getLeftOrRightByIndex(sourceEdgeIndex, COORDINATE_OFFSET);
+			final int targetCoordIndex = getLeftOrRightByIndex(targetEdgeIndex, COORDINATE_OFFSET);
+
+			int ccwNext = sourceEdgeIndex;
+			int ccwNextSourceCoordIndex = getLeftOrRightByIndex(ccwNext, COORDINATE_OFFSET);
+			int ccwNextTargetCoordIndex = getLeftOrRightByIndex(-ccwNext, COORDINATE_OFFSET);
+
+			int i = 0;
+
+			while (++i < 360) {
+				if (ccwNextSourceCoordIndex == sourceCoordIndex && ccwNextTargetCoordIndex == targetCoordIndex) {
+					return new FlyweightEdge(-ccwNext);
+				} else if (ccwNextSourceCoordIndex == targetCoordIndex && ccwNextTargetCoordIndex == sourceCoordIndex) {
+					return new FlyweightEdge(ccwNext);
+				}
+
+				ccwNext = getLeftOrRightByIndex(ccwNext, CCWI_OFFSET);
+				ccwNextSourceCoordIndex = getLeftOrRightByIndex(ccwNext, COORDINATE_OFFSET);
+				ccwNextTargetCoordIndex = getLeftOrRightByIndex(-ccwNext, COORDINATE_OFFSET);
+
+			}
+			return null;
+		}
 	}
 
 	@Override

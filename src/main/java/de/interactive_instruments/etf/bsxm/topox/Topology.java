@@ -24,9 +24,13 @@ public interface Topology {
 
 	String getName();
 
+	/**
+	 * Represents a vertex in the graph
+	 */
 	interface Node {
+
 		/**
-		 * Returns an edge that is connected to this node.
+		 * Returns an edge of which this is a node
 		 *
 		 * @return an edge
 		 */
@@ -34,49 +38,87 @@ public interface Topology {
 
 		/**
 		 * Get X coordinate
-		 * @return
+		 *
+		 * @return X coordinate
 		 */
 		double x();
 
 		/**
 		 * Get Y coordinate
-		 * @return
+		 *
+		 * @return Y coordinate
 		 */
 		double y();
 	}
 
+	/**
+	 * A pair of two adjacent nodes
+	 */
 	interface Edge {
+		/**
+		 * Get the source node of this edge
+		 *
+		 * @return a Node
+		 */
 		Node source();
 
+		/**
+		 * Get the target node of this edge
+		 *
+		 * @return a Node
+		 */
 		Node target();
 
+		/**
+		 * Get the angle of the source node
+		 *
+		 * @return angle in radians
+		 */
 		double sourceAngle();
 
+		/**
+		 * Get the angle of the target node
+		 *
+		 * @return angle in radians
+		 */
 		double targetAngle();
 
 		/**
-		 * Left object
-		 * @return
+		 * Get the ID of the object on the left side
+		 *
+		 * @return encoded ID
 		 */
 		int leftObject();
 
 		/**
-		 * Right object
-		 * @return
+		 * Get the ID of the object on the right side
+		 *
+		 * @return encoded ID
 		 */
 		int rightObject();
 
 		/**
-		 * Object on edge
+		 * Get the next edge counter-clockwise from the source node
 		 *
-		 * @return ID
+		 * @return counter-clockwise edge
 		 */
-		int object();
-
 		Edge sourceCcwNext();
 
+		/**
+		 * Get the next edge counter-clockwise from the target node
+		 *
+		 * @return counter-clockwise edge
+		 */
 		Edge targetCcwNext();
 
+		/**
+		 * Find an edge connected to this edge
+		 *
+		 * @param node source or target node used to find the edge
+		 * @return NULL if the Node is not connected to the
+		 * source or target node of this edge or the connected edge
+		 */
+		Edge edge(Node node);
 	}
 
 	/**
