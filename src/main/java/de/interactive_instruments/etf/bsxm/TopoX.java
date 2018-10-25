@@ -19,7 +19,7 @@ import static de.interactive_instruments.etf.bsxm.topox.TopologyBuilder.compress
 import static de.interactive_instruments.etf.bsxm.topox.TopologyBuilder.getRight;
 
 import java.io.*;
-import java.util.Scanner;
+import java.util.*;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -36,20 +36,51 @@ import de.interactive_instruments.etf.bsxm.topox.*;
 import de.interactive_instruments.exceptions.ExcUtils;
 
 /**
- * TopoX facade
+ * TopoX facade.
+ *
+ * Not thread safe.
  *
  * @author Jon Herrmann ( herrmann aT interactive-instruments doT de )
  */
 public class TopoX {
 
-	private final TopologyErrorCollector[] topologyErrorCollector = new TopologyErrorCollector[5];
-	private final String[] errorFiles = new String[5];
-	private final GeoJsonWriter[] geoJsonWriters = new GeoJsonWriter[5];
-	private final TopologyBuilder[] topologyBuilders = new TopologyBuilder[5];
-	private final PosListParser[] parsers = new HashingPosListParser[5];
-	private int tc = 0;
-	private int dbNameLength = 0;
+	/**
+	 * The Theme object bundles all objects that are used to
+	 * create topological information for one or multiple Features,
+	 * including error handling, parsing and
+	 * building topological data structure.
+	 */
+	private final static class Theme {
+		final String theme;
+		final TopologyErrorCollector topologyErrorCollector;
+		final String errorFile;
+		final GeoJsonWriter geoJsonWriter;
+		final TopologyBuilder topologyBuilder;
+		final PosListParser parser;
+
+		private Theme(final String theme, final TopologyErrorCollector topologyErrorCollector, final String errorFile,
+				final GeoJsonWriter geoJsonWriter, final TopologyBuilder topologyBuilder, final PosListParser parser) {
+			this.theme = theme;
+			this.topologyErrorCollector = topologyErrorCollector;
+			this.errorFile = errorFile;
+			this.geoJsonWriter = geoJsonWriter;
+			this.topologyBuilder = topologyBuilder;
+			this.parser = parser;
+		}
+	}
+
+	private final List<Theme> themes = new ArrayList();
+
+	// Used to check if a theme already exists and to avoid file name conflicts.
+	private final Set<String> themeNames = new HashSet();
+
+	// For example "DB-"
 	private String dbnamePrefix;
+
+	// Length of the database name. 6 for "DB-000"
+	private int dbNameLength = 0;
+
+	// Current BaseX pre value in a context
 	private int currentObjectPre;
 
 	/**
@@ -59,6 +90,7 @@ public class TopoX {
 	 *
 	 * @param name full database name ( i.e. DB-000 )
 	 * @param dbCount number of databases that will be used
+	 *                   TODO: not used yet, use it to pre calculate initialEdgeCapacity
 	 * @return full database name
 	 * @throws BaseXException if database name is not suffixed with a three digits index
 	 */
@@ -85,67 +117,60 @@ public class TopoX {
 	 * Does not override the error output file and writes all errors to System.out.
 	 */
 	@Requires(Permission.CREATE)
-	public int devTopologyBuilder(final String name, final String path,
-			final String identifier, final String geometry, final int initialEdgeCapacity, final String outputDir)
+	public int devTopologyBuilder(final String themeName, final int initialEdgeCapacity, final String outputDir)
 			throws BaseXException {
-		if (tc < 2) {
-			try {
-				final Theme theme = new Theme(name, path, identifier, geometry);
-				final File errorOutputDir = new File(outputDir);
-
-				final IFile geoJsonOutputFile = new IFile(errorOutputDir, theme.getName() + ".js");
-				final GeoJsonWriter writer = new GeoJsonWriter(geoJsonOutputFile);
-				writer.init();
-				this.geoJsonWriters[tc] = writer;
-
-				final File errorOutputFile = new File(errorOutputDir, theme.getName() + ".xml");
-				this.errorFiles[tc] = errorOutputFile.toString();
-
-				topologyBuilders[tc] = new TopologyBuilder(theme, topologyErrorCollector[tc], 16);
-				final XMLOutputFactory xof = XMLOutputFactory.newInstance();
-				topologyErrorCollector[tc] = new TopologyErrorXmlWriter(theme, xof.createXMLStreamWriter(System.out));
-
-				return tc++;
-			} catch (final IOException | XMLStreamException e) {
-				throw new BaseXException(e);
-			}
+		if (!themeNames.add(themeName)) {
+			throw new BaseXException("Invalid theme name: already exists.");
 		}
-		return -1;
+
+		try {
+			final File errorOutputDir = new File(outputDir);
+			final IFile geoJsonOutputFile = new IFile(errorOutputDir, themeName + ".js");
+			final GeoJsonWriter writer = new GeoJsonWriter(geoJsonOutputFile);
+			writer.init();
+
+			final File errorOutputFile = new File(errorOutputDir, themeName + ".xml");
+			final XMLOutputFactory xof = XMLOutputFactory.newInstance();
+			final TopologyErrorXmlWriter topologyErrorCollector = new TopologyErrorXmlWriter(themeName,
+					xof.createXMLStreamWriter(System.out));
+			final TopologyBuilder topologyBuilder = new TopologyBuilder(themeName, topologyErrorCollector, 16);
+
+			themes.add(new Theme(themeName, topologyErrorCollector, errorOutputFile.toString(), writer, topologyBuilder, null));
+			return themes.size()-1;
+		} catch (final IOException | XMLStreamException e) {
+			throw new BaseXException(e);
+		}
 	}
 
 	/**
 	 * Creates a new Topology builder.
 	 */
 	@Requires(Permission.CREATE)
-	public int newTopologyBuilder(final String name, final String path,
-			final String identifier, final String geometry, final int initialEdgeCapacity, final String tmpOutputDir)
+	public int newTopologyBuilder(final String themeName, final int initialEdgeCapacity, final String outputDir)
 			throws BaseXException {
-		if (tc < 5) {
-			try {
-				final Theme theme = new Theme(name, path, identifier, geometry);
-				final XMLOutputFactory xof = XMLOutputFactory.newInstance();
-				final File errorOutputDir = new File(tmpOutputDir);
+		try {
+			final XMLOutputFactory xof = XMLOutputFactory.newInstance();
+			final File errorOutputDir = new File(outputDir);
 
-				final IFile geoJsonOutputFile = new IFile(errorOutputDir, theme.getName() + ".js");
-				final GeoJsonWriter writer = new GeoJsonWriter(geoJsonOutputFile);
-				writer.init();
-				this.geoJsonWriters[tc] = writer;
+			final IFile geoJsonOutputFile = new IFile(errorOutputDir, themeName + ".js");
+			final GeoJsonWriter writer = new GeoJsonWriter(geoJsonOutputFile);
+			writer.init();
 
-				final File errorOutputFile = new File(errorOutputDir, theme.getName() + ".xml");
-				this.errorFiles[tc] = errorOutputFile.toString();
+			final File errorOutputFile = new File(errorOutputDir, themeName + ".xml");
 
-				final XMLStreamWriter streamWriter = xof.createXMLStreamWriter(new FileOutputStream(errorOutputFile), "UTF-8");
-				topologyErrorCollector[tc] = new TopologyErrorXmlWriter(theme, streamWriter);
+			final XMLStreamWriter streamWriter = xof.createXMLStreamWriter(new FileOutputStream(errorOutputFile), "UTF-8");
+			final TopologyErrorXmlWriter topologyErrorCollector = new TopologyErrorXmlWriter(themeName, streamWriter);
 
-				topologyBuilders[tc] = new TopologyBuilder(theme, topologyErrorCollector[tc], initialEdgeCapacity);
-				parsers[tc] = new HashingPosListParser(topologyBuilders[tc]);
-				topologyErrorCollector[tc].init();
-				return tc++;
-			} catch (final IOException | XMLStreamException e) {
-				throw new BaseXException(e);
-			}
+			final TopologyBuilder topologyBuilder = new TopologyBuilder(themeName, topologyErrorCollector, initialEdgeCapacity);
+			final HashingPosListParser parser = new HashingPosListParser(topologyBuilder);
+			topologyErrorCollector.init();
+
+			themes.add(
+					new Theme(themeName, topologyErrorCollector, errorOutputFile.toString(), writer, topologyBuilder, parser));
+			return themes.size()-1;
+		} catch (final IOException | XMLStreamException e) {
+			throw new BaseXException(e);
 		}
-		return -1;
 	}
 
 	/**
@@ -220,18 +245,17 @@ public class TopoX {
 	 */
 	@Requires(Permission.NONE)
 	public void nextInterior(final int id) {
-		topologyBuilders[id].nextInterior();
+		themes.get(id).topologyBuilder.nextInterior();
 	}
 
 	/**
 	 * Switch the Topology Builder to the next geometric object
 	 *
 	 * @param id ID of Topology Builder
-	 * @return input object
 	 */
 	@Requires(Permission.NONE)
 	public void nextGeometricObject(final int id) {
-		parsers[id].nextGeometricObject();
+		themes.get(id).parser.nextGeometricObject();
 	}
 
 	/**
@@ -249,52 +273,61 @@ public class TopoX {
 
 	@Requires(Permission.READ)
 	public void parseSegment(final int id, final DBNode posList, final int type) {
-		parsers[id].parseDirectPositions(posList.data().text(posList.pre(), true), false, genIndex(posList), type);
+		themes.get(id).parser.parseDirectPositions(posList.data().text(posList.pre(), true), false, genIndex(posList), type);
+	}
+
+	@Requires(Permission.NONE)
+	public void onEdge(final int id, final DBNode coordinateNode) throws IOException {
+
+		// todo
+
 	}
 
 	@Requires(Permission.NONE)
 	public String errorFile(final int id) {
-		topologyErrorCollector[id].release();
-		System.out.println(topologyBuilders[id].toString());
-		return this.errorFiles[id];
+		themes.get(id).topologyErrorCollector.release();
+		// TODO propagate as MBean
+		System.out.println(themes.get(id).topologyErrorCollector.toString());
+		return themes.get(id).errorFile;
 	}
 
 	@Requires(Permission.NONE)
 	public void writeGeoJsonPointFeature(final int id, final String errorId, final String error, final String x, final String y)
 			throws IOException {
-		geoJsonWriters[id].writePointFeature(errorId, error, x, y);
+		themes.get(id).geoJsonWriter.writePointFeature(errorId, error, x, y);
 	}
 
 	@Requires(Permission.NONE)
 	public void startGeoJsonFeature(final int id, final String featureId) throws IOException {
-		geoJsonWriters[id].startFeature(featureId);
+		themes.get(id).geoJsonWriter.startFeature(featureId);
 	}
 
 	@Requires(Permission.NONE)
 	public void addGeoJsonCoordinates(final int id, final DBNode coordinateNode) throws IOException {
-		geoJsonWriters[id].addCoordinates(coordinateNode.data().text(coordinateNode.pre(), true));
+		themes.get(id).geoJsonWriter.addCoordinates(coordinateNode.data().text(coordinateNode.pre(), true));
 	}
 
 	@Requires(Permission.NONE)
 	public void nextGeoJsonInterior(final int id) throws IOException {
-		geoJsonWriters[id].nextInterior();
+		themes.get(id).geoJsonWriter.nextInterior();
 	}
 
 	@Requires(Permission.NONE)
 	public void addGeoJsonInteriorCoordinates(final int id, final DBNode coordinateNode) throws IOException {
-		geoJsonWriters[id].addCoordinatesInterior(coordinateNode.data().text(coordinateNode.pre(), true));
+		themes.get(id).geoJsonWriter.addCoordinatesInterior(coordinateNode.data().text(coordinateNode.pre(), true));
 	}
 
 	@Requires(Permission.CREATE)
 	public void attachIssueMap(final int id, final String attachmentId) throws IOException {
 
+		final GeoJsonWriter geoJsonWriter = themes.get(id).geoJsonWriter;
 		try {
-			geoJsonWriters[id].close();
+			geoJsonWriter.close();
 		} catch (final IOException ignore) {
 			ExcUtils.suppress(ignore);
 		}
 
-		final File dir = geoJsonWriters[id].getFile().getParentFile();
+		final File dir = geoJsonWriter.getFile().getParentFile();
 		final IFile attachmentMapFile = new IFile(dir, attachmentId + ".html");
 
 		final InputStream cStream = this.getClass().getResourceAsStream("/html/IssueMap.html");
@@ -308,7 +341,7 @@ public class TopoX {
 		final Scanner s = new Scanner(stream).useDelimiter("\\A");
 		final String result = s.hasNext() ? s.next() : "";
 		attachmentMapFile.writeContent(new StringBuffer(
-				result.replaceAll("'out.js'", "'" + geoJsonWriters[id].getFile().getName() + "'")));
+				result.replaceAll("'out.js'", "'" + geoJsonWriter.getFile().getName() + "'")));
 	}
 
 	private static int makeCompressedNodeIndex(final byte dbIndex, final int objectGeoDiffIndex) {
