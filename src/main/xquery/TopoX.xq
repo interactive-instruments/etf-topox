@@ -47,21 +47,43 @@ declare function topox:init-db($dbName as xs:string, $dbCount as xs:short) as xs
 };
 
 (:~
- : Creates a new object for building a topological data structure
+ : Creates a new object for building a topological data structure.
  :
- : Throws BaseXException if the $tempOutputDir directory cannot be used to write files.
+ : Throws BaseXException
+ : if the $tempOutputDir directory cannot be used to write files or
+ : if the theme name already exists.
  :
  : @param  $topologyName Name of the topology
  : @param  $tempOutputDir directory for storing error information
- : @param  $initialEdgeCapacity expected number of edges, should be 1995000 * number of databases
+ : @param  $initialEdgeCapacity expected number of edges.
+ : This value should be about 1995000 * number of databases (experience value from tests).
+ : The number is used to allocate the data structures accordingly and to increase the performance.
  : @return ID of the topology
  :)
 declare function topox:new-topology($topologyName as xs:string, $tempOutputDir as xs:string, $initialEdgeCapacity as xs:integer) as xs:int {
-    java:newTopologyBuilder($topologyName, 'path', '@gml:id', 'adv:position/gml:Surface', $initialEdgeCapacity, $tempOutputDir)
+    java:newTopologyBuilder($topologyName, $initialEdgeCapacity, $tempOutputDir)
 };
 
+(:~
+ : Creates a new object for building a topological data structure.
+ :
+ : Does not override the error output file and writes all errors to System.out.
+ :
+ : Note: this method can be used for development purposes and is not intended for production use!
+ :
+ : Throws BaseXException
+ : if the $tempOutputDir directory cannot be used to write files or
+ : if the theme name already exists.
+ :
+ : @param  $topologyName Name of the topology
+ : @param  $tempOutputDir directory for storing error information
+ : @param  $initialEdgeCapacity expected number of edges.
+ : This value should be about 1995000 * number of databases (experience value from tests).
+ : The number is used to allocate the data structures accordingly and to increase the performance.
+ : @return ID of the topology
+ :)
 declare function topox:dev-topology($topologyName as xs:string, $tempOutputDir as xs:string, $initialEdgeCapacity as xs:integer) as xs:int {
-    java:devTopologyBuilder($topologyName, 'path', '@gml:id', 'adv:position/gml:Surface', $initialEdgeCapacity, $tempOutputDir)
+    java:devTopologyBuilder($topologyName, $initialEdgeCapacity, $tempOutputDir)
 };
 
 (:~
