@@ -118,6 +118,9 @@ declare function topox:parse-surface($objects as node()*, $path as xs:string, $t
 (:~
  : Returns the document that contains all topological errors found
  :
+ : Note: for performance reasons, this a deterministic function. Calling this
+ : function after changing the error file does not result in a changed output.
+ :
  : @param  $topologyId ID of the topology
  : @return TopologicalErrors node
  :)

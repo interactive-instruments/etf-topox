@@ -283,6 +283,7 @@ public class TopoX {
 
 	}
 
+	@Deterministic
 	@Requires(Permission.NONE)
 	public String errorFile(final int id) {
 		themes.get(id).topologyErrorCollector.release();
