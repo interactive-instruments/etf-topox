@@ -1,11 +1,11 @@
 (:~
-
+ :
  : ---------------------------------------
  : TopoX XQuery Function Library Facade
  : ---------------------------------------
-
+ :
  : Copyright (C) 2018 interactive instruments GmbH
-
+ :
  : Licensed under the EUPL, Version 1.2 or - as soon they will be approved by
  : the European Commission - subsequent versions of the EUPL (the "Licence");
  : You may not use this work except in compliance with the Licence.
@@ -18,10 +18,10 @@
  : WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  : See the Licence for the specific language governing permissions and
  : limitations under the Licence.
-
- : @see     https://docs.etf-validator.net/Developer_manuals/Topox.html
+ :
+ : @see     https://jonherrmann.github.io/etf-topox/Developer_documentation.html (will be changed in future releases)
  : @author  Jon Herrmann ( herrmann aT interactive-instruments doT de )
- 
+ :
  :)
 module namespace topox = 'https://modules.etf-validator.net/topox/1';
 
@@ -29,6 +29,12 @@ import module namespace java = 'java:de.interactive_instruments.etf.bsxm.TopoX';
 
 declare namespace gml='http://www.opengis.net/gml/3.2';
 declare namespace ete='http://www.interactive-instruments.de/etf/topology-error/1.0';
+declare variable $topox:ERROR_CODES := (
+    'RING_OVERLAPPING_EDGES', 'RING_INTERSECTION',
+    'HOLE_EMPTY_INTERIOR', 'FREE_STANDING_SURFACE',
+    'BOUNDARY_POINT_DETACHED', 'BOUNDARY_EDGE_INVALID',
+    'EDGE_NOT_FOUND', 'INVALID_ANGLE'
+);
 
 (:~
  : Initialize the TopoX module with the database name
@@ -51,14 +57,14 @@ declare function topox:init-db($dbName as xs:string, $dbCount as xs:short) as xs
  :
  : Throws BaseXException
  : if the $tempOutputDir directory cannot be used to write files or
- : if the theme name already exists.
+ : if the name name already exists.
  :
- : @param  $topologyName Name of the topology
+ : @param  $topologyName name of the topological name
  : @param  $tempOutputDir directory for storing error information
  : @param  $initialEdgeCapacity expected number of edges.
  : This value should be about 1995000 * number of databases (experience value from tests).
  : The number is used to allocate the data structures accordingly and to increase the performance.
- : @return ID of the topology
+ : @return ID of the topology name
  :)
 declare function topox:new-topology($topologyName as xs:string, $tempOutputDir as xs:string, $initialEdgeCapacity as xs:integer) as xs:int {
     java:newTopologyBuilder($topologyName, $initialEdgeCapacity, $tempOutputDir)
@@ -69,25 +75,31 @@ declare function topox:new-topology($topologyName as xs:string, $tempOutputDir a
  :
  : Does not override the error output file and writes all errors to System.out.
  :
- : Note: this method can be used for development purposes and is not intended for production use!
+ : Note: this method can be used for development purposes and is
+ : not intended for production use! It will be removed in later releases.
  :
  : Throws BaseXException
  : if the $tempOutputDir directory cannot be used to write files or
- : if the theme name already exists.
+ : if the name name already exists.
  :
- : @param  $topologyName Name of the topology
+ : @param  $topologyName name of the topological name
  : @param  $tempOutputDir directory for storing error information
  : @param  $initialEdgeCapacity expected number of edges.
  : This value should be about 1995000 * number of databases (experience value from tests).
  : The number is used to allocate the data structures accordingly and to increase the performance.
- : @return ID of the topology
+ : @return ID of the topology name
  :)
 declare function topox:dev-topology($topologyName as xs:string, $tempOutputDir as xs:string, $initialEdgeCapacity as xs:integer) as xs:int {
     java:devTopologyBuilder($topologyName, $initialEdgeCapacity, $tempOutputDir)
 };
 
+
 (:~
  : Parses GML Surface nodes possessing LineStringSegments and Arcs
+ :
+ : Errors can be retrieved by calling the topological-errors() function.
+ :
+ : Throws BaseXException if the $topologyId is unknown
  :
  : @param   $objects that possess gml surfaces with LineStringSegments and Arcs
  : @param   $path not used yet
@@ -116,17 +128,117 @@ declare function topox:parse-surface($objects as node()*, $path as xs:string, $t
 };
 
 (:~
+ : Checks the topology for free-standing surfaces.
+ :
+ : Must be called after the parse-surface() function.
+ : Errors can be retrieved by calling the topological-errors() function.
+ :
+ : Throws BaseXException if the $topologyId is unknown
+ :
+ : @param   $topologyId ID of the topology to check
+ : @returns the number of free-standing surfaces found or 0 if there is only one outer border
+ :)
+declare function topox:detect-free-standing-surfaces($topologyId as xs:int) as xs:int {
+        let $initTime := prof:current-ms()
+        let $freeStandingSurfacesCount := java:detectFreeStandingSurfaces($topologyId)
+        let $duration := prof:current-ms()-$initTime
+        let $logDummy := prof:dump($freeStandingSurfacesCount || " free-standing surfaces detected in " || $duration || "ms")
+        return $freeStandingSurfacesCount
+};
+
+(:~
+ : Checks the topology for holes.
+ :
+ : Must be called after the parse-surface() function.
+ : Errors can be retrieved by calling the topological-errors() function.
+ :
+ : Throws BaseXException if the $topologyId is unknown
+ :
+ : @param   $topologyId ID of the topology to check
+ : @returns the number of holes found
+ :)
+declare function topox:detect-holes($topologyId as xs:int) as xs:int {
+    let $initTime := prof:current-ms()
+    let $holesCount := java:detectHoles($topologyId)
+    let $duration := prof:current-ms()-$initTime
+    let $logDummy := prof:dump($holesCount || " holes detected in " || $duration || "ms")
+    return $holesCount
+};
+
+(:~
+ : Creates a new object for checking boundaries and their overlapping.
+ :
+ : A boundary is exactly on an edge. There must be no overlap with another boundary
+ : otherwise an error is reported. In order to lay several boundaries over one edge,
+ : several independent boundary checking objects must be created.
+ :
+ : Requires an initialized topology object that has already
+ : captured topological information with the parse-surface() function.
+ : Errors can be retrieved by calling the topological-errors() function.
+ :
+ : Throws BaseXException if the $boundaryId is unknown
+ :
+ : @param  $topologyId ID of the topology
+ : @return ID of the boundary check object
+ :)
+declare function topox:new-boundary-check($topologyId as xs:int) as xs:int {
+    java:newBoundaryBuilder($topologyId)
+};
+
+(:~
+ : Parses an object as boundary.
+ :
+ : If there is another object with the same boundary, an error is reported.
+ :
+ : Requires an initialized boundary check object.
+ : Errors can be retrieved by calling the topological-errors() function.
+ :
+ : Throws BaseXException if the $boundaryId is unknown
+ :
+ : @param   $objects that possess gml surfaces with LineStringSegments and Arcs
+ : @param   $path not used yet
+ : @param   $boundaryId ID of the boundary
+ : @returns nothing
+ :)
+declare function topox:parse-boundary($objects as node()*, $path as xs:string, $boundaryId as xs:int) as empty-sequence() {
+    for $object in $objects
+    (: Todo dynamic path :)
+    for $geometry in java:nextFeature($boundaryId, $object)/*:position/gml:*
+    return
+    (
+        java:nextBoundaryObject($boundaryId),
+        for $geo in $geometry//gml:posList/text()
+        return
+            java:parseBoundary($boundaryId, $geo)
+    )
+};
+
+(:~
  : Returns the document that contains all topological errors found
  :
  : Note: for performance reasons, this a deterministic function. Calling this
- : function after changing the error file does not result in a changed output.
+  : function after changing the error file might not result in a changed output.
  :
  : @param  $topologyId ID of the topology
  : @return TopologicalErrors node
  :)
-declare function topox:topological-errors($topologyId as xs:int) as node() {
+declare function topox:topological-errors-doc($topologyId as xs:int) as node() {
     (: Todo: we will probably have to make some improvements here :)
-    doc(java:errorFile($topologyId))/ete:TopologicalErrors
+    doc(java:errorFile($topologyId))/ete:TopologicalErrors[1]
+};
+
+(:~
+ : Returns all topological error (e) elements from the error document
+ :
+ : Note: for performance reasons, this a deterministic function. Calling this
+ : function after changing the error file might not result in a changed output.
+ :
+ : @param  $topologyId ID of the topology
+ : @param  $errorCodes errorCodes to filter or ()
+ : @return zero or more topological error elements
+ :)
+declare function topox:topological-errors($topologyId as xs:int, $errorCodes as xs:string*) as element()* {
+    topox:topological-errors-doc($topologyId)/e[topox:check-error-code($errorCodes) or @t = $errorCodes]
 };
 
 (:~
@@ -152,11 +264,14 @@ declare function topox:feature($compressedValue as xs:long) as node() {
 (:~
  : Exports features that are part of a topological problem to a GeoJson file
  :
+ : Note: until now mainly used for development purposes. Translations are not supported yet.
+ :
  : @param  $topologyId ID of the topology
+ : @param  $errorCodes errorCodes to filter (optional)
  : @return nothing
  :)
-declare function topox:export-erroneous-features-to-geojson($topologyId as xs:int, $attachmentId as xs:string) as empty-sequence() {
-        let $topoErrors := topox:topological-errors($topologyId)/e[not(@t = "EDGE_NOT_FOUND" or @t = "INVALID_ANGLE")]
+declare function topox:export-erroneous-features-to-geojson($topologyId as xs:int, $attachmentId as xs:string, $errorCodes as xs:string*) as empty-sequence() {
+        let $topoErrors := topox:topological-errors($topologyId,  $errorCodes)[not(@t = ('EDGE_NOT_FOUND', 'INVALID_ANGLE'))]
         return (
             topox:export-error-points($topologyId, $topoErrors),
             topox:export-features($topologyId, $topoErrors),
@@ -164,6 +279,55 @@ declare function topox:export-erroneous-features-to-geojson($topologyId as xs:in
         )
 };
 
+(:~
+ : Exports features that are part of a topological problem to a GeoJson file
+ :
+ : Note: until now mainly used for development purposes. Translations are not supported yet.
+ :
+ : @param  $topologyId ID of the topology
+ : @return nothing
+ :)
+declare function topox:export-erroneous-features-to-geojson($topologyId as xs:int, $attachmentId as xs:string) as empty-sequence() {
+    topox:export-erroneous-features-to-geojson($topologyId, $attachmentId, ())
+};
+
+
+(:~ ---------------------------------------------- PRIVATE FUNCTIONS ---------------------------------------------- :)
+
+(:~
+ : Checks if valid error codes are passed
+ :
+ : Throws an error if a non-empty list of error codes
+ : has been passed and an error code is unknown.
+ :
+ : @param  $errorCodes error code to check
+ : @return true if $errorCodes is empty, false otherwise
+ :)
+declare %private function topox:check-error-code($errorCodes as xs:string*) {
+  if (empty($errorCodes)) then
+    true()
+  else if (not(every $errCode in $errorCodes satisfies $errCode = $topox:ERROR_CODES)) then
+    error(xs:QName('ete:INVALID_ERROR_CODE'), 'invalid error codes ' || $errorCodes)
+  else
+    false()
+};
+
+(:~
+ : Maps an Arc to integer 1 and other types to 2
+ :
+ : @param  $segmentType gml local segment name
+ : @return segment type as int
+ :)
+declare %private function topox:segment-type-to-int($segmentType as xs:string) as xs:int {
+    if ($segmentType eq 'Arc') then
+        xs:int(1)
+    else
+        xs:int(2)
+};
+
+(:~
+ : Export error messages for GeoJson. Only in German, until now...
+ :)
 declare %private function topox:error-message($error as node()) as xs:string {
     let $is := topox:geometric-object( $error/IS[1]/text() )
     let $isFeature := topox:feature($error/IS[1]/text())
@@ -198,6 +362,30 @@ declare %private function topox:error-message($error as node()) as xs:string {
                                  return "' <br/> mit Geometrie  '" || $overlappingGmlId || "' aufgetreten"
                              else ""
                  return $mesg1 || $mesg2
+
+    else if( $error/@t = 'FREE_STANDING_SURFACE') then
+                 "Freistehende Fl\u00E4che bei Punkt <br/>" || $error/X || " " || $error/Y ||
+                     "<br/> am Objekt '" ||
+                     $isFeatureId || "' <br/> bei Geometrie <br/> '" || $isGmlId  || "' erkannt. "
+
+    else if( $error/@t = 'HOLE_EMPTY_INTERIOR') then
+                     "Nicht geschlossene Fl\u00E4che bei Punkt <br/>" || $error/X || " " || $error/Y ||
+                         "<br/> am Objekt '" ||
+                         $isFeatureId || "' <br/> bei Geometrie <br/> '" || $isGmlId  || "' erkannt. "
+
+    else if( $error/@t = 'BOUNDARY_POINT_DETACHED') then
+                     "Der Grenzpunkt <br/>" || $error/X || " " || $error/Y ||
+                         "<br/> am Objekt '" ||
+                         $isFeatureId || "' <br/> bei Geometrie <br/> '" || $isGmlId  ||
+                         "' liegt nicht auf dem Rand eines Gebiets. "
+
+    else if( $error/@t = 'BOUNDARY_EDGE_INVALID') then
+                     "Die Grenzpunkte <br/>" || $error/X || " " || $error/Y ||
+                         "<br/> und " || $error/X2 || " " || $error/Y2 ||
+                         "<br/> am Objekt '" ||
+                         $isFeatureId || "' <br/> bei Geometrie <br/> '" || $isGmlId  ||
+                         "' liegen nicht auf dem Rand eines Gebiets. "
+
     else
         let $mesg1 := "\u00DCberlappung oder \u00DCberschneidung im Linienverlauf zu Punkt <br/>" || $error/X || " " || $error/Y ||
             "<br/> am Objekt '" ||
@@ -228,14 +416,19 @@ declare %private function topox:error-message($error as node()) as xs:string {
         return $mesg1 || $mesg2 || $mesg3
 };
 
+(:~
+ : Export error points for GeoJson
+ :)
 declare %private function topox:export-error-points($topologyId as xs:int, $topoErrors as item()*) as empty-sequence() {
     for $e in $topoErrors
     return
         java:writeGeoJsonPointFeature( $topologyId, string($e/@i), topox:error-message($e), string($e/X), string($e/Y) )
 };
 
+(:~
+ : Export features with errros as GeoJson
+ :)
 declare %private function topox:export-features($topologyId as xs:int, $topoErrors as item()*) as empty-sequence() {
-    
     let $objectMap := map:merge(
             for $errObj in $topoErrors/*[local-name() = ('IS', 'CW', 'CCW', 'O')]/text()
             where $errObj != 0
@@ -259,18 +452,5 @@ declare %private function topox:export-features($topologyId as xs:int, $topoErro
             )
         )
     )
-};
-
-(:~
- : Maps an Arc to integer 1 and other types to 2
- :
- : @param  $segmentType gml local segment name
- : @return segment type as int
- :)
-declare %private function topox:segment-type-to-int($segmentType as xs:string) as xs:int {
-    if ($segmentType eq 'Arc') then
-        xs:int(1)
-    else
-        xs:int(2)
 };
 

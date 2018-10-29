@@ -15,8 +15,10 @@
  */
 package de.interactive_instruments.etf.bsxm.topox;
 
+import java.util.Iterator;
+
 /**
- * Flyweight interface for a Topology
+ * Interface for accessing topological data
  *
  * @author Jon Herrmann ( herrmann aT interactive-instruments doT de )
  */
@@ -28,13 +30,6 @@ public interface Topology {
 	 * Represents a vertex in the graph
 	 */
 	interface Node {
-
-		/**
-		 * Returns an edge of which this is a node
-		 *
-		 * @return an edge
-		 */
-		Edge anEdge();
 
 		/**
 		 * Get X coordinate
@@ -49,6 +44,22 @@ public interface Topology {
 		 * @return Y coordinate
 		 */
 		double y();
+
+		/**
+		 * Returns an edge of which this is a node
+		 *
+		 * @return an edge
+		 */
+		Edge anEdge();
+
+		/**
+		 * Find an edge connected to this node
+		 *
+		 * @param node source or target node used to find the edge
+		 * @return NULL if the Node is not connected to the
+		 * source or target node of this edge or the connected edge
+		 */
+		Edge edge(final Node node);
 	}
 
 	/**
@@ -84,18 +95,32 @@ public interface Topology {
 		double targetAngle();
 
 		/**
-		 * Get the ID of the object on the left side
+		 * Get the internal ID of the object on the left side
 		 *
 		 * @return encoded ID
 		 */
-		int leftObject();
+		int leftInternalObjectId();
 
 		/**
-		 * Get the ID of the object on the right side
+		 * Get the internal ID of the object on the right side
 		 *
 		 * @return encoded ID
 		 */
-		int rightObject();
+		int rightInternalObjectId();
+
+		/**
+		 * Get the object on the left side
+		 *
+		 * @return object
+		 */
+		long leftObject();
+
+		/**
+		 * Get the object on the right side
+		 *
+		 * @return object
+		 */
+		long rightObject();
 
 		/**
 		 * Get the next edge counter-clockwise from the source node
@@ -118,7 +143,7 @@ public interface Topology {
 		 * @return NULL if the Node is not connected to the
 		 * source or target node of this edge or the connected edge
 		 */
-		Edge edge(Node node);
+		Edge edge(final Node node);
 	}
 
 	/**
@@ -128,8 +153,23 @@ public interface Topology {
 	 */
 	double[] bbox();
 
+	/**
+	 * Get an edgy by source X/Y and target X/Y coordinates
+	 *
+	 * @param xSource source X coordinate
+	 * @param ySource source Y coordinate
+	 * @param xTarget target X coordinate
+	 * @param yTarget target Y coordinate
+	 * @return the edge or null if a edge with these coordinates does not exist
+	 */
 	Edge edge(final double xSource, final double ySource, final double xTarget, final double yTarget);
 
+	/**
+	 * Get a node by X/Y coordinate
+	 * @param x X coordinate
+	 * @param y Y coordinate
+	 * @return the node or null if a node with these coordinates does not exist
+	 */
 	Node node(final double x, final double y);
 
 	/**
@@ -137,5 +177,12 @@ public interface Topology {
 	 *
 	 * @return edge iterator
 	 */
-	Iterable<Edge> borders();
+	Iterable<Edge> emptyInteriors();
+
+	/**
+	 * Returns edges of free-standing surfaces
+	 *
+	 * @return edge iterator
+	 */
+	Iterable<Edge> freeStandingSurfaces();
 }

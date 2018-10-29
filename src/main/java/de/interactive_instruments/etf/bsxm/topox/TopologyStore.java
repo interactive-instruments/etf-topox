@@ -16,27 +16,22 @@
 package de.interactive_instruments.etf.bsxm.topox;
 
 import static de.interactive_instruments.etf.bsxm.topox.TopologyBuilder.*;
+import static java.lang.Math.abs;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Iterator;
 
 import de.interactive_instruments.SUtils;
+import gnu.trove.TIntArrayList;
 
 /**
- * Immutable access to topology data
+ * Query topology data
  *
  * @author Jon Herrmann ( herrmann aT interactive-instruments doT de )
  */
 class TopologyStore implements Topology {
-
-	private int getLeftOrRightByIndex(final int index, final int propertyOffset) {
-		if (index > 0) {
-			return getLeft(builder.topology.getQuick(index + propertyOffset));
-		} else {
-			return getRight(builder.topology.getQuick((-index) + propertyOffset));
-		}
-	}
 
 	private final class FlyweightEdge implements Topology.Edge {
 		private final int edgeIndex;
@@ -57,40 +52,47 @@ class TopologyStore implements Topology {
 
 		@Override
 		public double sourceAngle() {
-			if (edgeIndex > 0) {
-				return TopologyBuilder.getSourceAngle(builder.topology, edgeIndex);
-			} else {
-				return TopologyBuilder.getTargetAngle(builder.topology, -edgeIndex);
-			}
+			return builder.getAngleByIndex(edgeIndex);
 		}
 
 		@Override
 		public double targetAngle() {
-			if (edgeIndex > 0) {
-				return TopologyBuilder.getTargetAngle(builder.topology, edgeIndex);
-			} else {
-				return TopologyBuilder.getSourceAngle(builder.topology, -edgeIndex);
+			return builder.getAngleByIndex(-edgeIndex);
+		}
+
+		@Override
+		public int leftInternalObjectId() {
+			return builder.getLeftOrRightByIndex(edgeIndex, OBJ_OFFSET);
+		}
+
+		@Override
+		public int rightInternalObjectId() {
+			return builder.getLeftOrRightByIndex(-edgeIndex, OBJ_OFFSET);
+		}
+
+		@Override
+		public long leftObject() {
+			return builder.getTopologicalData(abs(edgeIndex)+LEFT_LOCATION_INDEX);
+		}
+
+		@Override
+		public long rightObject() {
+			final long right = builder.getTopologicalData(abs(edgeIndex)+RIGHT_LOCATION_INDEX);
+			if(right==Integer.MIN_VALUE) {
+				// check if this is a free-standing surface mark
+				return 0;
 			}
-		}
-
-		@Override
-		public int leftObject() {
-			return getLeftOrRightByIndex(edgeIndex, OBJ_OFFSET);
-		}
-
-		@Override
-		public int rightObject() {
-			return getLeftOrRightByIndex(-edgeIndex, OBJ_OFFSET);
+			return right;
 		}
 
 		@Override
 		public Edge sourceCcwNext() {
-			return new FlyweightEdge(getLeftOrRightByIndex(edgeIndex, CCWI_OFFSET));
+			return new FlyweightEdge(builder.getLeftOrRightByIndex(edgeIndex, CCWI_OFFSET));
 		}
 
 		@Override
 		public Edge targetCcwNext() {
-			return new FlyweightEdge(getLeftOrRightByIndex(-edgeIndex, CCWI_OFFSET));
+			return new FlyweightEdge(builder.getLeftOrRightByIndex(-edgeIndex, CCWI_OFFSET));
 		}
 
 		@Override
@@ -113,18 +115,24 @@ class TopologyStore implements Topology {
 		}
 
 		@Override
+		public double x() {
+			return builder.getCoordinate(builder.getLeftOrRightByIndex(edgeIndex, COORDINATE_OFFSET));
+		}
+
+		@Override
+		public double y() {
+			return builder.getCoordinate(builder.getLeftOrRightByIndex(edgeIndex, COORDINATE_OFFSET) + 1);
+		}
+
+		@Override
 		public Edge anEdge() {
 			return new FlyweightEdge(edgeIndex);
 		}
 
 		@Override
-		public double x() {
-			return builder.coordinates.getQuick(getLeftOrRightByIndex(edgeIndex, COORDINATE_OFFSET));
-		}
-
-		@Override
-		public double y() {
-			return builder.coordinates.getQuick(getLeftOrRightByIndex(edgeIndex, COORDINATE_OFFSET) + 1);
+		public Edge edge(Topology.Node node) {
+			final int targetEdgeIndex = ((FlyweightNode) node).edgeIndex;
+			return edgeByIndex(edgeIndex, targetEdgeIndex);
 		}
 
 		@Override
@@ -158,11 +166,11 @@ class TopologyStore implements Topology {
 		bbox[2] = Double.MAX_VALUE;
 		// ymax
 		bbox[3] = Double.MIN_VALUE;
-		for (int i = 2; i < builder.coordinates.size(); ++i) {
-			bbox[0] = Math.min(builder.coordinates.getQuick(i), bbox[0]);
-			bbox[1] = Math.max(builder.coordinates.getQuick(i), bbox[1]);
-			bbox[2] = Math.min(builder.coordinates.getQuick(++i), bbox[2]);
-			bbox[3] = Math.max(builder.coordinates.getQuick(i), bbox[3]);
+		for (int i = 2; i < builder.internalCoordinateSize(); ++i) {
+			bbox[0] = Math.min(builder.getCoordinate(i), bbox[0]);
+			bbox[1] = Math.max(builder.getCoordinate(i), bbox[1]);
+			bbox[2] = Math.min(builder.getCoordinate(++i), bbox[2]);
+			bbox[3] = Math.max(builder.getCoordinate(i), bbox[3]);
 		}
 		return bbox;
 	}
@@ -179,12 +187,12 @@ class TopologyStore implements Topology {
 			return new FlyweightEdge(targetEdgeIndex);
 		} else {
 			// Use the coordinate indices for comparison
-			final int sourceCoordIndex = getLeftOrRightByIndex(sourceEdgeIndex, COORDINATE_OFFSET);
-			final int targetCoordIndex = getLeftOrRightByIndex(targetEdgeIndex, COORDINATE_OFFSET);
+			final int sourceCoordIndex = builder.getLeftOrRightByIndex(sourceEdgeIndex, COORDINATE_OFFSET);
+			final int targetCoordIndex = builder.getLeftOrRightByIndex(targetEdgeIndex, COORDINATE_OFFSET);
 
 			int ccwNext = sourceEdgeIndex;
-			int ccwNextSourceCoordIndex = getLeftOrRightByIndex(ccwNext, COORDINATE_OFFSET);
-			int ccwNextTargetCoordIndex = getLeftOrRightByIndex(-ccwNext, COORDINATE_OFFSET);
+			int ccwNextSourceCoordIndex = builder.getLeftOrRightByIndex(ccwNext, COORDINATE_OFFSET);
+			int ccwNextTargetCoordIndex = builder.getLeftOrRightByIndex(-ccwNext, COORDINATE_OFFSET);
 
 			int i = 0;
 
@@ -195,9 +203,9 @@ class TopologyStore implements Topology {
 					return new FlyweightEdge(ccwNext);
 				}
 
-				ccwNext = getLeftOrRightByIndex(ccwNext, CCWI_OFFSET);
-				ccwNextSourceCoordIndex = getLeftOrRightByIndex(ccwNext, COORDINATE_OFFSET);
-				ccwNextTargetCoordIndex = getLeftOrRightByIndex(-ccwNext, COORDINATE_OFFSET);
+				ccwNext = builder.getLeftOrRightByIndex(ccwNext, CCWI_OFFSET);
+				ccwNextSourceCoordIndex = builder.getLeftOrRightByIndex(ccwNext, COORDINATE_OFFSET);
+				ccwNextTargetCoordIndex = builder.getLeftOrRightByIndex(-ccwNext, COORDINATE_OFFSET);
 
 			}
 			return null;
@@ -206,12 +214,91 @@ class TopologyStore implements Topology {
 
 	@Override
 	public Node node(final double x, final double y) {
-		return new FlyweightNode(builder.getTargetEdge(x, y));
+		final int edgeIndex = builder.getTargetEdge(x, y);
+		if(edgeIndex!=-1) {
+			return new FlyweightNode(edgeIndex);
+		}else{
+			return null;
+		}
 	}
 
 	@Override
-	public Iterable<Edge> borders() {
-		return null;
+	public Iterable<Edge> emptyInteriors() {
+		final int maxPos = builder.internalTopologicalDataSize();
+		return () -> new Iterator<Edge>() {
+			int currentPos = findNextInterior(TOPOLOGY_FIELDS_SIZE);
+
+			private int findNextInterior(final int currentPos) {
+				for (int i = currentPos+RIGHT_LOCATION_INDEX; i < builder.internalTopologicalDataSize(); i+=TOPOLOGY_FIELDS_SIZE) {
+					// Check if an object is set on the right side
+					if(builder.getTopologicalData(i)==0) {
+						// Check if this is an interior edge
+						final long obj = builder.getTopologicalData(i-RIGHT_LOCATION_INDEX+OBJ_OFFSET);
+						if(getLeft(obj)<0) {
+							return i-RIGHT_LOCATION_INDEX;
+						}
+					}
+				}
+				return maxPos;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return currentPos+TOPOLOGY_FIELDS_SIZE<maxPos;
+			}
+
+			@Override
+			public Edge next() {
+				final Edge edge = new FlyweightEdge(currentPos);
+				currentPos = findNextInterior(currentPos+TOPOLOGY_FIELDS_SIZE);
+				return edge;
+			}
+		};
+	}
+
+
+	@Override
+	public Iterable<Edge> freeStandingSurfaces() {
+
+		// The edge index of the found free-standing surfaces
+		final TIntArrayList firstFoundFreeStandingSurfaceEdges = new TIntArrayList();
+
+		// The size of length of the free-standing surfaces
+		// It is naively assumed that the surface with the most edges is the larger one.
+		final TIntArrayList freeStandingSurfaceEdgeSize = new TIntArrayList();
+
+		builder.findFreeStandingSurfaces(firstFoundFreeStandingSurfaceEdges, freeStandingSurfaceEdgeSize);
+		if(freeStandingSurfaceEdgeSize.size()>0) {
+			int maxPos=0;
+			int max=freeStandingSurfaceEdgeSize.get(maxPos);
+			if(firstFoundFreeStandingSurfaceEdges.size()>1) {
+				// find max
+				for (int i = 1; i < freeStandingSurfaceEdgeSize.size(); i++) {
+					final int cur = freeStandingSurfaceEdgeSize.get(i);
+					if(cur>max) {
+						max=cur;
+						maxPos=i;
+					}
+				}
+			}
+			firstFoundFreeStandingSurfaceEdges.remove(maxPos);
+		}
+
+		final int maxPos = firstFoundFreeStandingSurfaceEdges.size();
+
+		return () -> new Iterator<Edge>() {
+			int currentPos = 0;
+
+			@Override
+			public boolean hasNext() {
+				return currentPos<maxPos;
+			}
+
+			@Override
+			public Edge next() {
+				return new FlyweightEdge(firstFoundFreeStandingSurfaceEdges.get(currentPos++));
+			}
+		};
 	}
 
 	@Override
@@ -220,7 +307,7 @@ class TopologyStore implements Topology {
 		sb.append("edges=");
 		sb.append(size());
 		sb.append(", coordinates=");
-		sb.append((builder.coordinates.size() - 2) / 2);
+		sb.append((builder.internalCoordinateSize() - 2) / 2);
 		sb.append('}');
 		return sb.toString();
 	}
@@ -253,62 +340,62 @@ class TopologyStore implements Topology {
 		writer.append(endlSeperator);
 
 		writer.flush();
-		for (int i = TopologyBuilder.TOPOLOGY_FIELDS_SIZE; i < builder.topology.size(); i++) {
+		for (int i = TopologyBuilder.TOPOLOGY_FIELDS_SIZE; i < builder.internalTopologicalDataSize(); i++) {
 			// Edge ID
 			writer.append(Integer.toString(i));
 			writer.append(seperator);
 
 			// Source X Coordinate
-			final int sourceCoordIndex = getLeft(builder.topology.getQuick(i));
-			writer.append(Double.toString(builder.coordinates.getQuick(sourceCoordIndex)));
+			final int sourceCoordIndex = getLeft(builder.getTopologicalData(i));
+			writer.append(Double.toString(builder.getCoordinate(sourceCoordIndex)));
 			writer.append(' ');
 
 			// Source Y Coordinate
-			writer.append(Double.toString(builder.coordinates.getQuick(sourceCoordIndex + 1)));
+			writer.append(Double.toString(builder.getCoordinate(sourceCoordIndex + 1)));
 			writer.append(seperator);
 
 			// Target X Coordinate
-			final int targetCoordIndex = getRight(builder.topology.getQuick(i));
-			writer.append(Double.toString(builder.coordinates.getQuick(targetCoordIndex)));
+			final int targetCoordIndex = getRight(builder.getTopologicalData(i));
+			writer.append(Double.toString(builder.getCoordinate(targetCoordIndex)));
 			writer.append(' ');
 
 			// Target Y Coordinate
-			writer.append(Double.toString(builder.coordinates.getQuick(targetCoordIndex + 1)));
+			writer.append(Double.toString(builder.getCoordinate(targetCoordIndex + 1)));
 			writer.append(seperator);
 			++i;
 
 			// Start angle
-			writer.append(Double.toString(Math.toDegrees(Double.longBitsToDouble(builder.topology.getQuick(i++)))));
+			writer.append(Double.toString(Math.toDegrees(Double.longBitsToDouble(builder.getTopologicalData(i++)))));
 			writer.append(seperator);
 
 			// Target angle
-			writer.append(Double.toString(Math.toDegrees(Double.longBitsToDouble(builder.topology.getQuick(i++)))));
+			writer.append(Double.toString(Math.toDegrees(Double.longBitsToDouble(builder.getTopologicalData(i++)))));
 			writer.append(seperator);
 
 			// CCW next from start
-			writer.append(Integer.toString(getLeft(builder.topology.getQuick(i))));
+			writer.append(Integer.toString(getLeft(builder.getTopologicalData(i))));
 			writer.append(seperator);
 
 			// CCW next from end
-			writer.append(Integer.toString(getRight(builder.topology.getQuick(i++))));
+			writer.append(Integer.toString(getRight(builder.getTopologicalData(i++))));
 			writer.append(seperator);
 
 			// Left object
-			final int leftObjectIndex = getLeft(builder.topology.getQuick(i));
+			final int leftObjectIndex = getLeft(builder.getTopologicalData(i));
 			writer.append(Integer.toString(leftObjectIndex));
 			writer.append(seperator);
 
 			// Right object
-			final int rightObjectIndex = getRight(builder.topology.getQuick(i));
+			final int rightObjectIndex = getRight(builder.getTopologicalData(i));
 			writer.append(Integer.toString(rightObjectIndex));
 			writer.append(seperator);
 
 			// Left object XPath
-			writer.append(Long.toString(builder.topology.getQuick(++i)));
+			writer.append(Long.toString(builder.getTopologicalData(++i)));
 			writer.append(seperator);
 
 			// Right object XPath
-			writer.append(Long.toString(builder.topology.getQuick(++i)));
+			writer.append(Long.toString(builder.getTopologicalData(++i)));
 			writer.append(endlSeperator);
 		}
 		writer.flush();

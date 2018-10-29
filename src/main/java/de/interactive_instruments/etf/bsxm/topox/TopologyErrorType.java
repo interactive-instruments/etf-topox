@@ -16,7 +16,7 @@
 package de.interactive_instruments.etf.bsxm.topox;
 
 /**
- * Todo: discuss error types and document it
+ * TopoX error types
  *
  * @author Jon Herrmann ( herrmann aT interactive-instruments doT de )
  */
@@ -28,9 +28,9 @@ enum TopologyErrorType {
 	 * Outputs:
 	 * - X, Y for the point of failure
 	 * - IS for the existing object that is on the edge
-	 * - N for the object that collides with the existing one
+	 * - O for the object that collides with the existing one
 	 *
-	 * TODO rename to OVERLAPPING_EDGES
+	 * TODO rename to TOPO_OVERLAPPING_EDGES
 	 */
 	RING_OVERLAPPING_EDGES,
 
@@ -43,9 +43,53 @@ enum TopologyErrorType {
 	 * 	- CW for the object which is clockwise from the error
 	 * 	- CCW for the object which is counter-clockwise from the error
 	 *
-	 * 	TODO rename to INTERSECTION
+	 * 	TODO rename to TOPO_INTERSECTION
 	 */
 	RING_INTERSECTION,
+
+	/**
+	 * 	Hole
+	 *
+	 * 	Outputs:
+	 * 	- X, Y for the point of failure
+	 * 	- IS for the object where the hole has been detected
+	 */
+	HOLE_EMPTY_INTERIOR,
+
+	/**
+	 * 	Free standing surface
+	 *
+	 * 	Outputs:
+	 * 	- X, Y for the point of failure
+	 * 	- IS for the object where the free standing surface has been detected
+	 */
+	FREE_STANDING_SURFACE,
+
+	/**
+	 * Detached boundary point
+	 *
+	 * A boundary point was defined that could not be found in the
+	 * topological data.
+	 *
+	 * Outputs:
+	 * - X, Y for the point of failure
+	 * - IS for the object that defined the boundary
+	 */
+	BOUNDARY_POINT_DETACHED,
+
+	/**
+	 * Invalid boundary edge
+	 *
+	 * Edge points have been found but the points
+	 * are not connected.
+	 *
+	 * Outputs:
+	 * - X, Y for the point of failure
+	 * - IS for the object that defined the boundary
+	 * - X2, Y2 for the second point of failure
+	 */
+	BOUNDARY_EDGE_INVALID,
+
 
 	//////////////////////////////////////////////////////////////////////////
 	// Deprecated and removed later
@@ -81,14 +125,19 @@ enum TopologyErrorType {
 	//////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * The edge cannot be found. This most likely
-	 * will happen if there are previous errors in the geometric object.
+	 * An edge could not be found. This is most likely a consequential
+	 * error if others occurred and for instance the connection between
+	 * two points has been invalidated in the data structure. If this is
+	 * the only type of error that occurred, then this may indicate a
+	 * bug in the software.
 	 */
 	EDGE_NOT_FOUND,
 
 	/**
-	 * Calculated edges of a node are invalid. This most likely
-	 * will happen if previous edges of the geometric object are invalid.
+	 * An error occurred while connecting an additional edge to a point.
+	 * Attempting to traverse the angles of all connected edges has exceeded
+	 * the maximum number of possible steps. If this is the only type of
+	 * error that occurred, then this may indicate a bug in the software.
 	 */
 	INVALID_ANGLE
 

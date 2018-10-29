@@ -46,7 +46,7 @@ public class TopologyErrorXmlWriter implements TopologyErrorCollector {
 			writer.writeStartElement(TOPOX_ERROR_NS_PREFIX, "TopologicalErrors", TOPOX_ERROR_NS);
 			writer.setPrefix(TOPOX_ERROR_NS_PREFIX, TOPOX_ERROR_NS);
 			writer.writeNamespace(TOPOX_ERROR_NS_PREFIX, TOPOX_ERROR_NS);
-			writer.writeAttribute("theme", themeName);
+			writer.writeAttribute("name", themeName);
 		} catch (final XMLStreamException e) {
 			throw new IllegalStateException("Initialization failed: ", e);
 		}

@@ -44,35 +44,13 @@ import de.interactive_instruments.exceptions.ExcUtils;
  */
 public class TopoX {
 
-	/**
-	 * The Theme object bundles all objects that are used to
-	 * create topological information for one or multiple Features,
-	 * including error handling, parsing and
-	 * building topological data structure.
-	 */
-	private final static class Theme {
-		final String theme;
-		final TopologyErrorCollector topologyErrorCollector;
-		final String errorFile;
-		final GeoJsonWriter geoJsonWriter;
-		final TopologyBuilder topologyBuilder;
-		final PosListParser parser;
-
-		private Theme(final String theme, final TopologyErrorCollector topologyErrorCollector, final String errorFile,
-				final GeoJsonWriter geoJsonWriter, final TopologyBuilder topologyBuilder, final PosListParser parser) {
-			this.theme = theme;
-			this.topologyErrorCollector = topologyErrorCollector;
-			this.errorFile = errorFile;
-			this.geoJsonWriter = geoJsonWriter;
-			this.topologyBuilder = topologyBuilder;
-			this.parser = parser;
-		}
-	}
-
+	// Used to check if a name already exists and to avoid file name conflicts.
+	private final Set<String> themeNames = new HashSet();
 	private final List<Theme> themes = new ArrayList();
 
-	// Used to check if a theme already exists and to avoid file name conflicts.
-	private final Set<String> themeNames = new HashSet();
+	// Used to avoid conflicts between the Theme and BoundaryBuilder IDs
+	private final static int BOUNDARY_ID_OFFSET = 4096;
+	private final List<BoundaryBuilder> boundaries = new ArrayList();
 
 	// For example "DB-"
 	private String dbnamePrefix;
@@ -112,10 +90,66 @@ public class TopoX {
 		return name;
 	}
 
+
+	// Builder creation
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Creates a new topology builder
+	 *
+	 * @param themeName name of the topological name
+	 * @param initialEdgeCapacity xpected number of edges.
+	 *                               This value should be about 1995000 * number of databases
+	 *                               (experience value from tests). The number is used to allocate
+	 *                               the data structures accordingly and to increase the performance.
+	 * @param outputDir directory for storing error information
+	 * @return ID of the topology name
+	 * @throws BaseXException  if the $tempOutputDir directory cannot be used to write files or
+	 * if the name name already exists.
+	 */
+	@Requires(Permission.CREATE)
+	public int newTopologyBuilder(final String themeName, final int initialEdgeCapacity, final String outputDir)
+			throws BaseXException {
+		if (!themeNames.add(themeName)) {
+			throw new BaseXException("Invalid theme name: already exists.");
+		}
+		try {
+			final XMLOutputFactory xof = XMLOutputFactory.newInstance();
+			final File errorOutputDir = new File(outputDir);
+
+			final IFile geoJsonOutputFile = new IFile(errorOutputDir, themeName + ".js");
+			final GeoJsonWriter writer = new GeoJsonWriter(geoJsonOutputFile);
+			writer.init();
+
+			final File errorOutputFile = new File(errorOutputDir, themeName + ".xml");
+			final XMLStreamWriter streamWriter = xof.createXMLStreamWriter(new FileOutputStream(errorOutputFile), "UTF-8");
+			final TopologyErrorXmlWriter topologyErrorCollector = new TopologyErrorXmlWriter(themeName, streamWriter);
+			final TopologyBuilder topologyBuilder = new TopologyBuilder(themeName, topologyErrorCollector, initialEdgeCapacity);
+			topologyErrorCollector.init();
+
+			themes.add(
+					new Theme(themeName, topologyErrorCollector, errorOutputFile.toString(), writer, topologyBuilder));
+			return themes.size() - 1;
+		} catch (final IOException | XMLStreamException e) {
+			throw new BaseXException(e);
+		}
+	}
+
 	/**
 	 * Can be used for dev purposes.
 	 * Does not override the error output file and writes all errors to System.out.
+	 *
+	 * @param themeName name of the topological name
+	 * @param initialEdgeCapacity xpected number of edges.
+	 *                               This value should be about 1995000 * number of databases
+	 *                               (experience value from tests). The number is used to allocate
+	 *                               the data structures accordingly and to increase the performance.
+	 * @param outputDir directory for storing error information
+	 * @return ID of the topology name
+	 * @throws BaseXException  if the $tempOutputDir directory cannot be used to write files or
+	 * if the name name already exists.
 	 */
+	@Deprecated
 	@Requires(Permission.CREATE)
 	public int devTopologyBuilder(final String themeName, final int initialEdgeCapacity, final String outputDir)
 			throws BaseXException {
@@ -129,124 +163,66 @@ public class TopoX {
 			final GeoJsonWriter writer = new GeoJsonWriter(geoJsonOutputFile);
 			writer.init();
 
-			final File errorOutputFile = new File(errorOutputDir, themeName + ".xml");
+			final File errorOutputFile = new File(errorOutputDir, themeName + ".noxml");
 			final XMLOutputFactory xof = XMLOutputFactory.newInstance();
 			final TopologyErrorXmlWriter topologyErrorCollector = new TopologyErrorXmlWriter(themeName,
 					xof.createXMLStreamWriter(System.out));
 			final TopologyBuilder topologyBuilder = new TopologyBuilder(themeName, topologyErrorCollector, 16);
 
-			themes.add(new Theme(themeName, topologyErrorCollector, errorOutputFile.toString(), writer, topologyBuilder, null));
-			return themes.size()-1;
+			themes.add(new Theme(themeName, topologyErrorCollector, errorOutputFile.toString(), writer, topologyBuilder));
+			return themes.size() - 1;
 		} catch (final IOException | XMLStreamException e) {
 			throw new BaseXException(e);
 		}
 	}
 
 	/**
-	 * Creates a new Topology builder.
+	 * Creates a new object for checking boundaries and their overlapping.
+	 *
+	 *  A boundary is exactly on an edge. There must be no overlap with another boundary
+	 *  otherwise an error is reported. In order to lay several boundaries over one edge,
+	 *  several independent boundary checking objects must be created.
+	 *
+	 *  Requires an initialized topology object that has already
+	 *  captured topological information.
+	 *
+	 * @param topologyId ID of the topology
+	 *
+	 * @return ID of the boundary check object
+	 * @throws BaseXException if the $topologyId is unknown
 	 */
 	@Requires(Permission.CREATE)
-	public int newTopologyBuilder(final String themeName, final int initialEdgeCapacity, final String outputDir)
+	public int newBoundaryBuilder(final int topologyId)
 			throws BaseXException {
-		try {
-			final XMLOutputFactory xof = XMLOutputFactory.newInstance();
-			final File errorOutputDir = new File(outputDir);
-
-			final IFile geoJsonOutputFile = new IFile(errorOutputDir, themeName + ".js");
-			final GeoJsonWriter writer = new GeoJsonWriter(geoJsonOutputFile);
-			writer.init();
-
-			final File errorOutputFile = new File(errorOutputDir, themeName + ".xml");
-
-			final XMLStreamWriter streamWriter = xof.createXMLStreamWriter(new FileOutputStream(errorOutputFile), "UTF-8");
-			final TopologyErrorXmlWriter topologyErrorCollector = new TopologyErrorXmlWriter(themeName, streamWriter);
-
-			final TopologyBuilder topologyBuilder = new TopologyBuilder(themeName, topologyErrorCollector, initialEdgeCapacity);
-			final HashingPosListParser parser = new HashingPosListParser(topologyBuilder);
-			topologyErrorCollector.init();
-
-			themes.add(
-					new Theme(themeName, topologyErrorCollector, errorOutputFile.toString(), writer, topologyBuilder, parser));
-			return themes.size()-1;
-		} catch (final IOException | XMLStreamException e) {
-			throw new BaseXException(e);
+		if(topologyId<0 || topologyId>=themes.size()) {
+			throw new BaseXException("Unknown topology ID: "+String.valueOf(topologyId));
 		}
+		this.boundaries.add(new BoundaryBuilder(themes.get(topologyId)));
+		return this.boundaries.size()-1+BOUNDARY_ID_OFFSET;
 	}
 
-	/**
-	 * Get the pre ID from a compressed long TopoX index
-	 *
-	 * @param compressedIndex TopoX index
-	 * @return BaseX integer pre value of the geometric object
-	 */
-	@Deterministic
-	@Requires(Permission.NONE)
-	public int pre(final long compressedIndex) {
-		return getRight(compressedIndex);
-	}
+	// Parsing
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Get the pre ID from a compressed long TopoX index
+	 * Switch the Topology Builder to the next Feature
 	 *
-	 * @param compressedIndex TopoX index
-	 * @return BaseX integer pre value of the object
-	 */
-	@Deterministic
-	@Requires(Permission.NONE)
-	public int preObject(final long compressedIndex) {
-		return getRight(compressedIndex) -
-				objectIndex(compressedIndex);
-	}
-
-	/**
-	 * Get the full database name from a compressed long TopoX index
-	 *
-	 * Note: initDb has to be called first
-	 *
-	 * @param compressedIndex TopoX index
-	 * @return full database name
-	 */
-	@Deterministic
-	@Requires(Permission.NONE)
-	public String dbname(final long compressedIndex) {
-		final String dbIndexStr = Integer.toString(dbIndex(compressedIndex));
-		final StringBuilder sb = new StringBuilder(this.dbnamePrefix.length() + 3);
-		sb.append(this.dbnamePrefix);
-		final int pads = 3 - dbIndexStr.length();
-		if (pads > 0) {
-			for (int i = pads - 1; i >= 0; i--) {
-				sb.append('0');
-			}
-		}
-		return sb.append(dbIndexStr).toString();
-	}
-
-	/**
-	 * Regenerate the object pre as
-	 *
-	 * Can be used as key in XQuery maps
-	 *
-	 * @param compressedIndex TopoX index
-	 * @return BaseX integer pre value
-	 */
-	@Deterministic
-	@Requires(Permission.NONE)
-	public long objPreAsGeoPre(final long compressedIndex) {
-		return compress(
-				dbIndex(compressedIndex) << 24,
-				getRight(compressedIndex) -
-						objectIndex(compressedIndex));
-	}
-
-	/**
-	 * Switch the Topology Builder to the next interior
+	 * This means that the object pre value is temporary saved
+	 * for other parsing operations in this features context (and
+	 * avoids passing the value as argument).
 	 *
 	 * @param id ID of Topology Builder
+	 * @param object geometric object
+	 * @return input object
 	 */
 	@Requires(Permission.NONE)
-	public void nextInterior(final int id) {
-		themes.get(id).topologyBuilder.nextInterior();
+	public DBNode nextFeature(final int id, final DBNode object) {
+		currentObjectPre = object.pre();
+		return object;
 	}
+
+	// Topological data parsing
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * Switch the Topology Builder to the next geometric object
@@ -259,36 +235,87 @@ public class TopoX {
 	}
 
 	/**
-	 * Switch the Topology Builder to the next Feature
+	 * Parse the segment of a geometric object
+	 *
+	 * Requires that the current object was previously set by calling {@link #nextFeature(int, DBNode)}
 	 *
 	 * @param id ID of Topology Builder
-	 * @param object geometric object
-	 * @return input object
+	 * @param posList gml posList
+	 * @param type gml type: 1 for arc 2 for all others
 	 */
-	@Requires(Permission.NONE)
-	public DBNode nextFeature(final int id, final DBNode object) {
-		currentObjectPre = object.pre();
-		return object;
-	}
-
 	@Requires(Permission.READ)
 	public void parseSegment(final int id, final DBNode posList, final int type) {
 		themes.get(id).parser.parseDirectPositions(posList.data().text(posList.pre(), true), false, genIndex(posList), type);
 	}
 
+	/**
+	 * Switch the Topology Builder to the next interior
+	 *
+	 * @param id ID of Topology Builder
+	 */
 	@Requires(Permission.NONE)
-	public void onEdge(final int id, final DBNode coordinateNode) throws IOException {
-
-		// todo
-
+	public void nextInterior(final int id) {
+		themes.get(id).nextInterior();
 	}
+
+	/**
+	 * Detect holes
+	 *
+	 * @param id ID of Topology Builder
+	 */
+	@Deterministic
+	@Requires(Permission.NONE)
+	public int detectHoles(final int id) {
+		return themes.get(id).detectHoles();
+	}
+
+	/**
+	 * Detect free-standing surfaces
+	 *
+	 * @param id ID of Topology Builder
+	 */
+	@Deterministic
+	@Requires(Permission.NONE)
+	public int detectFreeStandingSurfaces(final int id) {
+		return themes.get(id).detectFreeStandingSurfaces();
+	}
+
+	// Border parsing
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Switch the Boundary Builder to the next geometric object
+	 *
+	 * @param id ID of Boundary Builder
+	 */
+	@Requires(Permission.NONE)
+	public void nextBoundaryObject(final int id) {
+		boundaries.get(id-BOUNDARY_ID_OFFSET).parser.nextGeometricObject();
+	}
+
+	/**
+	 * Parse the geometry of a boundary object
+	 *
+	 * Requires that the current object was previously set by calling {@link #nextFeature(int, DBNode)}
+	 *
+	 * @param id ID of Boundary Builder
+	 * @param geo gml geometry
+	 */
+	@Requires(Permission.READ)
+	public void parseBoundary(final int id, final DBNode geo) {
+		// geotype 2: use pass through handler
+		boundaries.get(id-BOUNDARY_ID_OFFSET).parser.parseDirectPositions(geo.data().text(geo.pre(), true), false, genIndex(geo), 2);
+	}
+
+	// Error output
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Deterministic
 	@Requires(Permission.NONE)
 	public String errorFile(final int id) {
 		themes.get(id).topologyErrorCollector.release();
 		// TODO propagate as MBean
-		System.out.println(themes.get(id).topologyErrorCollector.toString());
+		System.out.println(themes.get(id).toString());
 		return themes.get(id).errorFile;
 	}
 
@@ -345,15 +372,83 @@ public class TopoX {
 				result.replaceAll("'out.js'", "'" + geoJsonWriter.getFile().getName() + "'")));
 	}
 
+	// pre value, database and object encoding
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Get the pre ID from a compressed long TopoX index
+	 *
+	 * @param compressedIndex TopoX index
+	 * @return BaseX integer pre value of the geometric object
+	 */
+	@Deterministic
+	@Requires(Permission.NONE)
+	public static int pre(final long compressedIndex) {
+		return getRight(compressedIndex);
+	}
+
+	/**
+	 * Get the pre ID from a compressed long TopoX index
+	 *
+	 * @param compressedIndex TopoX index
+	 * @return BaseX integer pre value of the object
+	 */
+	@Deterministic
+	@Requires(Permission.NONE)
+	public static int preObject(final long compressedIndex) {
+		return getRight(compressedIndex) -
+				objectIndex(compressedIndex);
+	}
+
+	/**
+	 * Get the full database name from a compressed long TopoX index
+	 *
+	 * Note: initDb has to be called first
+	 *
+	 * @param compressedIndex TopoX index
+	 * @return full database name
+	 */
+	@Deterministic
+	@Requires(Permission.NONE)
+	public String dbname(final long compressedIndex) {
+		final String dbIndexStr = Integer.toString(dbIndex(compressedIndex));
+		final StringBuilder sb = new StringBuilder(this.dbnamePrefix.length() + 3);
+		sb.append(this.dbnamePrefix);
+		final int pads = 3 - dbIndexStr.length();
+		if (pads > 0) {
+			for (int i = pads - 1; i >= 0; i--) {
+				sb.append('0');
+			}
+		}
+		return sb.append(dbIndexStr).toString();
+	}
+
+	/**
+	 * Regenerate the object pre as
+	 *
+	 * Can be used as key in XQuery maps
+	 *
+	 * @param compressedIndex TopoX index
+	 * @return BaseX integer pre value
+	 */
+	@Deterministic
+	@Requires(Permission.NONE)
+	public static long objPreAsGeoPre(final long compressedIndex) {
+		return compress(
+				dbIndex(compressedIndex) << 24,
+				getRight(compressedIndex) -
+						objectIndex(compressedIndex));
+	}
+
 	private static int makeCompressedNodeIndex(final byte dbIndex, final int objectGeoDiffIndex) {
 		return (((dbIndex) << 24) | objectGeoDiffIndex & 0xFFFFFF);
 	}
 
-	static int dbIndex(final long compressedIndex) {
+	private static int dbIndex(final long compressedIndex) {
 		return (int) (compressedIndex >>> 56);
 	}
 
-	static int objectIndex(final long compressedIndex) {
+	private static int objectIndex(final long compressedIndex) {
 		return ((int) (compressedIndex >>> 32) & 0xFFFFFF);
 	}
 

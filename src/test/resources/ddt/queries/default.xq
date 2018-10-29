@@ -59,5 +59,7 @@ let $dummy := topox:detect-free-standing-surfaces($topoId)
 let $initTime := prof:current-ms()
 let $dummy := topox:export-erroneous-features-to-geojson($topoId, "Map")
 let $duration := prof:current-ms()-$initTime
-return local:log(" Results exported in " || $duration || " ms" )
+let $dummy := local:log(" Results exported in " || $duration || " ms" )
+
+return topox:topological-errors-doc($topoId)
 

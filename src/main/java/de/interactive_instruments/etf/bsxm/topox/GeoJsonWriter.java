@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.interactive_instruments.etf.bsxm;
+package de.interactive_instruments.etf.bsxm.topox;
 
 import java.io.*;
 
 import de.interactive_instruments.IFile;
 
 /**
+ * A writer for GeoJson
+ *
  * @author Jon Herrmann ( herrmann aT interactive-instruments doT de )
  */
-class GeoJsonWriter implements Closeable {
+public class GeoJsonWriter implements Closeable {
 
 	private final BufferedWriter writer;
 	private final static String initalStructure = "{\"type\":\"FeatureCollection\",\"features\":[";
@@ -35,6 +37,13 @@ class GeoJsonWriter implements Closeable {
 
 	private WritingMode mode = WritingMode.INIT;
 
+	/**
+	 * Create a new GeoJson Writer
+	 *
+	 * @param file output file
+	 *
+	 * @throws IOException if output file could not be created
+	 */
 	public GeoJsonWriter(final IFile file) throws IOException {
 		this.file = file;
 		file.expectFileIsWritable();
