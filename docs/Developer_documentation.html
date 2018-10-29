@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+</head>
+<body>
+<h1 id="developing-tests-with-topox">Developing tests with TopoX</h1>
+<p>The following walkthrough requires a working installation of BaseX with the TopoX plugin installed.</p>
+<p>Before TopoX can be used in a test, the library <strong>must be initialized</strong> with the name of the database and the number of databases that will be used:</p>
+<pre class="xquery"><code>
+topox:init-db(&quot;MY-DB-000&quot;, xs:short(1))</code></pre>
+<p>The first parameter (<code>&quot;MY-DB-000&quot;</code>) is the database name.</p>
+<p>Database names must be suffixed with a three digits index starting with <code>000</code>. This is necessary because internally the suffix is used to encode references (see architecture documentation for details).</p>
+<p>As second parameter the number of databases is passed.</p>
+<p>The Features of interest are selected and projected. For example with this Query:</p>
+<pre class="xquery"><code>
+let $surfaces := $db/adv:AX_Bestandsdatenauszug/adv:enthaelt/wfsAdv:FeatureCollection/gml:featureMember/*[adv:modellart/adv:AA_Modellart[adv:advStandardModell = $modellart] and local-name() = (&#39;AX_Fliessgewaesser&#39;, &#39;AX_Schiffsverkehr&#39;, &#39;AX_Strassenverkehr&#39;) and not(adv:hatDirektUnten) and adv:position/gml:Surface]
+</code></pre>
+<p>Multiple topologies can be set up for a set of Features and checked. The initialization of a new topology object -which represents a <strong>topological theme</strong>- is done with:</p>
+<pre class="xquery"><code>
+let $topoId := topox:new-topology(
+  &#39;Tatsaechliche_Nutzung&#39;,
+  &#39;/tmp&#39;,
+  $initialEdgeCapacity
+)
+</code></pre>
+<p>where the first parameter is the name of the topology theme, the second one a path to a temporary output directory as string and the third one the expected number of edges that should exist in the data. The third parameter is used to initialize the data structure in an appropriate size and thus to increase the performance. It can be specified smaller than the actual number, but then internal reallocations and performance losses can be the result. In tests good results were achieved with a value of <code>1995000 * number of databases</code>.</p>
+<p>The call returns an integer as identifier for the topological theme that must be used in all further function calls.</p>
+<p>The parsing and validation is started with:</p>
+<pre class="xquery"><code>
+let $dummy := topox:parse-surface($surfaces, &#39;adv:position/gml:Surface&#39;, $topoId)
+</code></pre>
+<p>The Features are passed in the first parameter. The second parameter is the path to the geometry properties starting from the passed Features. At present, GML LineStringSegments and Arcs are processed.</p>
+<p>This function call will take some time depending on the amount of data.</p>
+<p>During the parsing, errors are written to a temporary file. The detected errors include intersections and overlapping edges (see RING_OVERLAPPING_EDGES and RING_INTERSECTION error codes). The errors can be retrieved by using the topological-errors() function:</p>
+<pre class="xquery"><code>
+let $errors := topox:topological-errors($topoId, (&#39;RING_INTERSECTION&#39;))
+
+for $error in $errors
+    let $isFeature := topox:feature($error/IS[1]/text())
+    let $isFeatureId := xs:string($isFeature/@gml:id)
+order by $isFeatureId
+    return $isFeatureId || &quot; : intersection at point &quot; || $error/X/text() || &quot; &quot; $error/Y/text()
+</code></pre>
+<p>The structure that the topological-errors() function returns is described in the <strong>Topological errors types</strong> section.</p>
+<p>A complete example can be found <a href="../src/test/resources/ddt/queries/default.xq">here</a>.</p>
+<h1 id="advanced-features">Advanced features</h1>
+<p>The following post processing features must be called <strong>after</strong> the topological data structure has been built ( parse-surface() has been called ).</p>
+<h2 id="detection-of-holes">Detection of holes</h2>
+<p>Holes -the surface of a Feature with an inner boundary that is not filled by another surface- can be detected by using the detect-holes() function:</p>
+<pre><code>let $holeCount := topox:detect-holes($topoId)</code></pre>
+<p>The function returns the number of found holes. All detected issues are saved with the HOLE_EMPTY_INTERIOR error code and can be retrieved with the topological-errors() function.</p>
+<h2 id="detection-of-free-standing-surfaces">Detection of free-standing surfaces</h2>
+<p>Free-standing surfaces can be detected by using the detect-free-standing-surfaces() function:</p>
+<pre><code>let $freeStandingSurfaceCount := topox:detect-free-standing-surfaces($topoId)</code></pre>
+<p>The function returns the number of found free-standing surfaces.</p>
+<p>All detected issues are saved with the FREE_STANDING_SURFACE error code and can be retrieved with the topological-errors() function.</p>
+<h2 id="check-boundaries">Check boundaries</h2>
+<p>Some objects can describe certain boundaries, like units of administration dividing areas. With TopoX it can be tested whether the boundaries of the administrative units are exactly on the boundary points and edges of other features.</p>
+<p>Boundaries can be condensed like topological themes and must be created with:</p>
+<pre><code>let $boundaryId := topox:new-boundary-check($topoId)</code></pre>
+<p>where the parameter references a topological theme as basis for checks.</p>
+<p>The second call to start the parsing of boundaries, is very similar to the parse-surface() function.</p>
+<pre><code>let $borderParsingDummy := topox:parse-boundary($borders, &#39;adv:position/gml:*&#39;, $boundaryId)</code></pre>
+<p>If the points or edges of the boundaries do not overlap exactly with the basis data, BOUNDARY_POINT_DETACHED and BOUNDARY_EDGE_INVALID errors are reported in the error file.</p>
+<h2 id="create-issue-map-experimental">Create issue map (experimental)</h2>
+<p>This function will export a map with the topological errors as HTML file to the temp folder. This feature is still very experimental and intended for developers until now.</p>
+<pre><code>let $dummyMap := topox:export-erroneous-features-to-geojson($topoId, &quot;Map&quot;)</code></pre>
+<h1 id="topological-errors-types">Topological errors types</h1>
+<h2 id="structure">Structure</h2>
+<p>TopoX exposes the errors found via two functions: topological-errors-doc() and topological-errors(). The first function can be used to retrieve all errors as one node, the second one accepts a parameter to filter the errors for specific error types:</p>
+<pre class="xquery"><code>
+(: Get all erros :)
+let $allErrors := topological-errors-doc($topoId)
+
+(: Get only errors of the type RING\_INTERSECTION and the FREE\_STANDING\_SURFACE :)
+let $ringAndFreeStandingSurfaceErrors := topological-errors($topoId, 
+        (&#39;RING_INTERSECTION&#39;, &#39;FREE_STANDING_SURFACE&#39;))</code></pre>
+<p>The internal error structure, completly returned by the topological-errors-doc() function, looks like this:</p>
+<div class="sourceCode"><pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;ete:TopologicalErrors</span><span class="ot"> xmlns:ete=</span><span class="st">&quot;http://www.interactive-instruments.de/etf/topology-error/1.0&quot;</span>
+<span class="ot">    name=</span><span class="st">&quot;Tatsaechliche_Nutzung&quot;</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;e</span><span class="ot"> i=</span><span class="st">&quot;1&quot;</span><span class="ot"> t=</span><span class="st">&quot;RING_INTERSECTION&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;IS&gt;</span>519785877976<span class="kw">&lt;/IS&gt;</span>
+        <span class="kw">&lt;X&gt;</span>367300.055<span class="kw">&lt;/X&gt;</span>
+        <span class="kw">&lt;Y&gt;</span>5614385.776<span class="kw">&lt;/Y&gt;</span>
+        <span class="kw">&lt;CW&gt;</span>579820659004<span class="kw">&lt;/CW&gt;</span>
+        <span class="kw">&lt;CCW&gt;</span>609885430083<span class="kw">&lt;/CCW&gt;</span>
+    <span class="kw">&lt;/e&gt;</span>
+    <span class="kw">&lt;e</span><span class="ot"> i=</span><span class="st">&quot;2&quot;</span><span class="ot"> t=</span><span class="st">&quot;FREE_STANDING_SURFACE&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;X&gt;</span>364965.726<span class="kw">&lt;/X&gt;</span>
+        <span class="kw">&lt;Y&gt;</span>5620249.802<span class="kw">&lt;/Y&gt;</span>
+        <span class="kw">&lt;IS&gt;</span>365113240849<span class="kw">&lt;/IS&gt;</span>
+    <span class="kw">&lt;/e&gt;</span>
+<span class="kw">&lt;/ete:TopologicalErrors&gt;</span></code></pre></div>
+<p>The structure's root is the <em>TopologicalErrors</em> element and <em>name</em> attribute represents the topological theme. Below the root element, the errors can be found ( <em>e</em> elements). topological-errors() will only return these (filtered) error <em>e</em> elements.</p>
+<p>Each error possesses an simple integer ID ( <em>i</em> attribute ) and the error type ( <em>t</em> attribute). The names and attributes are abbreviated to support faster parsing of the error file. An error code can possess various properties which will be described below.</p>
+<p>The X and Y properties always stand for the X and Y coordinates. All other properties (IS, CW, CCW) reference a feature and its geometry in the database.</p>
+<p>The feature can be queried with the <code>feature()</code>, the geometry with <code>geometric-object()</code> function:</p>
+<pre class="xquery"><code>
+let $error := topox:topological-errors($topoId, (&#39;RING_INTERSECTION&#39;))[1]
+
+(: Feature gml:id :)
+let $feature := topox:feature($error/CW[1]/text())
+let $featureId := xs:string($feature/@gml:id)
+
+(: Geometry gml:id :)
+let $geometry := topox:geometric-object($error/CW[1]/text())
+let $geometryId := topox:geometric-object($feature/../../../../@gml:id)
+</code></pre>
+<p>Even if multiple databases are used, the objects are automatically fetched from the corresponding database.</p>
+<h2 id="codes">Codes</h2>
+<h3 id="ring_overlapping_edges">RING_OVERLAPPING_EDGES</h3>
+<p>There are two Features that define an edge at two points. The features lie on the same side and therefore overlap. The <em>IS</em> property references the first object that is on the edge, the <em>O</em> refernces the object that collides with the existing one. The <em>X, Y</em> properties may reference either the start or the end point of the edge.</p>
+<h3 id="ring_intersection">RING_INTERSECTION</h3>
+<p>There are at least three edges that are connected at one point (<em>X, Y</em> properties). Due to their angles, two edges intersect in the course of the lines. The <em>IS</em> property references the object where the error has been detected. <em>CW</em> is the object that is connected counter-clockwise to the edge, <em>CWW</em> is the object that is connected counter-clockwise to the edge.</p>
+<h3 id="hole_empty_interior">HOLE_EMPTY_INTERIOR</h3>
+<p>The surface of a Feature with an inner boundary is not filled by the surface of another Feature. The <em>IS</em> property (and <em>X, Y</em> properties) references the object where the error has been detected.</p>
+<h3 id="free_standing_surface">FREE_STANDING_SURFACE</h3>
+<p>There are at least two free-standing surfaces. All surfaces except the largest, with the most edges, are reported. The <em>IS</em> property (and <em>X, Y</em> properties) references the object where the error has been detected.</p>
+<h3 id="boundary_point_detached">BOUNDARY_POINT_DETACHED</h3>
+<p>A boundary point (<em>X, Y</em> properties) was defined that could not be found in the topological basis data. The <em>IS</em> property references the object where the error has been detected.</p>
+<h3 id="boundary_edge_invalid">BOUNDARY_EDGE_INVALID</h3>
+<p>An edge (<em>X, Y</em> reference start point of the edge, <em>X2, Y2</em> the end point) was defined that could not be found in the topological basis data. The <em>IS</em> property references the object where the error has been detected.</p>
+<h3 id="edge_not_found">EDGE_NOT_FOUND</h3>
+<p>An edge could not be found. This is most likely a consequential error if others occurred and for instance the connection between two points has been invalidated in the data structure. If this is the only type of error that occurred, then this may indicate a bug in the software.</p>
+<h3 id="invalid_angle">INVALID_ANGLE</h3>
+<p>An error occurred while connecting an additional edge to a point. Attempting to traverse the angles of all connected edges has exceeded the maximum number of possible steps. If this is the only type of error that occurred, then this may indicate a bug in the software.</p>
+<p><strong>Note:</strong> In general the EDGE_NOT_FOUND and the INVALID_ANGLE errors can be ignored if errors have previously been reported with other error codes.</p>
+</body>
+</html>
