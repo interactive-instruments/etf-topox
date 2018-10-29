@@ -12,15 +12,19 @@ buildscript {
 				username 'ii-bda'
 				password '6ozhS683'
 			}}
+		mavenCentral()
 	}
 	dependencies {
 		classpath group: 'de.interactive_instruments.bda', name: 'etf-bda', version:'1.0.26'
+		classpath ("org.junit.platform:junit-platform-gradle-plugin:1.2.0")
 	}
 	dependencies {
 		ant.unjar src: configurations.classpath.files.find {it.path.contains('etf')}, dest: 'build/gradle'
 	}
 }
 apply from: 'build/gradle/ii-bda.gradle'
+apply plugin: 'org.junit.platform.gradle.plugin'
+
 
 ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -48,6 +52,8 @@ dependencies {
 
   	testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.3.1'
 	testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.3.1'
+	testCompile 'com.tngtech.archunit:archunit-junit5-api:0.9.1'
+	testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.9.1'
 	testCompile group: 'ch.qos.logback', name: 'logback-classic', version: etf_logbackVersion
 	testCompile group: 'de.interactive_instruments', name: 'ii-commons-util', version:'3.0.0'+project.snapshotSuffix
 
@@ -56,6 +62,23 @@ dependencies {
 	testRuntime "org.basex:basex:$basexVersion"
 	compileOnly "org.basex:basex-api:$basexVersion"
 	testCompile "org.basex:basex-api:$basexVersion"
+}
+
+// Support JUnit 5 in gradle < 4.6
+test {
+	testLogging {
+		events 'PASSED', 'FAILED', 'SKIPPED'
+	}
+
+	afterSuite { desc, result ->
+		if (!desc.parent) {
+			println "\nTest result: ${result.resultType}"
+			println "Test summary: ${result.testCount} tests, " +
+					"${result.successfulTestCount} succeeded, " +
+					"${result.failedTestCount} failed, " +
+					"${result.skippedTestCount} skipped"
+		}
+	}
 }
 
 sourceSets {
@@ -126,4 +149,4 @@ artifacts {
 	archives xar
 }
 
-test.dependsOn = ['xar']
+junitPlatformTest.dependsOn xar
