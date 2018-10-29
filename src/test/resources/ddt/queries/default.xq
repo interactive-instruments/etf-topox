@@ -36,13 +36,28 @@ let $topoId := topox:new-topology(
 
 
 let $duration := prof:current-ms()-$initTime
-let $logMessage1 := local:log("TopoX initialized in " || $duration || " ms" )
-let $dummy1 := topox:parse-surface($surfaces, 'adv:position/gml:Surface', $topoId)
+let $dummy := local:log("TopoX initialized in " || $duration || " ms" )
+
+
+let $initTime := prof:current-ms()
+let $dummy := topox:parse-surface($surfaces, 'adv:position/gml:Surface', $topoId)
+let $duration := prof:current-ms()-$initTime
+let $dummy := local:log("Topology built in " || $duration || " ms" )
+
+(: Uncomment this to detect holes
+let $dummy := topox:detect-holes($topoId)
+:)
+
+(: Uncomment this to detect free-standing surfaces
+let $dummy := topox:detect-free-standing-surfaces($topoId)
+:)
 
 (:
   To view file on local machine, temporary toggle
   security.fileuri.strict_origin_policy to false in Firefox
 :)
-let $dummy2 := topox:export-erroneous-features-to-geojson($topoId, "DebugMap")
+let $initTime := prof:current-ms()
+let $dummy := topox:export-erroneous-features-to-geojson($topoId, "Map")
+let $duration := prof:current-ms()-$initTime
+return local:log(" Results exported in " || $duration || " ms" )
 
-return topox:topological-errors($topoId)
