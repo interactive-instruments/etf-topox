@@ -24,7 +24,11 @@ public interface HashingSegmentHandler {
 
 	void coordinate2d(final double x, final double y, final long hash, final long location, final int type);
 
-	void coordinates2d(final double[] coordinates, final long hashesAndLocations[], final int type);
+	default void coordinates2d(final double[] coordinates, final long hashesAndLocations[], final int type) {
+		for (int i = 0; i < coordinates.length; i += 2) {
+			coordinate2d(coordinates[i], coordinates[i + 1], hashesAndLocations[i], hashesAndLocations[i + 1], type);
+		}
+	}
 
 	void nextGeometricObject();
 }
