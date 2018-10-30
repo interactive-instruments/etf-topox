@@ -57,10 +57,8 @@ public class Theme {
 		for (final Topology.Edge emptyInterior : topology.emptyInteriors()) {
 			count++;
 			topologyErrorCollector.collectError(HOLE_EMPTY_INTERIOR,
-					"X",
-					String.valueOf(emptyInterior.source().x()),
-					"Y",
-					String.valueOf(emptyInterior.source().y()),
+					emptyInterior.source().x(),
+					emptyInterior.source().y(),
 					"IS",
 					String.valueOf(emptyInterior.leftObject()));
 		}
@@ -72,10 +70,8 @@ public class Theme {
 		for (final Topology.Edge freeStandingSurface : topology.freeStandingSurfaces()) {
 			count++;
 			topologyErrorCollector.collectError(FREE_STANDING_SURFACE,
-					"X",
-					String.valueOf(freeStandingSurface.source().x()),
-					"Y",
-					String.valueOf(freeStandingSurface.source().y()),
+					freeStandingSurface.source().x(),
+					freeStandingSurface.source().y(),
 					"IS",
 					String.valueOf(freeStandingSurface.leftObject()));
 		}

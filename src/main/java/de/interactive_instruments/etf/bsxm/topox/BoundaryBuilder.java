@@ -48,8 +48,7 @@ public class BoundaryBuilder {
 				previousNode=theme.topology.node(x,y);
 				if(previousNode==null) {
 					errorCollector.collectError(BOUNDARY_POINT_DETACHED,
-							"X", String.valueOf(x),
-							"Y", String.valueOf(y),
+							x,y,
 							"IS", String.valueOf(location)
 					);
 				}
@@ -57,8 +56,7 @@ public class BoundaryBuilder {
 				final Topology.Node nextNode = theme.topology.node(x, y);
 				if(nextNode==null) {
 					errorCollector.collectError(BOUNDARY_POINT_DETACHED,
-							"X", String.valueOf(x),
-							"Y", String.valueOf(y),
+							x,y,
 							"IS", String.valueOf(location)
 					);
 					previousNode = null;
@@ -66,8 +64,7 @@ public class BoundaryBuilder {
 					final Topology.Edge edge = previousNode.edge(nextNode);
 					if(edge==null) {
 						errorCollector.collectError(BOUNDARY_EDGE_INVALID,
-								"X", String.valueOf(x),
-								"Y", String.valueOf(y),
+								x,y,
 								"IS", String.valueOf(location),
 								"X2", String.valueOf(previousNode.x()),
 								"Y2", String.valueOf(previousNode.y())

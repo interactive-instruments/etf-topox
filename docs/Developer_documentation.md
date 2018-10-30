@@ -178,7 +178,7 @@ The structure's root is the _TopologicalErrors_ element and _name_ attribute rep
 
 Each error possesses an simple integer ID ( _i_ attribute ) and the error type ( _t_ attribute). The names and attributes are abbreviated to support faster parsing of the error file. An error code can possess various properties which will be described below.
 
-The X and Y properties always stand for the X and Y coordinates. All other properties (IS, CW, CCW) reference a feature and its geometry in the database. If an error is returned more than one time for a point, a _p_ attribute (for previous) is added to the error, which may indicate fault masking. The value of _p_ referes to the first occurance of the error (_i_ value). topological-errors() does not return repeated errors.
+The X and Y properties always stand for the X and Y coordinates. All other properties (IS, CW, CCW) reference a feature and its geometry in the database. If an error is returned more than one time for a point, a _p_ attribute (for previous) is added to the next error, which may indicate fault masking. The value of _p_ referes to the first occurance of the error (_i_ value). topological-errors() does not return these repeated errors.
 
 The feature can be queried with the `feature()`, the geometry with `geometric-object()` function:
 
