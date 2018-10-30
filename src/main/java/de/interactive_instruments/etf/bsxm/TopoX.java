@@ -346,17 +346,18 @@ public class TopoX {
 	}
 
 	@Requires(Permission.CREATE)
-	public void attachIssueMap(final int id, final String attachmentId) throws IOException {
-
+	public void attachIssueMap(final int id, final String geoJsonAttachmentId) throws IOException {
 		final GeoJsonWriter geoJsonWriter = themes.get(id).geoJsonWriter;
 		try {
 			geoJsonWriter.close();
 		} catch (final IOException ignore) {
 			ExcUtils.suppress(ignore);
 		}
-
+		final String htmlFileName = themes.get(id).name+"_Map.html";
 		final File dir = geoJsonWriter.getFile().getParentFile();
-		final IFile attachmentMapFile = new IFile(dir, attachmentId + ".html");
+		final IFile attachmentMapFile = new IFile(dir, htmlFileName);
+
+		geoJsonWriter.getFile().moveTo(dir.getPath()+File.separator+Objects.requireNonNull(geoJsonAttachmentId));
 
 		final InputStream cStream = this.getClass().getResourceAsStream("/html/IssueMap.html");
 		final InputStream stream;
@@ -365,11 +366,12 @@ public class TopoX {
 		} else {
 			stream = cStream;
 		}
+
 		// could be optimized
 		final Scanner s = new Scanner(stream).useDelimiter("\\A");
 		final String result = s.hasNext() ? s.next() : "";
 		attachmentMapFile.writeContent(new StringBuffer(
-				result.replaceAll("'out.js'", "'" + geoJsonWriter.getFile().getName() + "'")));
+				result.replaceAll("'out.js'", "'" + geoJsonAttachmentId + "'")));
 	}
 
 	// pre value, database and object encoding
