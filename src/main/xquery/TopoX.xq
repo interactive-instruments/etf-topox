@@ -230,6 +230,8 @@ declare function topox:topological-errors-doc($topologyId as xs:int) as node() {
 (:~
  : Returns all topological error (e) elements from the error document
  :
+ : Repeated errors are filtered (they can be retrieved with the topological-errors-doc function).
+ :
  : Note: for performance reasons, this a deterministic function. Calling this
  : function after changing the error file might not result in a changed output.
  :
@@ -238,7 +240,7 @@ declare function topox:topological-errors-doc($topologyId as xs:int) as node() {
  : @return zero or more topological error elements
  :)
 declare function topox:topological-errors($topologyId as xs:int, $errorCodes as xs:string*) as element()* {
-    topox:topological-errors-doc($topologyId)/e[topox:check-error-code($errorCodes) or @t = $errorCodes]
+    topox:topological-errors-doc($topologyId)/e[not(@p) and (topox:check-error-code($errorCodes) or @t = $errorCodes)]
 };
 
 (:~
@@ -270,12 +272,12 @@ declare function topox:feature($compressedValue as xs:long) as node() {
  : @param  $errorCodes errorCodes to filter (optional)
  : @return nothing
  :)
-declare function topox:export-erroneous-features-to-geojson($topologyId as xs:int, $attachmentId as xs:string, $errorCodes as xs:string*) as empty-sequence() {
+declare function topox:export-erroneous-features-to-geojson($topologyId as xs:int, $geoJsonAttachmentId as xs:string, $errorCodes as xs:string*) as empty-sequence() {
         let $topoErrors := topox:topological-errors($topologyId,  $errorCodes)[not(@t = ('EDGE_NOT_FOUND', 'INVALID_ANGLE'))]
         return (
             topox:export-error-points($topologyId, $topoErrors),
             topox:export-features($topologyId, $topoErrors),
-            java:attachIssueMap($topologyId, $attachmentId)
+            java:attachIssueMap($topologyId, $geoJsonAttachmentId)
         )
 };
 
@@ -287,8 +289,8 @@ declare function topox:export-erroneous-features-to-geojson($topologyId as xs:in
  : @param  $topologyId ID of the topology
  : @return nothing
  :)
-declare function topox:export-erroneous-features-to-geojson($topologyId as xs:int, $attachmentId as xs:string) as empty-sequence() {
-    topox:export-erroneous-features-to-geojson($topologyId, $attachmentId, ())
+declare function topox:export-erroneous-features-to-geojson($topologyId as xs:int, $geoJsonAttachmentId as xs:string) as empty-sequence() {
+    topox:export-erroneous-features-to-geojson($topologyId, $geoJsonAttachmentId, ())
 };
 
 

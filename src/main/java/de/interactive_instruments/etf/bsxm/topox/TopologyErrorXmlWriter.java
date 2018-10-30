@@ -20,6 +20,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import de.interactive_instruments.SUtils;
 import de.interactive_instruments.exceptions.ExcUtils;
+import gnu.trove.TLongIntHashMap;
 
 /**
  * Object for persisting topological errors in a XML file
@@ -33,10 +34,12 @@ public class TopologyErrorXmlWriter implements TopologyErrorCollector {
 	private final String themeName;
 	private final XMLStreamWriter writer;
 	private int counter = 0;
+	private final TLongIntHashMap coordinateHashToPreviousErrorId;
 
 	public TopologyErrorXmlWriter(final String themeName, final XMLStreamWriter writer) {
 		this.themeName = themeName;
 		this.writer = writer;
+		this.coordinateHashToPreviousErrorId = new TLongIntHashMap(128);
 	}
 
 	@Override
@@ -55,16 +58,15 @@ public class TopologyErrorXmlWriter implements TopologyErrorCollector {
 	@Override
 	public void collectError(final TopologyErrorType topologyErrorType, final String... parameter) {
 		try {
+			// error element
 			writer.writeStartElement("e");
+			// id
 			writer.writeAttribute("i", Integer.toString(++counter));
+			// errorType
 			writer.writeAttribute("t", topologyErrorType.toString());
-			if (parameter != null) {
-				for (int i = 0; i < parameter.length; i++) {
-					writer.writeStartElement(parameter[i]);
-					writer.writeCharacters(parameter[++i]);
-					writer.writeEndElement();
-				}
-			}
+
+			collectParameters(parameter);
+
 			writer.writeEndElement();
 		} catch (final XMLStreamException e) {
 			final String message = themeName + " " +
@@ -72,6 +74,53 @@ public class TopologyErrorXmlWriter implements TopologyErrorCollector {
 			throw new IllegalStateException("Error writing topological error: " + message, e);
 		}
 	}
+
+	@Override
+	public void collectError(final TopologyErrorType topologyErrorType, final double x, final double y, final String... parameter) {
+		try {
+			// error element
+			writer.writeStartElement("e");
+			// id
+			writer.writeAttribute("i", Integer.toString(++counter));
+			// errorType
+			writer.writeAttribute("t", topologyErrorType.toString());
+
+			final long coordinateHash = TopologyBuilder.calcCoordHashCode(x,y);
+			final int previousErrorI = coordinateHashToPreviousErrorId.get(coordinateHash);
+			if(previousErrorI!=0) {
+				// previous error
+				writer.writeAttribute("p", Integer.toString(previousErrorI));
+			}else{
+				coordinateHashToPreviousErrorId.put(coordinateHash, counter);
+			}
+			writer.writeStartElement("X");
+			writer.writeCharacters(Double.toString(x));
+			writer.writeEndElement();
+
+			writer.writeStartElement("Y");
+			writer.writeCharacters(Double.toString(y));
+			writer.writeEndElement();
+
+			collectParameters(parameter);
+
+			writer.writeEndElement();
+		} catch (final XMLStreamException e) {
+			final String message = themeName + " " +
+					topologyErrorType.toString() + " : " + SUtils.concatStr(" ", parameter);
+			throw new IllegalStateException("Error writing topological error: " + message, e);
+		}
+	}
+
+	private void collectParameters(final String... parameter) throws XMLStreamException {
+		if (parameter != null) {
+			for (int i = 0; i < parameter.length; i++) {
+				writer.writeStartElement(parameter[i]);
+				writer.writeCharacters(parameter[++i]);
+				writer.writeEndElement();
+			}
+		}
+	}
+
 
 	@Override
 	public void release() {

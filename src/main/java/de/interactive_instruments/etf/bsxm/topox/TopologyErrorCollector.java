@@ -27,4 +27,6 @@ public interface TopologyErrorCollector extends Releasable {
 	void init();
 
 	void collectError(final TopologyErrorType topologyErrorType, final String... parameter);
+
+	void collectError(final TopologyErrorType topologyErrorType, final double x, final double y, final String... parameter);
 }

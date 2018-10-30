@@ -2,6 +2,7 @@ declare namespace adv='http://www.adv-online.de/namespaces/adv/gid/6.0';
 declare namespace wfsAdv='http://www.adv-online.de/namespaces/adv/gid/wfs';
 declare namespace gml='http://www.opengis.net/gml/3.2';
 declare namespace ete='http://www.interactive-instruments.de/etf/topology-error/1.0';
+declare namespace uuid='java.util.UUID';
 
 import module namespace topox = 'https://modules.etf-validator.net/topox/1';
 
@@ -57,7 +58,7 @@ let $dummy := topox:detect-free-standing-surfaces($topoId)
   security.fileuri.strict_origin_policy to false in Firefox
 :)
 let $initTime := prof:current-ms()
-let $dummy := topox:export-erroneous-features-to-geojson($topoId, "Map")
+let $dummy := topox:export-erroneous-features-to-geojson($topoId, "Map_" || uuid:randomUUID() || ".js")
 let $duration := prof:current-ms()-$initTime
 let $dummy := local:log(" Results exported in " || $duration || " ms" )
 
