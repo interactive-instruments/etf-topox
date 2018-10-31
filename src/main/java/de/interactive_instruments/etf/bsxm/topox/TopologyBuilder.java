@@ -24,11 +24,7 @@ import java.util.Map;
 
 import de.interactive_instruments.container.Pair;
 import de.interactive_instruments.etf.bsxm.TopoX;
-
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TLongArrayList;
-import gnu.trove.TLongHashSet;
-import gnu.trove.TLongIntHashMap;
+import gnu.trove.*;
 
 /**
  * A memory optimized store that holds the topology information.
@@ -40,9 +36,12 @@ import gnu.trove.TLongIntHashMap;
 public class TopologyBuilder implements HashingSegmentHandler {
 
 	/**
+	 * Coordinates
+	 *
 	 * Array containing coordinates referenced from the topology edges.
+	 * First index is the X, second one always the Y coordinate.
 	 */
-	final TDoubleArrayList coordinates;
+	private final TDoubleArrayList coordinates;
 
 	/**
 	 * ID of the current geometry
@@ -70,7 +69,7 @@ public class TopologyBuilder implements HashingSegmentHandler {
 	 *
 	 * Todo consider using a rehash mechanism when collisions are detected
 	 */
-	private final Map<Pair<Double, Double>, Integer> coordinateCollisionHashToEdgeMap = new HashMap<>();
+	private final Map<Coordinate, Integer> coordinateCollisionHashToEdgeMap = new HashMap<>();
 	private int errors = 0;
 
 	/**
@@ -81,6 +80,7 @@ public class TopologyBuilder implements HashingSegmentHandler {
 	private final TLongHashSet edgeExistence;
 
 	/**
+	 * Topological Data Structure
 	 *
 	 * Array containing topology edges. Each edge contains 10 values
 	 * which are compressed into 7 longs:
@@ -119,7 +119,7 @@ public class TopologyBuilder implements HashingSegmentHandler {
 	 * The order of the array values are optimized for edge creation
 	 *
 	 */
-	final TLongArrayList topology;
+	private final TLongArrayList topology;
 
 	// Offset for the index reference of the X coordinate in the coordinates array.
 	// Y is at position + 1
@@ -159,8 +159,8 @@ public class TopologyBuilder implements HashingSegmentHandler {
 	// Collector object for errors
 	private final TopologyErrorCollector errorCollector;
 
-	// Name of the toplogy theme
-	final Theme theme;
+	// Name of the toplogy name
+	final String themeName;
 
 	// surface boundary
 	private boolean exterior;
@@ -170,19 +170,19 @@ public class TopologyBuilder implements HashingSegmentHandler {
 	private double previousY;
 	private long previousHash;
 
-	public TopologyBuilder(final Theme theme,
+	public TopologyBuilder(final String themeName,
 			final TopologyErrorCollector errorCollector,
 			final int initialEdgeCapacity) {
-		this(theme, errorCollector, initialEdgeCapacity, 0.95);
+		this(themeName, errorCollector, initialEdgeCapacity, 0.95);
 	}
 
-	public TopologyBuilder(final Theme theme,
+	public TopologyBuilder(final String themeName,
 			final TopologyErrorCollector errorCollector,
 			final int initialEdgeCapacity,
 			final double uniqueCoordinatesPerEdge) {
 		this.exterior = true;
 		this.errorCollector = errorCollector;
-		this.theme = theme;
+		this.themeName = themeName;
 
 		this.edgeExistence = new TLongHashSet(initialEdgeCapacity);
 		this.topology = new TLongArrayList(initialEdgeCapacity * TOPOLOGY_FIELDS_SIZE);
@@ -198,6 +198,31 @@ public class TopologyBuilder implements HashingSegmentHandler {
 		this.coordinateHashToEdgeMap = new TLongIntHashMap((int) (coordinateArrSize / 2));
 	}
 
+	private final static class Coordinate extends Pair<Double, Double> {
+
+		public Coordinate(final Double left, final Double right) {
+			super(left, right);
+		}
+
+		/**
+		 * Faster equality check, avoids using autoboxing functions
+		 */
+		@Override
+		public boolean equals(final Object o) {
+			if ((!(o instanceof Coordinate))) {
+				return false;
+			}
+			final Coordinate c = (Coordinate) o;
+			return c.getLeft().doubleValue() == this.getLeft().doubleValue()
+					&& c.getRight().doubleValue() == this.getRight().doubleValue();
+		}
+
+		@Override
+		public String toString() {
+			return getLeft() + ", " + getRight();
+		}
+	}
+
 	private void addCoordinates() {
 		coordinates.add(this.previousX);
 		coordinates.add(previousY);
@@ -210,16 +235,19 @@ public class TopologyBuilder implements HashingSegmentHandler {
 	 * and the previousEdgeIndex is set to 0.
 	 */
 	private void findOrCreateFirstNode() {
-		final long hashCode = calcCoordHashCode(this.previousX, previousY);
+		final long hashCode = calcCoordHashCode(this.previousX, this.previousY);
 		final int sourceEdgeIndex = coordinateHashToEdgeMap.get(hashCode);
 		if (sourceEdgeIndex == 0) {
 			// There is no coordinate to edge mapping. Add the coordinates.
 			addCoordinates();
 			coordinateHashToEdgeMap.put(hashCode, this.topology.size());
-		} else if (coordinates.getQuick(getLeftOrRightByIndex(sourceEdgeIndex, COORDINATE_OFFSET) + 1) != previousY) {
+		} else if (coordinatesNotEqual(sourceEdgeIndex, this.previousX, this.previousY)) {
 			// collision detection
-			addCoordinates();
-			coordinateCollisionHashToEdgeMap.put(new Pair<>(this.previousX, previousY), this.topology.size());
+			final Object ret = coordinateCollisionHashToEdgeMap.putIfAbsent(
+					new Coordinate(this.previousX, previousY), this.topology.size());
+			if (ret == null) {
+				addCoordinates();
+			}
 		} else {
 			this.previousEdgeIndex = sourceEdgeIndex;
 		}
@@ -240,22 +268,44 @@ public class TopologyBuilder implements HashingSegmentHandler {
 			// to the edge that is created here
 			coordinateHashToEdgeMap.put(hashCode, -this.topology.size());
 			return -this.topology.size();
-		} else if (coordinates.getQuick(getLeftOrRightByIndex(targetEdgeIndex, COORDINATE_OFFSET) + 1) != y) {
+		} else if (coordinatesNotEqual(targetEdgeIndex, x, y)) {
 			// collision detection
-			coordinates.add(x);
-			coordinates.add(y);
-			coordinateCollisionHashToEdgeMap.put(new Pair<>(x, y), -this.topology.size());
+			final Object ret = coordinateCollisionHashToEdgeMap.putIfAbsent(new Coordinate(x, y), -this.topology.size());
+			if (ret == null) {
+				coordinates.add(x);
+				coordinates.add(y);
+				return -this.topology.size();
+			} else {
+				++errors;
+				return (int) ret;
+			}
 		}
 		return targetEdgeIndex;
 	}
 
+	private boolean coordinatesNotEqual(final int edgeIndex, final double x, final double y) {
+		final int coordIndex = getLeftOrRightByIndex(edgeIndex, COORDINATE_OFFSET);
+		return coordinates.getQuick(coordIndex) != x || coordinates.getQuick(coordIndex + 1) != y;
+	}
+
+	/**
+	 * Get target edge index or return -1 if not found
+	 * @param x X coordiante
+	 * @param y Y coordiante
+	 * @return edge index or -1 if not found
+	 */
 	int getTargetEdge(final double x, final double y) {
 		final long hashCode = calcCoordHashCode(x, y);
 		final int edgeIndex = coordinateHashToEdgeMap.get(hashCode);
-		if (coordinates.getQuick(getLeftOrRightByIndex(edgeIndex, COORDINATE_OFFSET) + 1) != y) {
+		if (coordinatesNotEqual(edgeIndex, x, y)) {
 			// collision detection
 			++errors;
-			return coordinateCollisionHashToEdgeMap.get(new Pair<>(x, y));
+			final Object ret = coordinateCollisionHashToEdgeMap.get(new Coordinate(x, y));
+			if (ret == null) {
+				return -1;
+			} else {
+				return (int) ret;
+			}
 		}
 		return edgeIndex;
 	}
@@ -284,7 +334,7 @@ public class TopologyBuilder implements HashingSegmentHandler {
 	}
 
 	private int adjustCcwNexts(final int sourceEdgeIndex, final int newTargetEdgeIndex, final long compressedLocation) {
-		// get target ccw of source edge
+		// getTopologicalData target ccw of source edge
 		final int currentTargetEdgeIndex = setLeftRightCcwNextIfNullOrGet(sourceEdgeIndex, newTargetEdgeIndex);
 		if (currentTargetEdgeIndex == 0) {
 			// simple case: there is none
@@ -312,11 +362,11 @@ public class TopologyBuilder implements HashingSegmentHandler {
 				// will happen if previous edges of the geometric object are invalid.
 				// Save the error information to help reproducing the entire problem.
 				final int sourceEdgeCoordIndex = getEdgeCoordIndex(sourceEdgeIndex);
-				final int targetEdgeCoordIndex = getEdgeCoordIndex(newTargetEdgeIndex);
+				final int targetEdgeCoordIndex = getEdgeCoordIndex(-newTargetEdgeIndex);
 				errorCollector.collectError(
-						INVALID_ANGLE, "OBJ", String.valueOf(this.objectId),
-						"SX", String.valueOf(this.coordinates.get(sourceEdgeCoordIndex)),
-						"SY", String.valueOf(this.coordinates.get(sourceEdgeCoordIndex + 1)),
+						INVALID_ANGLE,
+						this.coordinates.get(sourceEdgeCoordIndex), this.coordinates.get(sourceEdgeCoordIndex + 1),
+						"OBJ", String.valueOf(this.objectId),
 						"TX", String.valueOf(this.coordinates.get(targetEdgeCoordIndex)),
 						"TY", String.valueOf(this.coordinates.get(targetEdgeCoordIndex + 1)));
 				return -1;
@@ -329,31 +379,28 @@ public class TopologyBuilder implements HashingSegmentHandler {
 					final int sourceEdgeCoordIndex = getEdgeCoordIndex(sourceEdgeIndex);
 					errorCollector.collectError(
 							RING_INTERSECTION,
+							this.coordinates.get(sourceEdgeCoordIndex), this.coordinates.get(sourceEdgeCoordIndex + 1),
 							"IS", String.valueOf(compressedLocation),
-							"X", String.valueOf(this.coordinates.get(sourceEdgeCoordIndex)),
-							"Y", String.valueOf(this.coordinates.get(sourceEdgeCoordIndex + 1)),
 							"CW", getLocationAsStr(-ccwNext),
 							"CCW", getLocationAsStr(cwNext));
 				}
 			} else {
-				// Right side of target edge. Must be negated to get the right hand side.
+				// Right side of target edge. Must be negated to getTopologicalData the right hand side.
 				final int ccwObjectFromTargetEdge = getLeftOrRightByIndex(-ccwNext, OBJ_OFFSET);
 				if (ccwObjectFromTargetEdge != 0 && abs(ccwObjectFromTargetEdge) != objectId) {
 					final int sourceEdgeCoordIndex = getEdgeCoordIndex(sourceEdgeIndex);
 					errorCollector.collectError(
-							INVALID_INTERIOR_ORIENTATION_OR_OUTSIDE_EXTERIOR,
+							RING_INTERSECTION,
+							this.coordinates.get(sourceEdgeCoordIndex), this.coordinates.get(sourceEdgeCoordIndex + 1),
 							"IS", String.valueOf(compressedLocation),
-							"X", String.valueOf(this.coordinates.get(sourceEdgeCoordIndex)),
-							"Y", String.valueOf(this.coordinates.get(sourceEdgeCoordIndex + 1)),
 							"CW", getLocationAsStr(-ccwNext),
 							"CCW", getLocationAsStr(cwNext));
 				} else if (cwObjectFromTargetEdge != 0 && abs(cwObjectFromTargetEdge) != objectId) {
 					final int sourceEdgeCoordIndex = getEdgeCoordIndex(sourceEdgeIndex);
 					errorCollector.collectError(
-							INTERIOR_INTERSECTION,
+							RING_INTERSECTION,
+							this.coordinates.get(sourceEdgeCoordIndex), this.coordinates.get(sourceEdgeCoordIndex + 1),
 							"IS", String.valueOf(compressedLocation),
-							"X", String.valueOf(this.coordinates.get(sourceEdgeCoordIndex)),
-							"Y", String.valueOf(this.coordinates.get(sourceEdgeCoordIndex + 1)),
 							"CW", getLocationAsStr(-ccwNext),
 							"CCW", getLocationAsStr(cwNext));
 				}
@@ -388,7 +435,7 @@ public class TopologyBuilder implements HashingSegmentHandler {
 
 			int i = 0;
 
-			while (true) {
+			while (++i < 360) {
 
 				if (ccwNextSourceCoordIndex == sourceCoordIndex && ccwNextTargetCoordIndex == targetCoordIndex) {
 					this.previousEdgeIndex = -ccwNext;
@@ -403,11 +450,8 @@ public class TopologyBuilder implements HashingSegmentHandler {
 				ccwNext = getLeftOrRightByIndex(ccwNext, CCWI_OFFSET);
 				ccwNextSourceCoordIndex = getLeftOrRightByIndex(ccwNext, COORDINATE_OFFSET);
 				ccwNextTargetCoordIndex = getLeftOrRightByIndex(-ccwNext, COORDINATE_OFFSET);
-
-				if (++i > 360) {
-					return false;
-				}
 			}
+			return false;
 		}
 		return true;
 	}
@@ -449,8 +493,8 @@ public class TopologyBuilder implements HashingSegmentHandler {
 				if (!findEdge(x, y)) {
 					// The edge can not be found, most likely due to previous errors in the geometric object.
 					errorCollector.collectError(EDGE_NOT_FOUND,
+							this.previousX, this.previousY,
 							"OBJ", String.valueOf(this.objectId),
-							"SX", String.valueOf(this.previousX), "SY", String.valueOf(this.previousY),
 							"TX", String.valueOf(x), "TY", String.valueOf(y));
 					this.previousEdgeIndex = 0;
 					previousX = x;
@@ -487,7 +531,7 @@ public class TopologyBuilder implements HashingSegmentHandler {
 						// Add indices for source and target coordinates
 						this.topology.add(compress(previousTargetCoordinateIndex, newIndexCoordIndex));
 
-						addAngles(x, y, centerX, centerY);
+						addAnglesArc(x, y, centerX, centerY);
 
 						if (targetEdgeIndex != this.previousEdgeIndex) {
 							// the edge is connected to an existing edge
@@ -516,7 +560,7 @@ public class TopologyBuilder implements HashingSegmentHandler {
 						// Add coordinates
 						this.topology.add(compress(previousTargetCoordinateIndex, targetEdgeCoordIndex));
 
-						addAngles(x, y, centerX, centerY);
+						addAnglesArc(x, y, centerX, centerY);
 
 						// Adjust the ccw-nexts
 						final int sourceCcwNext = adjustCcwNexts(previousEdgeIndex, current, compressedLocation);
@@ -541,7 +585,7 @@ public class TopologyBuilder implements HashingSegmentHandler {
 					// Add source coordinates which were the target in the previous edge
 					this.topology.add(compress(previousTargetCoordinateIndex, getEdgeCoordIndex(targetEdgeIndex)));
 
-					addAngles(x, y, centerX, centerY);
+					addAnglesArc(x, y, centerX, centerY);
 
 					// Adjust the ccw-next of the previous edge node target
 					connectCurrentEdge(targetEdgeIndex, compressedLocation);
@@ -565,7 +609,7 @@ public class TopologyBuilder implements HashingSegmentHandler {
 
 	@Override
 	public void coordinate2d(final double x, final double y, final long hash, final long compressedLocation, final int ignore) {
-		if (previousHash != 0) {
+		if (previousHash != 0 && previousHash != hash) {
 			createEdgeOrSetObject(x, y, hash, compressedLocation);
 		}
 		previousX = x;
@@ -581,8 +625,8 @@ public class TopologyBuilder implements HashingSegmentHandler {
 			if (!findEdge(x, y)) {
 				// The edge can not be found, most likely due to previous errors in the geometric object.
 				errorCollector.collectError(EDGE_NOT_FOUND,
+						this.previousX, this.previousY,
 						"OBJ", String.valueOf(this.objectId),
-						"SX", String.valueOf(this.previousX), "SY", String.valueOf(this.previousY),
 						"TX", String.valueOf(x), "TY", String.valueOf(y));
 				this.previousEdgeIndex = 0;
 				this.previousHash = 0;
@@ -697,7 +741,31 @@ public class TopologyBuilder implements HashingSegmentHandler {
 		this.topology.add(0);
 	}
 
-	private void setObject(long compressedLocation) {
+	private void collectErrorInnerRingSelfIntersection(final long compressedLocation, final int locationOffset) {
+		final int edgeCoordIndex = getEdgeCoordIndex(previousEdgeIndex);
+		errorCollector.collectError(
+				INNER_RING_SELF_INTERSECTION,
+				this.coordinates.get(edgeCoordIndex),
+				this.coordinates.get(edgeCoordIndex + 1),
+				// existing object id
+				"IS", String.valueOf(topology.getQuick(locationOffset)),
+				// new object overlapping id
+				"O", String.valueOf(compressedLocation));
+	}
+
+	private void collectErrorOverlappingEdges(final long compressedLocation, final int locationOffset) {
+		final int edgeCoordIndex = getEdgeCoordIndex(previousEdgeIndex);
+		errorCollector.collectError(
+				RING_OVERLAPPING_EDGES,
+				this.coordinates.get(edgeCoordIndex),
+				this.coordinates.get(edgeCoordIndex + 1),
+				// existing object id
+				"IS", String.valueOf(topology.getQuick(locationOffset)),
+				// new object overlapping id
+				"O", String.valueOf(compressedLocation));
+	}
+
+	private void setObject(final long compressedLocation) {
 		final int reqIndex = abs(previousEdgeIndex);
 		final long previousObjs = topology.getQuick(reqIndex + OBJ_OFFSET);
 		final int leftObj = getLeft(previousObjs);
@@ -708,14 +776,26 @@ public class TopologyBuilder implements HashingSegmentHandler {
 			if (this.exterior && previousEdgeIndex < 0) {
 				// the negative previousEdgeIndex indicates that the edge has been created
 				// by the outer ring on the left side.
-				errorCollector.collectError(OUTER_RING_INVALID_CURVE_ORIENTATION,
-						"t", String.valueOf(compressedLocation),
-						"o", String.valueOf(topology.getQuick(reqIndex + LEFT_LOCATION_INDEX)));
+
+				// TODO distinguish with an OUTER_RING_INVALID_CURVE_ORIENTATION error ?
+				collectErrorOverlappingEdges(compressedLocation, reqIndex + LEFT_LOCATION_INDEX);
+				/*
+				errorCollector.collectError(
+						// OUTER_RING_INVALID_CURVE_ORIENTATION,
+						RING_OVERLAPPING_EDGES,
+						"E1", String.valueOf(compressedLocation),
+						"E2", String.valueOf(topology.getQuick(reqIndex + LEFT_LOCATION_INDEX))
+				);
+				*/
 			} else if (rightObj != 0) {
 				// there is also inner or outer ring on the the right side
-				errorCollector.collectError(RING_OVERLAPPING_EDGES,
-						"t", String.valueOf(compressedLocation),
-						"o", String.valueOf(topology.getQuick(reqIndex + RIGHT_LOCATION_INDEX)));
+				/*
+				errorCollector.collectError(
+						RING_OVERLAPPING_EDGES,
+						"E1", String.valueOf(compressedLocation),
+						"E2", String.valueOf(topology.getQuick(reqIndex + RIGHT_LOCATION_INDEX)));
+						*/
+				collectErrorOverlappingEdges(compressedLocation, reqIndex + RIGHT_LOCATION_INDEX);
 			} else {
 				// Set on right side
 				topology.setQuick(reqIndex + OBJ_OFFSET, compress(leftObj, newObjectId));
@@ -726,14 +806,22 @@ public class TopologyBuilder implements HashingSegmentHandler {
 			if (!this.exterior && previousEdgeIndex < 0) {
 				// the negative previousEdgeIndex indicates that the edge has been created
 				// by the inner ring on the left side.
-				errorCollector.collectError(RING_OVERLAPPING_EDGES,
-						"t", String.valueOf(compressedLocation),
-						"o", String.valueOf(topology.getQuick(reqIndex + LEFT_LOCATION_INDEX)));
+				/*
+				errorCollector.collectError(
+						RING_OVERLAPPING_EDGES,
+						"E1", String.valueOf(compressedLocation),
+						"E2", String.valueOf(topology.getQuick(reqIndex + LEFT_LOCATION_INDEX)));
+						*/
+				collectErrorOverlappingEdges(compressedLocation, reqIndex + LEFT_LOCATION_INDEX);
 			} else if (rightObj != 0) {
 				// there is also inner or outer ring on the the right side
-				errorCollector.collectError(RING_OVERLAPPING_EDGES,
-						"t", String.valueOf(compressedLocation),
-						"o", String.valueOf(topology.getQuick(reqIndex + RIGHT_LOCATION_INDEX)));
+				/*
+				errorCollector.collectError(
+						RING_OVERLAPPING_EDGES,
+						"E1", String.valueOf(compressedLocation),
+						"E2", String.valueOf(topology.getQuick(reqIndex + RIGHT_LOCATION_INDEX)));
+				*/
+				collectErrorOverlappingEdges(compressedLocation, reqIndex + RIGHT_LOCATION_INDEX);
 			} else {
 				// Set on right side
 				topology.setQuick(reqIndex + OBJ_OFFSET, compress(leftObj, newObjectId));
@@ -744,9 +832,14 @@ public class TopologyBuilder implements HashingSegmentHandler {
 			// Left side is free. If this is an inner ring, check on other side that no other inner
 			// ring is intersecting with this one
 			if (!this.exterior && rightObj < 0) {
-				errorCollector.collectError(INNER_RING_SELF_INTERSECTION,
+				/*
+				errorCollector.collectError(
+						INNER_RING_SELF_INTERSECTION,
 						"t", String.valueOf(compressedLocation),
 						"o", String.valueOf(topology.getQuick(reqIndex + RIGHT_LOCATION_INDEX)));
+				*/
+
+				collectErrorInnerRingSelfIntersection(compressedLocation, reqIndex + RIGHT_LOCATION_INDEX);
 				this.previousEdgeIndex = 0;
 				this.previousHash = 0;
 			} else {
@@ -776,6 +869,19 @@ public class TopologyBuilder implements HashingSegmentHandler {
 								sourceX - targetX)));
 	}
 
+	private void addAnglesArc(final double targetX, final double targetY, final double sourceX, final double sourceY) {
+		topology.add(
+				Double.doubleToLongBits(
+						atan2(
+								targetY - sourceY,
+								targetX - sourceX)));
+		topology.add(
+				Double.doubleToLongBits(
+						atan2(
+								sourceY - targetY,
+								sourceX - targetX)));
+	}
+
 	private int getEdgeCoordIndex(final int edgeIndex) {
 		if (edgeIndex == -topology.size()) {
 			return this.coordinates.size() - 2;
@@ -786,7 +892,7 @@ public class TopologyBuilder implements HashingSegmentHandler {
 		}
 	}
 
-	private static long calcCoordHashCode(final double x, final double y) {
+	static long calcCoordHashCode(final double x, final double y) {
 		long coordHash = 0xcbf29ce484222325L;
 		coordHash = coordHash * 0x100000001b3L * Double.doubleToLongBits(x);
 		coordHash = coordHash * 0x100000001b3L * Double.doubleToLongBits(y * y);
@@ -800,6 +906,105 @@ public class TopologyBuilder implements HashingSegmentHandler {
 		// spread
 		edgeHash = edgeHash * Math.max(previousHash, hash);
 		return !edgeExistence.add(edgeHash);
+	}
+
+	int internalTopologicalDataSize() {
+		return topology.size();
+	}
+
+	long getTopologicalData(final int edgeIndex) {
+		return topology.getQuick(edgeIndex);
+	}
+
+	int internalCoordinateSize() {
+		return coordinates.size();
+	}
+
+	double getCoordinate(final int coordinateIndex) {
+		return coordinates.getQuick(coordinateIndex);
+	}
+
+	private boolean checkIfInteriorEdgeAndMark(final int edgeIndex) {
+		if (topology.getQuick(abs(edgeIndex) + RIGHT_LOCATION_INDEX) == 0) {
+			final long obj = topology.getQuick(edgeIndex + OBJ_OFFSET);
+			// Check if this is an exterior edge
+			if (getLeft(obj) < 0) {
+				// mark it
+				topology.setQuick(edgeIndex + RIGHT_LOCATION_INDEX, Integer.MIN_VALUE);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	int findNextEmptyInterior(final int currentPos) {
+		final int maxEdgeSearch = 100_000;
+		for (int i = currentPos; i < topology.size(); i += TOPOLOGY_FIELDS_SIZE) {
+			// Check if an object is set on the right side
+			if (checkIfInteriorEdgeAndMark(i)) {
+				// Check if this is an interior edge
+				final int emptyInteriorEdge = i;
+				int next = getLeftOrRightByIndex(-emptyInteriorEdge, CCWI_OFFSET);
+				int steps = 0;
+				for (; steps < maxEdgeSearch && emptyInteriorEdge != next && -emptyInteriorEdge != next &&
+						checkIfInteriorEdgeAndMark(next); steps++) {
+					next = getLeftOrRightByIndex(-next, CCWI_OFFSET);
+				}
+				return emptyInteriorEdge;
+			}
+		}
+		return topology.size();
+	}
+
+	/**
+	 * Check if edge is an exterior edge without an object on the right side and mark the
+	 * edge by setting a max value on the right side.
+	 *
+	 * @param edgeIndex edge index
+	 * @return true if edge is an exterior edge without an object on the right side
+	 */
+	private boolean checkIfOutsideExteriorEdgeAndMark(final int edgeIndex) {
+		if (topology.getQuick(abs(edgeIndex) + RIGHT_LOCATION_INDEX) == 0) {
+			final long obj = topology.getQuick(edgeIndex + OBJ_OFFSET);
+			// Check if this is an exterior edge
+			if (getLeft(obj) > 0) {
+				// mark it
+				topology.setQuick(edgeIndex + RIGHT_LOCATION_INDEX, Integer.MIN_VALUE);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Find free standing edges in the topological data strcuture
+	 *
+	 * @param firstFoundFreeStandingSurfaceEdges array for adding the first edge of the free standing surface
+	 * @param freeStandingSurfaceEdgeSize edge count of the free standing surface
+	 */
+	void findFreeStandingSurfaces(final TIntArrayList firstFoundFreeStandingSurfaceEdges,
+			final TIntArrayList freeStandingSurfaceEdgeSize) {
+		final int maxEdgeSearch = 1_000_000;
+
+		for (int i = TOPOLOGY_FIELDS_SIZE; i < topology.size(); i += TOPOLOGY_FIELDS_SIZE) {
+			// Check if an object is set on the right side
+			if (checkIfOutsideExteriorEdgeAndMark(i)) {
+				// Found the first exterior edge without anything on the right side.
+				// Mark this edge and begin to iterate along the edges until we either
+				// return to this edge or find an edge that has something on the right side.
+				final int freestandingSurfaceEdge = i;
+				int next = getLeftOrRightByIndex(-freestandingSurfaceEdge, CCWI_OFFSET);
+				int steps = 0;
+				for (; steps < maxEdgeSearch && freestandingSurfaceEdge != next && -freestandingSurfaceEdge != next &&
+						checkIfOutsideExteriorEdgeAndMark(next); steps++) {
+					next = getLeftOrRightByIndex(-next, CCWI_OFFSET);
+				}
+				if (steps > 1) {
+					firstFoundFreeStandingSurfaceEdges.add(freestandingSurfaceEdge);
+					freeStandingSurfaceEdgeSize.add(steps);
+				}
+			}
+		}
 	}
 
 	static double getSourceAngle(final TLongArrayList topology, final int index) {
@@ -884,7 +1089,7 @@ public class TopologyBuilder implements HashingSegmentHandler {
 		}
 	}
 
-	private int getLeftOrRightByIndex(final int index, final int propertyOffset) {
+	int getLeftOrRightByIndex(final int index, final int propertyOffset) {
 		if (index > 0) {
 			return getLeft(topology.getQuick(index + propertyOffset));
 		} else {
@@ -935,10 +1140,6 @@ public class TopologyBuilder implements HashingSegmentHandler {
 		exterior = false;
 	}
 
-	TopologyStore build() {
-		return new TopologyStore(this);
-	}
-
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder("TopologyBuilder{ ");
@@ -956,5 +1157,21 @@ public class TopologyBuilder implements HashingSegmentHandler {
 		sb.append(errors);
 		sb.append('}');
 		return sb.toString();
+	}
+
+	int internalGetCurrentObjectId() {
+		return objectId;
+	}
+
+	int internalGetObjectsProcessed() {
+		return objectsProcessed;
+	}
+
+	int internalGetLookupCollisions() {
+		return coordinateCollisionHashToEdgeMap.size();
+	}
+
+	int internalGetLookupErrors() {
+		return errors;
 	}
 }
