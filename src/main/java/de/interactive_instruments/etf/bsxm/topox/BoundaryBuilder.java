@@ -44,31 +44,28 @@ public class BoundaryBuilder {
 
 		@Override
 		public void coordinate2d(final double x, final double y, final long hash, final long location, final int type) {
-			if(previousNode==null) {
-				previousNode=theme.topology.node(x,y);
-				if(previousNode==null) {
+			if (previousNode == null) {
+				previousNode = theme.topology.node(x, y);
+				if (previousNode == null) {
 					errorCollector.collectError(BOUNDARY_POINT_DETACHED,
-							x,y,
-							"IS", String.valueOf(location)
-					);
+							x, y,
+							"IS", String.valueOf(location));
 				}
-			}else{
+			} else {
 				final Topology.Node nextNode = theme.topology.node(x, y);
-				if(nextNode==null) {
+				if (nextNode == null) {
 					errorCollector.collectError(BOUNDARY_POINT_DETACHED,
-							x,y,
-							"IS", String.valueOf(location)
-					);
+							x, y,
+							"IS", String.valueOf(location));
 					previousNode = null;
-				}else{
+				} else {
 					final Topology.Edge edge = previousNode.edge(nextNode);
-					if(edge==null) {
+					if (edge == null) {
 						errorCollector.collectError(BOUNDARY_EDGE_INVALID,
-								x,y,
+								x, y,
 								"IS", String.valueOf(location),
 								"X2", String.valueOf(previousNode.x()),
-								"Y2", String.valueOf(previousNode.y())
-						);
+								"Y2", String.valueOf(previousNode.y()));
 					}
 					previousNode = nextNode;
 				}

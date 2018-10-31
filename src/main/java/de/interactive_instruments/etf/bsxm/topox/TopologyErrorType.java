@@ -90,7 +90,6 @@ enum TopologyErrorType {
 	 */
 	BOUNDARY_EDGE_INVALID,
 
-
 	//////////////////////////////////////////////////////////////////////////
 	// Deprecated and removed later
 	/**
