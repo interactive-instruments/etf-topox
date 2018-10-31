@@ -12,7 +12,7 @@ topox:init-db("MY-DB-000", xs:short(1))
 ```
 The first parameter (`"MY-DB-000"`) is the database name.
 
-Database names must be suffixed with a three digits index starting with `000`. This is necessary because internally the suffix is used to encode references (see architecture documentation for details). 
+Database names must be suffixed with a three digits index starting with `000`. This is necessary because internally the suffix is used to encode references (see architecture documentation for details).
 
 As second parameter the number of databases is passed.
 
@@ -29,9 +29,9 @@ Multiple topologies can be set up for a set of Features and checked. The initial
 ```XQuery
 
 let $topoId := topox:new-topology(
-  'Tatsaechliche_Nutzung',
-  '/tmp',
-  $initialEdgeCapacity
+'Tatsaechliche_Nutzung',
+'/tmp',
+$initialEdgeCapacity
 )
 
 ```
@@ -51,7 +51,7 @@ let $dummy := topox:parse-surface($surfaces, 'adv:position/gml:Surface', $topoId
 
 The Features are passed in the first parameter. The second parameter is the path to the geometry properties starting from the passed Features. At present, GML LineStringSegments and Arcs are processed.
 
-This function call will take some time depending on the amount of data. 
+This function call will take some time depending on the amount of data.
 
 During the parsing, errors are written to a temporary file. The detected errors include intersections and overlapping edges (see RING\_OVERLAPPING\_EDGES and RING\_INTERSECTION error codes). The errors can be retrieved by using the topological-errors() function:
 
@@ -98,7 +98,7 @@ Free-standing surfaces can be detected by using the detect-free-standing-surface
 let $freeStandingSurfaceCount := topox:detect-free-standing-surfaces($topoId)
 ```
 
-The function returns the number of found free-standing surfaces. 
+The function returns the number of found free-standing surfaces.
 
 All detected issues are saved with the FREE\_STANDING\_SURFACE error code and can be retrieved with the topological-errors() function.
 
@@ -122,7 +122,7 @@ The second call to start the parsing of boundaries, is very similar to the parse
 let $borderParsingDummy := topox:parse-boundary($borders, 'adv:position/gml:*', $boundaryId)
 ```
 
-If the points or edges of the boundaries do not overlap exactly with the basis 
+If the points or edges of the boundaries do not overlap exactly with the basis
 data, BOUNDARY\_POINT\_DETACHED and BOUNDARY\_EDGE\_INVALID errors are reported in the error file.
 
 
@@ -139,7 +139,7 @@ let $dummyMap := topox:export-erroneous-features-to-geojson($topoId, "Map")
 Topological errors types
 ========================
 
-Structure 
+Structure
 ---------
 
 TopoX exposes the errors found via two functions: topological-errors-doc() and topological-errors(). The first function can be used to retrieve all errors as one node, the second one accepts a parameter to filter the errors for specific error types:
@@ -150,7 +150,7 @@ TopoX exposes the errors found via two functions: topological-errors-doc() and t
 let $allErrors := topological-errors-doc($topoId)
 
 (: Get only errors of the type RING\_INTERSECTION and the FREE\_STANDING\_SURFACE :)
-let $ringAndFreeStandingSurfaceErrors := topological-errors($topoId, 
+let $ringAndFreeStandingSurfaceErrors := topological-errors($topoId,
 		('RING_INTERSECTION', 'FREE_STANDING_SURFACE'))
 ```
 
@@ -158,19 +158,19 @@ The internal error structure, completly returned by the topological-errors-doc()
 
 ```xml
 <ete:TopologicalErrors xmlns:ete="http://www.interactive-instruments.de/etf/topology-error/1.0"
-    name="Tatsaechliche_Nutzung">
-    <e i="1" t="RING_INTERSECTION">
-        <IS>519785877976</IS>
-        <X>367300.055</X>
-        <Y>5614385.776</Y>
-        <CW>579820659004</CW>
-        <CCW>609885430083</CCW>
-    </e>
-    <e i="2" t="FREE_STANDING_SURFACE">
-        <X>364965.726</X>
-        <Y>5620249.802</Y>
-        <IS>365113240849</IS>
-    </e>
+	name="Tatsaechliche_Nutzung">
+	<e i="1" t="RING_INTERSECTION">
+		<IS>519785877976</IS>
+		<X>367300.055</X>
+		<Y>5614385.776</Y>
+		<CW>579820659004</CW>
+		<CCW>609885430083</CCW>
+	</e>
+	<e i="2" t="FREE_STANDING_SURFACE">
+		<X>364965.726</X>
+		<Y>5620249.802</Y>
+		<IS>365113240849</IS>
+	</e>
 </ete:TopologicalErrors>
 ```
 
@@ -208,7 +208,7 @@ There are two Features that define an edge at two points. The features lie on th
 
 ### RING\_INTERSECTION
 
-There are at least three edges that are connected at one point (*X, Y* properties). Due to their angles, two edges intersect in the course of the lines. The *IS* property references the object where the error has been detected. *CW* is the object that is connected counter-clockwise to the edge, *CWW* is the object that is connected counter-clockwise to the edge. 
+There are at least three edges that are connected at one point (*X, Y* properties). Due to their angles, two edges intersect in the course of the lines. The *IS* property references the object where the error has been detected. *CW* is the object that is connected counter-clockwise to the edge, *CWW* is the object that is connected counter-clockwise to the edge.
 
 ### HOLE\_EMPTY\_INTERIOR
 
@@ -226,7 +226,7 @@ A boundary point (*X, Y* properties) was defined that could not be found in the 
 
 An edge (*X, Y* reference start point of the edge, *X2, Y2* the end point) was defined that could not be found in the topological basis data. The *IS* property references the object where the error has been detected.
 
-### EDGE\_NOT\_FOUND 
+### EDGE\_NOT\_FOUND
 An edge could not be found. This is most likely a consequential error if others occurred and for instance the connection between two points has been invalidated in the data structure. If this is the only type of error that occurred, then this may indicate a bug in the software.
 
 ### INVALID\_ANGLE

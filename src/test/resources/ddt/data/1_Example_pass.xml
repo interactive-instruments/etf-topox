@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adv:AX_Bestandsdatenauszug xmlns:adv="http://www.adv-online.de/namespaces/adv/gid/6.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:fes="http://www.opengis.net/fes/2.0" xmlns:wfsAdv="http://www.adv-online.de/namespaces/adv/gid/wfs" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:gml="http://www.opengis.net/gml/3.2">
+    <adv:erfolgreich>true</adv:erfolgreich>
+    <adv:antragsnummer>JUNIT_FeatureCollection.1</adv:antragsnummer>
+    <adv:allgemeineAngaben>
+        <adv:AX_K_Benutzungsergebnis>
+            <adv:folgeverarbeitung>
+                <adv:AX_FOLGEVA>
+                    <adv:datenformat>1000</adv:datenformat>
+                </adv:AX_FOLGEVA>
+            </adv:folgeverarbeitung>
+            <adv:empfaenger>
+                <adv:AA_Empfaenger>
+                    <adv:direkt>true</adv:direkt>
+                </adv:AA_Empfaenger>
+            </adv:empfaenger>
+        </adv:AX_K_Benutzungsergebnis>
+    </adv:allgemeineAngaben>
+    <adv:koordinatenangaben>
+        <adv:AA_Koordinatenreferenzsystemangaben>
+            <adv:crs xlink:href="urn:adv:crs:PSEUDO"></adv:crs>
+            <adv:anzahlDerNachkommastellen>3</adv:anzahlDerNachkommastellen>
+            <adv:standard>true</adv:standard>
+        </adv:AA_Koordinatenreferenzsystemangaben>
+    </adv:koordinatenangaben>
+    <adv:enthaelt>
+        <wfsAdv:FeatureCollection gml:id="FeatureCollection.1">
+            <gml:featureMember>
+                <adv:AX_Landwirtschaft gml:id="Feature.1">
+                    <gml:identifier codeSpace="http://www.adv-online.de/">urn:adv:oid:JUNIT:Feature.1</gml:identifier>
+                    <adv:lebenszeitintervall>
+                        <adv:AA_Lebenszeitintervall>
+                            <adv:beginnt>2018-12-31T00:00:00Z</adv:beginnt>
+                        </adv:AA_Lebenszeitintervall>
+                    </adv:lebenszeitintervall>
+                    <adv:modellart>
+                        <adv:AA_Modellart>
+                            <adv:advStandardModell>DLKM</adv:advStandardModell>
+                        </adv:AA_Modellart>
+                    </adv:modellart>
+                    <adv:modellart>
+                        <adv:AA_Modellart>
+                            <adv:sonstigesModell>NWABK</adv:sonstigesModell>
+                        </adv:AA_Modellart>
+                    </adv:modellart>
+                    <adv:anlass>000000</adv:anlass>
+                    <adv:position>
+                        <gml:Surface gml:id="Feature.1.position_complex.Geom_0">
+                            <gml:patches>
+                                <gml:PolygonPatch>
+                                    <gml:exterior>
+                                        <gml:Ring>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.1.position_complex.Geom_1">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList gml:dimension="2">35.957 91.084 31.337 87.717</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.1.position_complex.Geom_2">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>31.337 87.717 31.896 84.630</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.1.position_complex.Geom_3">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>31.896 84.630 32.036 81.121</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.1.position_complex.Geom_4">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>32.036 81.121 32.456 76.912</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.1.position_complex.Geom_5">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>32.456 76.912 34.276 73.964</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.1.position_complex.Geom_6">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>34.276 73.964 36.237 73.543</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.1.position_complex.Geom_7">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>36.237 73.543 37.917 71.860</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.1.position_complex.Geom_8">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>37.917 71.860 37.777 69.053</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.1.position_complex.Geom_9">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>37.777 69.053 36.797 66.106</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.1.position_complex.Geom_10">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>36.797 66.106 36.936 63.580</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.1.position_complex.Geom_11">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>36.936 63.580 40.017 63.299</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.1.position_complex.Geom_12">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>40.017 63.299 42.537 64.423</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.1.position_complex.Geom_13">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>42.537 64.423 47.718 66.246</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.1.position_complex.Geom_14">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>47.718 66.246 51.639 72.420</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.1.position_complex.Geom_15">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>51.639 72.420 52.058 74.806</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.1.position_complex.Geom_16">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>52.058 74.806 51.079 77.612</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.1.position_complex.Geom_17">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>51.079 77.612 50.238 79.998</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.1.position_complex.Geom_18">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>50.238 79.998 51.499 82.524</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.1.position_complex.Geom_19">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>51.499 82.524 52.059 85.892</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.1.position_complex.Geom_20">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>52.059 85.892 52.339 92.768</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.1.position_complex.Geom_21">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>52.339 92.768 50.098 95.153</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.1.position_complex.Geom_22">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>50.098 95.153 48.138 93.610</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.1.position_complex.Geom_23">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>48.138 93.610 43.658 92.487</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.1.position_complex.Geom_24">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>43.658 92.487 35.957 91.084</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                        </gml:Ring>
+                                    </gml:exterior>
+                                </gml:PolygonPatch>
+                            </gml:patches>
+                        </gml:Surface>
+                    </adv:position>
+                    <adv:funktion>0000</adv:funktion>
+                    <adv:name>
+                        <adv:AX_Lagebezeichnung>
+                            <adv:unverschluesselt>PSEUDO_FEATURE</adv:unverschluesselt>
+                        </adv:AX_Lagebezeichnung>
+                    </adv:name>
+                </adv:AX_Landwirtschaft>
+            </gml:featureMember>
+
+            <gml:featureMember>
+                <adv:AX_Landwirtschaft gml:id="Feature.2">
+                    <gml:identifier codeSpace="http://www.adv-online.de/">urn:adv:oid:JUNIT:Feature.2</gml:identifier>
+                    <adv:lebenszeitintervall>
+                        <adv:AA_Lebenszeitintervall>
+                            <adv:beginnt>2018-12-31T00:00:00Z</adv:beginnt>
+                        </adv:AA_Lebenszeitintervall>
+                    </adv:lebenszeitintervall>
+                    <adv:modellart>
+                        <adv:AA_Modellart>
+                            <adv:advStandardModell>DLKM</adv:advStandardModell>
+                        </adv:AA_Modellart>
+                    </adv:modellart>
+                    <adv:modellart>
+                        <adv:AA_Modellart>
+                            <adv:sonstigesModell>NWABK</adv:sonstigesModell>
+                        </adv:AA_Modellart>
+                    </adv:modellart>
+                    <adv:anlass>000000</adv:anlass>
+                    <adv:position>
+                        <gml:Surface gml:id="Feature.2.position_complex.Geom_0">
+                            <gml:patches>
+                                <gml:PolygonPatch>
+                                    <gml:interior>
+                                        <gml:Ring>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.2.position_complex.Geom_1">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>37.917 71.860 37.777 69.053</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.2.position_complex.Geom_2">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>37.777 69.053 36.797 66.106</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.2.position_complex.Geom_3">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>36.797 66.106 36.936 63.580</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.2.position_complex.Geom_4">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>36.936 63.580 25.060 63.930</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.2.position_complex.Geom_5">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>25.060 63.930 24.764 69.018</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                            <gml:curveMember>
+                                                <gml:Curve gml:id="Feature.2.position_complex.Geom_6">
+                                                    <gml:segments>
+                                                        <gml:LineStringSegment>
+                                                            <gml:posList>24.764 69.018 37.917 71.860</gml:posList>
+                                                        </gml:LineStringSegment>
+                                                    </gml:segments>
+                                                </gml:Curve>
+                                            </gml:curveMember>
+                                        </gml:Ring>
+                                    </gml:interior>
+                                </gml:PolygonPatch>
+                            </gml:patches>
+                        </gml:Surface>
+                    </adv:position>
+                    <adv:funktion>0000</adv:funktion>
+                    <adv:name>
+                        <adv:AX_Lagebezeichnung>
+                            <adv:unverschluesselt>PSEUDO_FEATURE</adv:unverschluesselt>
+                        </adv:AX_Lagebezeichnung>
+                    </adv:name>
+                </adv:AX_Landwirtschaft>
+            </gml:featureMember>
+
+        </wfsAdv:FeatureCollection>
+    </adv:enthaelt>
+</adv:AX_Bestandsdatenauszug>

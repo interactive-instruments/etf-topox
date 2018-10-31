@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.apache.commons.io.filefilter.OrFileFilter;
 import org.basex.core.cmd.XQuery;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.builder.Input;
@@ -32,6 +33,7 @@ import org.xmlunit.diff.Diff;
 import org.xmlunit.diff.Difference;
 
 import de.interactive_instruments.IFile;
+import de.interactive_instruments.io.FilenameExtensionFilter;
 import de.interactive_instruments.io.GmlAndXmlFilter;
 import de.interactive_instruments.io.MultiFileFilter;
 
@@ -116,12 +118,14 @@ class BsxDataDrivenTest {
 	}
 
 	private BsxDataDrivenTest(final IFile ddtDirectory) {
-		final MultiFileFilter xmlFilter = GmlAndXmlFilter.instance().filename();
-		dataFiles = ddtDirectory.secureExpandPathDown("data").listIFiles(xmlFilter);
+		final MultiFileFilter xmlFileFilter = GmlAndXmlFilter.instance().filename();
+		final FilenameExtensionFilter zipFileFilter = new FilenameExtensionFilter(".zip");
+		final MultiFileFilter fileFilter = xmlFileFilter.or(zipFileFilter);
+		dataFiles = ddtDirectory.secureExpandPathDown("data").listIFiles(fileFilter);
 		queryDir = ddtDirectory.secureExpandPathDown("queries");
 		defaultQueryFile = queryDir.secureExpandPathDown("default.xq");
 		assertTrue(defaultQueryFile.exists(), "Default XQuery file missing");
-		expectedFiles = ddtDirectory.secureExpandPathDown("expected").listIFiles(xmlFilter);
+		expectedFiles = ddtDirectory.secureExpandPathDown("expected").listIFiles(xmlFileFilter);
 		assertTrue(dataFiles.length > 0, "No XML files found in test data directory");
 		assertEquals(dataFiles.length, expectedFiles.length,
 				"Number of test data files does not match the number of expected result files");

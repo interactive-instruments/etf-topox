@@ -22,6 +22,7 @@ import java.io.IOException;
 import org.junit.jupiter.api.Test;
 
 import de.interactive_instruments.IFile;
+import de.interactive_instruments.etf.bsxm.topox.GeoJsonWriter;
 
 /**
  * @author Jon Herrmann ( herrmann aT interactive-instruments doT de )

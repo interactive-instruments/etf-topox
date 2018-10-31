@@ -1,0 +1,202 @@
+<ete:TopologicalErrors xmlns:ete="http://www.interactive-instruments.de/etf/topology-error/1.0" name="Tatsaechliche_Nutzung">
+    <e i="1" t="HOLE_EMPTY_INTERIOR">
+        <X>378968.753</X>
+        <Y>5710088.023</Y>
+        <IS>3354369719665</IS>
+    </e>
+    <e i="2" t="HOLE_EMPTY_INTERIOR">
+        <X>378886.452</X>
+        <Y>5710273.687</Y>
+        <IS>7052336563440</IS>
+    </e>
+    <e i="3" t="HOLE_EMPTY_INTERIOR">
+        <X>377208.13</X>
+        <Y>5709300.387</Y>
+        <IS>3534758349151</IS>
+    </e>
+    <e i="4" t="FREE_STANDING_SURFACE">
+        <X>371162.245</X>
+        <Y>5708176.23</Y>
+        <IS>188978809102</IS>
+    </e>
+    <e i="5" t="FREE_STANDING_SURFACE">
+        <X>371433.863</X>
+        <Y>5707726.322</Y>
+        <IS>188978809239</IS>
+    </e>
+    <e i="6" t="FREE_STANDING_SURFACE">
+        <X>371330.007</X>
+        <Y>5707844.135</Y>
+        <IS>188978809889</IS>
+    </e>
+    <e i="7" t="FREE_STANDING_SURFACE">
+        <X>373113.909</X>
+        <Y>5708286.582</Y>
+        <IS>154619072443</IS>
+    </e>
+    <e i="8" t="FREE_STANDING_SURFACE">
+        <X>372378.328</X>
+        <Y>5711498.358</Y>
+        <IS>188978811377</IS>
+    </e>
+    <e i="9" t="FREE_STANDING_SURFACE">
+        <X>371942.809</X>
+        <Y>5710754.084</Y>
+        <IS>154619074155</IS>
+    </e>
+    <e i="10" t="FREE_STANDING_SURFACE">
+        <X>374685.289</X>
+        <Y>5709566.152</Y>
+        <IS>154619076204</IS>
+    </e>
+    <e i="11" t="FREE_STANDING_SURFACE">
+        <X>373550.148</X>
+        <Y>5709793.227</Y>
+        <IS>154619077112</IS>
+    </e>
+    <e i="12" t="FREE_STANDING_SURFACE">
+        <X>373529.393</X>
+        <Y>5709779.301</Y>
+        <IS>154619077730</IS>
+    </e>
+    <e i="13" t="FREE_STANDING_SURFACE">
+        <X>375645.619</X>
+        <Y>5709671.462</Y>
+        <IS>188978817067</IS>
+    </e>
+    <e i="14" t="FREE_STANDING_SURFACE">
+        <X>374799.974</X>
+        <Y>5709798.524</Y>
+        <IS>188978817463</IS>
+    </e>
+    <e i="15" t="FREE_STANDING_SURFACE">
+        <X>374856.11</X>
+        <Y>5709831.399</Y>
+        <IS>188978817885</IS>
+    </e>
+    <e i="16" t="FREE_STANDING_SURFACE">
+        <X>375170.928</X>
+        <Y>5710071.782</Y>
+        <IS>188978818301</IS>
+    </e>
+    <e i="17" t="FREE_STANDING_SURFACE">
+        <X>378485.89</X>
+        <Y>5710871.723</Y>
+        <IS>188978818524</IS>
+    </e>
+    <e i="18" t="FREE_STANDING_SURFACE">
+        <X>377509.902</X>
+        <Y>5709931.834</Y>
+        <IS>188978819762</IS>
+    </e>
+    <e i="19" t="FREE_STANDING_SURFACE">
+        <X>378546.939</X>
+        <Y>5710587.13</Y>
+        <IS>188978820580</IS>
+    </e>
+    <e i="20" t="FREE_STANDING_SURFACE">
+        <X>378974.247</X>
+        <Y>5710106.379</Y>
+        <IS>188978821776</IS>
+    </e>
+    <e i="21" t="FREE_STANDING_SURFACE">
+        <X>378898.075</X>
+        <Y>5710303.786</Y>
+        <IS>188978822834</IS>
+    </e>
+    <e i="22" t="FREE_STANDING_SURFACE">
+        <X>377211.684</X>
+        <Y>5709311.787</Y>
+        <IS>188978824788</IS>
+    </e>
+    <e i="23" t="FREE_STANDING_SURFACE">
+        <X>381082.177</X>
+        <Y>5709900.559</Y>
+        <IS>188978825853</IS>
+    </e>
+    <e i="24" t="FREE_STANDING_SURFACE">
+        <X>379061.901</X>
+        <Y>5709924.048</Y>
+        <IS>188978826138</IS>
+    </e>
+    <e i="25" t="FREE_STANDING_SURFACE">
+        <X>381044.591</X>
+        <Y>5711365.57</Y>
+        <IS>188978826676</IS>
+    </e>
+    <e i="26" t="FREE_STANDING_SURFACE">
+        <X>380222.234</X>
+        <Y>5710342.042</Y>
+        <IS>188978826745</IS>
+    </e>
+    <e i="27" t="FREE_STANDING_SURFACE">
+        <X>380520.84</X>
+        <Y>5710015.188</Y>
+        <IS>188978826982</IS>
+    </e>
+    <e i="28" t="FREE_STANDING_SURFACE">
+        <X>379547.05</X>
+        <Y>5711480.758</Y>
+        <IS>188978827247</IS>
+    </e>
+    <e i="29" t="FREE_STANDING_SURFACE">
+        <X>379545.282</X>
+        <Y>5711493.725</Y>
+        <IS>188978827535</IS>
+    </e>
+    <e i="30" t="FREE_STANDING_SURFACE">
+        <X>379553.617</X>
+        <Y>5711497.877</Y>
+        <IS>188978827914</IS>
+    </e>
+    <e i="31" t="FREE_STANDING_SURFACE">
+        <X>371256.89</X>
+        <Y>5712012.452</Y>
+        <IS>188978828300</IS>
+    </e>
+    <e i="32" t="FREE_STANDING_SURFACE">
+        <X>375169.002</X>
+        <Y>5712036.083</Y>
+        <IS>188978828520</IS>
+    </e>
+    <e i="33" t="FREE_STANDING_SURFACE">
+        <X>375377.412</X>
+        <Y>5713393.189</Y>
+        <IS>188978829016</IS>
+    </e>
+    <e i="34" t="FREE_STANDING_SURFACE">
+        <X>374820.83</X>
+        <Y>5712464.155</Y>
+        <IS>188978829204</IS>
+    </e>
+    <e i="35" t="FREE_STANDING_SURFACE">
+        <X>377889.088</X>
+        <Y>5714237.461</Y>
+        <IS>188978830013</IS>
+    </e>
+    <e i="36" t="FREE_STANDING_SURFACE">
+        <X>378484.904</X>
+        <Y>5712063.092</Y>
+        <IS>188978831748</IS>
+    </e>
+    <e i="37" t="FREE_STANDING_SURFACE">
+        <X>377103.15</X>
+        <Y>5713664.158</Y>
+        <IS>188978835240</IS>
+    </e>
+    <e i="38" t="FREE_STANDING_SURFACE">
+        <X>379714.936</X>
+        <Y>5714158.615</Y>
+        <IS>219043607221</IS>
+    </e>
+    <e i="39" t="FREE_STANDING_SURFACE">
+        <X>379055.681</X>
+        <Y>5712715.966</Y>
+        <IS>154619099052</IS>
+    </e>
+    <e i="40" t="FREE_STANDING_SURFACE">
+        <X>379326.304</X>
+        <Y>5713016.894</Y>
+        <IS>188978838091</IS>
+    </e>
+</ete:TopologicalErrors>

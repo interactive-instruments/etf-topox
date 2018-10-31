@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.interactive_instruments.etf.bsxm;
+package de.interactive_instruments.etf.bsxm.topox;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -24,8 +24,6 @@ import org.junit.jupiter.api.Test;
 
 import de.interactive_instruments.SUtils;
 import de.interactive_instruments.container.Pair;
-import de.interactive_instruments.etf.bsxm.topox.HashingPosListParser;
-import de.interactive_instruments.etf.bsxm.topox.HashingSegmentHandler;
 
 /**
  * @author Jon Herrmann ( herrmann aT interactive-instruments doT de )
@@ -77,8 +75,8 @@ public class SegmentLineParserTest {
 
 		parser.parseDirectPositions(str, false, 1, 2);
 
-		assertEquals(Double.valueOf(x), testLineSegmentHandler.getLastX(), 0);
-		assertEquals(Double.valueOf(y), testLineSegmentHandler.getLastY(), 0);
+		assertEquals(Double.valueOf(x), testLineSegmentHandler.getLastX(), Double.MIN_VALUE);
+		assertEquals(Double.valueOf(y), testLineSegmentHandler.getLastY(), Double.MIN_VALUE);
 	}
 
 	@Test
@@ -94,8 +92,8 @@ public class SegmentLineParserTest {
 
 		parser.parseDirectPositions(str, false, 1, 2);
 
-		assertEquals(Double.valueOf(x), testLineSegmentHandler.getLastX(), 0);
-		assertEquals(Double.valueOf(y), testLineSegmentHandler.getLastY(), 0);
+		assertEquals(Double.valueOf(x), testLineSegmentHandler.getLastX(), Double.MIN_VALUE);
+		assertEquals(Double.valueOf(y), testLineSegmentHandler.getLastY(), Double.MIN_VALUE);
 	}
 
 	@Test
@@ -108,8 +106,8 @@ public class SegmentLineParserTest {
 
 		final List<Pair<Double, Double>> coord = testLineSegmentHandler.getCoordinates();
 
-		assertEquals(Double.valueOf("3.3"), testLineSegmentHandler.getLastX(), 0);
-		assertEquals(Double.valueOf("3.4567"), testLineSegmentHandler.getLastY(), 0);
+		assertEquals(Double.valueOf("3.3"), testLineSegmentHandler.getLastX(), Double.MIN_VALUE);
+		assertEquals(Double.valueOf("3.4567"), testLineSegmentHandler.getLastY(), Double.MIN_VALUE);
 	}
 
 	@Test
@@ -125,8 +123,8 @@ public class SegmentLineParserTest {
 
 		parser.parseDirectPositions(str, false, 1, 2);
 
-		assertEquals(Double.valueOf(x), testLineSegmentHandler.getLastX(), 0);
-		assertEquals(Double.valueOf(y), testLineSegmentHandler.getLastY(), 0);
+		assertEquals(Double.valueOf(x), testLineSegmentHandler.getLastX(), Double.MIN_VALUE);
+		assertEquals(Double.valueOf(y), testLineSegmentHandler.getLastY(), Double.MIN_VALUE);
 	}
 
 	@Test
