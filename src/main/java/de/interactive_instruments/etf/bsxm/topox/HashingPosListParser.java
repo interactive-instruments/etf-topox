@@ -21,7 +21,7 @@ package de.interactive_instruments.etf.bsxm.topox;
  *
  * @author Jon Herrmann ( herrmann aT interactive-instruments doT de )
  */
-public class HashingPosListParser implements PosListParser {
+class HashingPosListParser implements PosListParser {
 
 	private double previousOrdinate;
 	private boolean threeDCoordinates = false;
@@ -120,8 +120,8 @@ public class HashingPosListParser implements PosListParser {
 	public HashingPosListParser(final HashingSegmentHandler hashingSegmentHandler) {
 		geoTypeHandlerStrategies = new HashingSegmentHandler[3];
 		geoTypeHandlerStrategies[0] = hashingSegmentHandler;
-		geoTypeHandlerStrategies[1]= new BufferedGeoArcHandlerStrategy(hashingSegmentHandler);
-		// geoTypeHandlerStrategies[1] = new HashingPassThroughHandlerStrategy(hashingSegmentHandler);
+		// geoTypeHandlerStrategies[1]= new BufferedGeoArcHandlerStrategy(hashingSegmentHandler);
+		geoTypeHandlerStrategies[1] = new HashingPassThroughHandlerStrategy(hashingSegmentHandler);
 		geoTypeHandlerStrategies[2] = new HashingPassThroughHandlerStrategy(hashingSegmentHandler);
 	}
 

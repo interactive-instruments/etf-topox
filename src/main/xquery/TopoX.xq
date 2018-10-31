@@ -217,7 +217,8 @@ declare function topox:parse-boundary($objects as node()*, $path as xs:string, $
  : Returns the document that contains all topological errors found
  :
  : Note: for performance reasons, this a deterministic function. Calling this
-  : function after changing the error file might not result in a changed output.
+ : function after changing the error file might not result in a changed output.
+ : Also note that no other function may be called after calling this function.
  :
  : @param  $topologyId ID of the topology
  : @return TopologicalErrors node
@@ -234,6 +235,7 @@ declare function topox:topological-errors-doc($topologyId as xs:int) as node() {
  :
  : Note: for performance reasons, this a deterministic function. Calling this
  : function after changing the error file might not result in a changed output.
+ : Also note that no other function may be called after calling this function.
  :
  : @param  $topologyId ID of the topology
  : @param  $errorCodes errorCodes to filter or ()
@@ -293,6 +295,42 @@ declare function topox:export-erroneous-features-to-geojson($topologyId as xs:in
     topox:export-erroneous-features-to-geojson($topologyId, $geoJsonAttachmentId, ())
 };
 
+(:~
+ : Returns the TopoX version (SemVer 2 format)
+ :
+ : @return version and build date as string
+ :)
+declare function topox:version() as xs:string {
+    java:version()
+};
+
+(:~
+ : Returns the TopoX version including the build version
+ :
+ : @return version including the build version
+ :)
+declare function topox:detailed-version() as xs:string {
+    java:detailedVersion()
+};
+
+(:~
+ : Returns information about the topology theme for diagnosis:
+ : - current internal object id
+ : - number of processed objects
+ : - number of stored edges
+ : - number of stored coordinates
+ : - detected coordinate lookup collisions
+ : - detected coordinate lookup errors
+ :
+ : Note: it is normal that lookup collisions and errors occur
+ : in large datasets.
+ :
+ : @param  $topologyId ID of the topology
+ : @return information as string
+ :)
+declare function topox:diag($topologyId as xs:int) as xs:string {
+    java:diag($topologyId)
+};
 
 (:~ ---------------------------------------------- PRIVATE FUNCTIONS ---------------------------------------------- :)
 

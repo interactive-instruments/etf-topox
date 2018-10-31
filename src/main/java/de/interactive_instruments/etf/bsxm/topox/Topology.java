@@ -166,6 +166,7 @@ public interface Topology {
 
 	/**
 	 * Get a node by X/Y coordinate
+	 *
 	 * @param x X coordinate
 	 * @param y Y coordinate
 	 * @return the node or null if a node with these coordinates does not exist
@@ -175,12 +176,18 @@ public interface Topology {
 	/**
 	 * Returns edges that have objects only on one side
 	 *
+	 * Contract: This method may only be called once.
+	 * The result should be cached by the caller.
+	 *
 	 * @return edge iterator
 	 */
 	Iterable<Edge> emptyInteriors();
 
 	/**
 	 * Returns edges of free-standing surfaces
+	 *
+	 * Contract: This method may only be called once.
+	 * The result should be cached by the caller.
 	 *
 	 * @return edge iterator
 	 */

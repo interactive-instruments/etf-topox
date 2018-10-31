@@ -53,7 +53,7 @@ public class Theme {
 	}
 
 	public int detectHoles() {
-		int count=0;
+		int count = 0;
 		for (final Topology.Edge emptyInterior : topology.emptyInteriors()) {
 			count++;
 			topologyErrorCollector.collectError(HOLE_EMPTY_INTERIOR,
@@ -66,7 +66,7 @@ public class Theme {
 	}
 
 	public int detectFreeStandingSurfaces() {
-		int count=0;
+		int count = 0;
 		for (final Topology.Edge freeStandingSurface : topology.freeStandingSurfaces()) {
 			count++;
 			topologyErrorCollector.collectError(FREE_STANDING_SURFACE,
@@ -76,6 +76,10 @@ public class Theme {
 					String.valueOf(freeStandingSurface.leftObject()));
 		}
 		return count;
+	}
+
+	public TopologyMXBean getMBean() {
+		return (TopologyMXBean) topology;
 	}
 
 	@Override

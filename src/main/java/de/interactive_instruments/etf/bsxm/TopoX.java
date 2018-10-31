@@ -19,12 +19,18 @@ import static de.interactive_instruments.etf.bsxm.topox.TopologyBuilder.compress
 import static de.interactive_instruments.etf.bsxm.topox.TopologyBuilder.getRight;
 
 import java.io.*;
+import java.lang.management.ManagementFactory;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.*;
+import java.util.jar.Manifest;
 
+import javax.management.*;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.commons.lang3.ClassUtils;
 import org.basex.core.BaseXException;
 import org.basex.query.QueryModule.Deterministic;
 import org.basex.query.QueryModule.Permission;
@@ -32,8 +38,11 @@ import org.basex.query.QueryModule.Requires;
 import org.basex.query.value.node.DBNode;
 
 import de.interactive_instruments.IFile;
+import de.interactive_instruments.JarUtils;
+import de.interactive_instruments.ReflectionUtils;
 import de.interactive_instruments.etf.bsxm.topox.*;
 import de.interactive_instruments.exceptions.ExcUtils;
+import de.interactive_instruments.properties.PropertyUtils;
 
 /**
  * TopoX facade.
@@ -60,6 +69,16 @@ public class TopoX {
 
 	// Current BaseX pre value in a context
 	private int currentObjectPre;
+
+	private final MBeanServer mBeanServer;
+
+	public TopoX() {
+		if (PropertyUtils.getenvOrProperty("ETF_AM_TOPOX_MB", "false").equals("true")) {
+			mBeanServer = ManagementFactory.getPlatformMBeanServer();
+		} else {
+			mBeanServer = null;
+		}
+	}
 
 	/**
 	 * Sets the database name prefix internally in the TopoX module.
@@ -89,7 +108,6 @@ public class TopoX {
 		this.dbNameLength = length;
 		return name;
 	}
-
 
 	// Builder creation
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -127,8 +145,21 @@ public class TopoX {
 			final TopologyBuilder topologyBuilder = new TopologyBuilder(themeName, topologyErrorCollector, initialEdgeCapacity);
 			topologyErrorCollector.init();
 
-			themes.add(
-					new Theme(themeName, topologyErrorCollector, errorOutputFile.toString(), writer, topologyBuilder));
+			final Theme theme = new Theme(themeName, topologyErrorCollector, errorOutputFile.toString(), writer,
+					topologyBuilder);
+			themes.add(theme);
+			if (mBeanServer != null) {
+				try {
+					final ObjectName name = new ObjectName("topox:topology=" + themeName);
+					if (mBeanServer.isRegistered(name)) {
+						mBeanServer.unregisterMBean(name);
+					}
+					mBeanServer.registerMBean(theme.getMBean(), name);
+				} catch (MalformedObjectNameException | InstanceNotFoundException | InstanceAlreadyExistsException
+						| MBeanRegistrationException | NotCompliantMBeanException ign) {
+					ExcUtils.suppress(ign);
+				}
+			}
 			return themes.size() - 1;
 		} catch (final IOException | XMLStreamException e) {
 			throw new BaseXException(e);
@@ -194,11 +225,11 @@ public class TopoX {
 	@Requires(Permission.CREATE)
 	public int newBoundaryBuilder(final int topologyId)
 			throws BaseXException {
-		if(topologyId<0 || topologyId>=themes.size()) {
-			throw new BaseXException("Unknown topology ID: "+String.valueOf(topologyId));
+		if (topologyId < 0 || topologyId >= themes.size()) {
+			throw new BaseXException("Unknown topology ID: " + String.valueOf(topologyId));
 		}
 		this.boundaries.add(new BoundaryBuilder(themes.get(topologyId)));
-		return this.boundaries.size()-1+BOUNDARY_ID_OFFSET;
+		return this.boundaries.size() - 1 + BOUNDARY_ID_OFFSET;
 	}
 
 	// Parsing
@@ -290,7 +321,7 @@ public class TopoX {
 	 */
 	@Requires(Permission.NONE)
 	public void nextBoundaryObject(final int id) {
-		boundaries.get(id-BOUNDARY_ID_OFFSET).parser.nextGeometricObject();
+		boundaries.get(id - BOUNDARY_ID_OFFSET).parser.nextGeometricObject();
 	}
 
 	/**
@@ -304,18 +335,25 @@ public class TopoX {
 	@Requires(Permission.READ)
 	public void parseBoundary(final int id, final DBNode geo) {
 		// geotype 2: use pass through handler
-		boundaries.get(id-BOUNDARY_ID_OFFSET).parser.parseDirectPositions(geo.data().text(geo.pre(), true), false, genIndex(geo), 2);
+		boundaries.get(id - BOUNDARY_ID_OFFSET).parser.parseDirectPositions(geo.data().text(geo.pre(), true), false,
+				genIndex(geo), 2);
 	}
 
 	// Error output
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	/**
+	 * Returns the error file as string
+	 *
+	 * Note: no other function may be called after calling this function.
+	 *
+	 * @param id ID of Topology Builder
+	 * @return path to error file
+	 */
 	@Deterministic
 	@Requires(Permission.NONE)
 	public String errorFile(final int id) {
 		themes.get(id).topologyErrorCollector.release();
-		// TODO propagate as MBean
-		System.out.println(themes.get(id).toString());
 		return themes.get(id).errorFile;
 	}
 
@@ -353,11 +391,11 @@ public class TopoX {
 		} catch (final IOException ignore) {
 			ExcUtils.suppress(ignore);
 		}
-		final String htmlFileName = themes.get(id).name+"_Map.html";
+		final String htmlFileName = themes.get(id).name + "_Map.html";
 		final File dir = geoJsonWriter.getFile().getParentFile();
 		final IFile attachmentMapFile = new IFile(dir, htmlFileName);
 
-		geoJsonWriter.getFile().moveTo(dir.getPath()+File.separator+Objects.requireNonNull(geoJsonAttachmentId));
+		geoJsonWriter.getFile().moveTo(dir.getPath() + File.separator + Objects.requireNonNull(geoJsonAttachmentId));
 
 		final InputStream cStream = this.getClass().getResourceAsStream("/html/IssueMap.html");
 		final InputStream stream;
@@ -372,6 +410,39 @@ public class TopoX {
 		final String result = s.hasNext() ? s.next() : "";
 		attachmentMapFile.writeContent(new StringBuffer(
 				result.replaceAll("'out.js'", "'" + geoJsonAttachmentId + "'")));
+	}
+
+	// Info output
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	@Deterministic
+	@Requires(Permission.READ)
+	public String version() {
+		try {
+			return this.getClass().getPackage().getImplementationVersion();
+		} catch (final Exception e) {
+			return "unknown";
+		}
+	}
+
+	@Deterministic
+	@Requires(Permission.READ)
+	public String detailedVersion() {
+		try {
+			final URLClassLoader cl = (URLClassLoader) getClass().getClassLoader();
+			final URL url = cl.findResource("META-INF/MANIFEST.MF");
+			final Manifest manifest = new Manifest(url.openStream());
+			final String version = manifest.getMainAttributes().getValue("Implementation-Version");
+			final String buildTime = manifest.getMainAttributes().getValue("Build-Date").substring(2);
+			return version + "-b" + buildTime;
+		} catch (Exception E) {
+			return "unknown";
+		}
+	}
+
+	@Requires(Permission.ADMIN)
+	public String diag(final int id) {
+		return themes.get(id).toString();
 	}
 
 	// pre value, database and object encoding
