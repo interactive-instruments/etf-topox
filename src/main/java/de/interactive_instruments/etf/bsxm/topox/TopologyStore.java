@@ -31,7 +31,7 @@ import gnu.trove.TIntArrayList;
  *
  * @author Jon Herrmann ( herrmann aT interactive-instruments doT de )
  */
-class TopologyStore implements Topology {
+class TopologyStore implements Topology, TopologyMXBean {
 
 	private final class FlyweightEdge implements Topology.Edge {
 		private final int edgeIndex;
@@ -72,13 +72,13 @@ class TopologyStore implements Topology {
 
 		@Override
 		public long leftObject() {
-			return builder.getTopologicalData(abs(edgeIndex)+LEFT_LOCATION_INDEX);
+			return builder.getTopologicalData(abs(edgeIndex) + LEFT_LOCATION_INDEX);
 		}
 
 		@Override
 		public long rightObject() {
-			final long right = builder.getTopologicalData(abs(edgeIndex)+RIGHT_LOCATION_INDEX);
-			if(right==Integer.MIN_VALUE) {
+			final long right = builder.getTopologicalData(abs(edgeIndex) + RIGHT_LOCATION_INDEX);
+			if (right == Integer.MIN_VALUE) {
 				// check if this is a free-standing surface mark
 				return 0;
 			}
@@ -99,6 +99,14 @@ class TopologyStore implements Topology {
 		public Edge edge(Topology.Node node) {
 			final int targetEdgeIndex = ((FlyweightNode) node).edgeIndex;
 			return edgeByIndex(edgeIndex, targetEdgeIndex);
+		}
+
+		@Override
+		public boolean equals(final Object obj) {
+			if (obj instanceof FlyweightEdge) {
+				return ((FlyweightEdge) obj).edgeIndex == this.edgeIndex;
+			}
+			return super.equals(obj);
 		}
 
 		@Override
@@ -133,6 +141,14 @@ class TopologyStore implements Topology {
 		public Edge edge(Topology.Node node) {
 			final int targetEdgeIndex = ((FlyweightNode) node).edgeIndex;
 			return edgeByIndex(edgeIndex, targetEdgeIndex);
+		}
+
+		@Override
+		public boolean equals(final Object obj) {
+			if (obj instanceof FlyweightNode) {
+				return ((FlyweightNode) obj).edgeIndex == this.edgeIndex;
+			}
+			return super.equals(obj);
 		}
 
 		@Override
@@ -215,47 +231,31 @@ class TopologyStore implements Topology {
 	@Override
 	public Node node(final double x, final double y) {
 		final int edgeIndex = builder.getTargetEdge(x, y);
-		if(edgeIndex!=-1) {
+		if (edgeIndex != -1) {
 			return new FlyweightNode(edgeIndex);
-		}else{
+		} else {
 			return null;
 		}
 	}
 
 	@Override
 	public Iterable<Edge> emptyInteriors() {
-		final int maxPos = builder.internalTopologicalDataSize();
 		return () -> new Iterator<Edge>() {
-			int currentPos = findNextInterior(TOPOLOGY_FIELDS_SIZE);
-
-			private int findNextInterior(final int currentPos) {
-				for (int i = currentPos+RIGHT_LOCATION_INDEX; i < builder.internalTopologicalDataSize(); i+=TOPOLOGY_FIELDS_SIZE) {
-					// Check if an object is set on the right side
-					if(builder.getTopologicalData(i)==0) {
-						// Check if this is an interior edge
-						final long obj = builder.getTopologicalData(i-RIGHT_LOCATION_INDEX+OBJ_OFFSET);
-						if(getLeft(obj)<0) {
-							return i-RIGHT_LOCATION_INDEX;
-						}
-					}
-				}
-				return maxPos;
-			}
+			int currentPos = builder.findNextEmptyInterior(TOPOLOGY_FIELDS_SIZE);
 
 			@Override
 			public boolean hasNext() {
-				return currentPos+TOPOLOGY_FIELDS_SIZE<maxPos;
+				return currentPos + TOPOLOGY_FIELDS_SIZE < builder.internalTopologicalDataSize();
 			}
 
 			@Override
 			public Edge next() {
 				final Edge edge = new FlyweightEdge(currentPos);
-				currentPos = findNextInterior(currentPos+TOPOLOGY_FIELDS_SIZE);
+				currentPos = builder.findNextEmptyInterior(currentPos + TOPOLOGY_FIELDS_SIZE);
 				return edge;
 			}
 		};
 	}
-
 
 	@Override
 	public Iterable<Edge> freeStandingSurfaces() {
@@ -268,16 +268,16 @@ class TopologyStore implements Topology {
 		final TIntArrayList freeStandingSurfaceEdgeSize = new TIntArrayList();
 
 		builder.findFreeStandingSurfaces(firstFoundFreeStandingSurfaceEdges, freeStandingSurfaceEdgeSize);
-		if(freeStandingSurfaceEdgeSize.size()>0) {
-			int maxPos=0;
-			int max=freeStandingSurfaceEdgeSize.get(maxPos);
-			if(firstFoundFreeStandingSurfaceEdges.size()>1) {
+		if (freeStandingSurfaceEdgeSize.size() > 0) {
+			int maxPos = 0;
+			int max = freeStandingSurfaceEdgeSize.get(maxPos);
+			if (firstFoundFreeStandingSurfaceEdges.size() > 1) {
 				// find max
 				for (int i = 1; i < freeStandingSurfaceEdgeSize.size(); i++) {
 					final int cur = freeStandingSurfaceEdgeSize.get(i);
-					if(cur>max) {
-						max=cur;
-						maxPos=i;
+					if (cur > max) {
+						max = cur;
+						maxPos = i;
 					}
 				}
 			}
@@ -291,7 +291,7 @@ class TopologyStore implements Topology {
 
 			@Override
 			public boolean hasNext() {
-				return currentPos<maxPos;
+				return currentPos < maxPos;
 			}
 
 			@Override
@@ -299,6 +299,82 @@ class TopologyStore implements Topology {
 				return new FlyweightEdge(firstFoundFreeStandingSurfaceEdges.get(currentPos++));
 			}
 		};
+	}
+
+	@Override
+	public int getCurrentObjectId() {
+		return builder.internalGetCurrentObjectId();
+	}
+
+	@Override
+	public int getObjectsProcessed() {
+		return builder.internalGetObjectsProcessed();
+	}
+
+	@Override
+	public int getEdgeSize() {
+		return builder.size();
+	}
+
+	@Override
+	public int getCoordinatesSize() {
+		return (builder.internalCoordinateSize() - 2) / 2;
+	}
+
+	@Override
+	public int getLookupCollisions() {
+		return builder.internalGetLookupCollisions();
+	}
+
+	@Override
+	public int getLookupErrors() {
+		return builder.internalGetLookupErrors();
+	}
+
+	private static void addEdgeInformation(final StringBuilder builder, final Edge edge) {
+		builder.append(edge.toString());
+		builder.append(", sourceAngle = ");
+		builder.append(Math.toDegrees(edge.sourceAngle()));
+		builder.append(", targetAngle = ");
+		builder.append(Math.toDegrees(edge.targetAngle()));
+		builder.append(", leftObject = ");
+		builder.append(edge.leftObject());
+		builder.append(", rightObject = ");
+		builder.append(edge.rightObject());
+	}
+
+	@Override
+	public String getEdgesAtPoint(final double x, final double y) {
+		final Node node = node(x, y);
+		final Edge edge = node.anEdge();
+		final StringBuilder outputInfo = new StringBuilder();
+		addEdgeInformation(outputInfo, edge);
+		outputInfo.append(SUtils.ENDL);
+		for (Edge next = edge.sourceCcwNext(); next != edge; next = next.sourceCcwNext()) {
+			addEdgeInformation(outputInfo, next);
+			outputInfo.append(SUtils.ENDL);
+		}
+		return outputInfo.toString();
+	}
+
+	@Override
+	public String getEdge(final double x1, final double y1, final double x2, final double y2) {
+		final Edge edge = edge(x1, y1, x2, y2);
+		final StringBuilder outputInfo = new StringBuilder();
+		addEdgeInformation(outputInfo, edge);
+		outputInfo.append(SUtils.ENDL);
+		outputInfo.append("Origin:");
+		for (Edge next = edge.sourceCcwNext(); next != edge; next = next.sourceCcwNext()) {
+			addEdgeInformation(outputInfo, next);
+			outputInfo.append(SUtils.ENDL);
+		}
+		outputInfo.append(SUtils.ENDL);
+		outputInfo.append("Target:");
+		for (Edge next = edge.targetCcwNext(); next != edge; next = next.targetCcwNext()) {
+			addEdgeInformation(outputInfo, next);
+			outputInfo.append(SUtils.ENDL);
+		}
+		return outputInfo.toString();
 	}
 
 	@Override
