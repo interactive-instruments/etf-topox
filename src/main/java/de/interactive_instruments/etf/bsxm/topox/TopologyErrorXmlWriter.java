@@ -76,7 +76,8 @@ public class TopologyErrorXmlWriter implements TopologyErrorCollector {
 	}
 
 	@Override
-	public void collectError(final TopologyErrorType topologyErrorType, final double x, final double y, final String... parameter) {
+	public void collectError(final TopologyErrorType topologyErrorType, final double x, final double y,
+			final String... parameter) {
 		try {
 			// error element
 			writer.writeStartElement("e");
@@ -85,12 +86,12 @@ public class TopologyErrorXmlWriter implements TopologyErrorCollector {
 			// errorType
 			writer.writeAttribute("t", topologyErrorType.toString());
 
-			final long coordinateHash = TopologyBuilder.calcCoordHashCode(x,y);
+			final long coordinateHash = TopologyBuilder.calcCoordHashCode(x, y);
 			final int previousErrorI = coordinateHashToPreviousErrorId.get(coordinateHash);
-			if(previousErrorI!=0) {
+			if (previousErrorI != 0) {
 				// previous error
 				writer.writeAttribute("p", Integer.toString(previousErrorI));
-			}else{
+			} else {
 				coordinateHashToPreviousErrorId.put(coordinateHash, counter);
 			}
 			writer.writeStartElement("X");
@@ -120,7 +121,6 @@ public class TopologyErrorXmlWriter implements TopologyErrorCollector {
 			}
 		}
 	}
-
 
 	@Override
 	public void release() {
