@@ -109,14 +109,14 @@ declare function topox:dev-topology($topologyName as xs:string, $tempOutputDir a
 declare function topox:parse-surface($objects as node()*, $path as xs:string, $topologyId as xs:int) as empty-sequence() {
     for $object in $objects
     (: Todo dynamic path :)
-    for $geometry in java:nextFeature($topologyId, $object)/*:position/gml:Surface
+    for $geometry in topox:geometries( java:nextFeature($topologyId, $object)/*:position )
     return
         (
         java:nextGeometricObject($topologyId),
-        for $segment in $geometry/gml:patches/gml:PolygonPatch/gml:exterior/gml:Ring/gml:curveMember/gml:Curve/gml:segments/gml:*[local-name() = ('LineStringSegment', 'Arc')]/gml:posList/text()
+        for $segment in $geometry/gml:exterior/gml:Ring/gml:curveMember/gml:Curve/gml:segments/gml:*[local-name() = ('LineStringSegment', 'Arc')]/gml:posList/text()
         return
             java:parseSegment($topologyId, $segment, topox:segment-type-to-int($segment/../../local-name())),
-        for $interior in $geometry/gml:patches/gml:PolygonPatch/gml:interior
+        for $interior in $geometry/gml:interior
         return
             (
             java:nextInterior($topologyId),
@@ -477,12 +477,12 @@ declare %private function topox:export-features($topologyId as xs:int, $topoErro
     for $obj in $objects
     return (
         java:startGeoJsonFeature($topologyId, xs:string($obj/@gml:id)),
-        for $geometry in $obj/*:position/gml:Surface
+        for $geometry in topox:geometries( $obj/*:position )
         return (
-            for $segment in $geometry/gml:patches/gml:PolygonPatch/gml:exterior/gml:Ring/gml:curveMember/gml:Curve/gml:segments/gml:*[local-name() = ('LineStringSegment', 'Arc')]/gml:posList/text()
+            for $segment in $geometry/gml:exterior/gml:Ring/gml:curveMember/gml:Curve/gml:segments/gml:*[local-name() = ('LineStringSegment', 'Arc')]/gml:posList/text()
                 return
             java:addGeoJsonCoordinates($topologyId, $segment),
-            for $interior in $geometry/gml:patches/gml:PolygonPatch/gml:interior
+            for $interior in $geometry/gml:interior
             return
             (
                 java:nextGeoJsonInterior($topologyId),
@@ -494,3 +494,21 @@ declare %private function topox:export-features($topologyId as xs:int, $topoErro
     )
 };
 
+(:~
+ : Returns all supported surface geometries of an object:
+ : - Surface
+ : - MultiSurface
+ : - PolyhedralSurface
+ : - CompositeSurface
+ :)
+declare %private function topox:geometries($obj as node()*) as node()* {
+    $obj/gml:*[local-name() = ('Surface', 'PolyhedralSurface')]/gml:patches/gml:PolygonPatch,
+    $obj/gml:MultiSurface/gml:*[local-name() = ('surfaceMember', 'surfaceMembers')]/gml:Polygon,
+    $obj/gml:MultiSurface/gml:*[local-name() = ('surfaceMember', 'surfaceMembers')]/gml:CompositeSurface/gml:surfaceMember//gml:*[local-name() = ('PolygonPatch', 'Polygon')],
+    $obj/gml:MultiSurface/gml:*[local-name() = ('surfaceMember', 'surfaceMembers')]/gml:Surface/gml:patches/gml:PolygonPatch,
+    $obj/gml:MultiSurface/gml:*[local-name() = ('surfaceMember', 'surfaceMembers')]/gml:PolyhedralSurface/gml:patches/gml:PolygonPatch,
+    $obj/gml:CompositeSurface/gml:surfaceMember/gml:Polygon,
+    $obj/gml:CompositeSurface/gml:surfaceMember/gml:CompositeSurface/gml:surfaceMember//gml:*[local-name() = ('PolygonPatch', 'Polygon')],
+    $obj/gml:CompositeSurface/gml:surfaceMember/gml:Surface/gml:patches/gml:PolygonPatch,
+    $obj/gml:CompositeSurface/gml:surfaceMember/gml:PolyhedralSurface/gml:patches/gml:PolygonPatch
+};
