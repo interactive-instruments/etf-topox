@@ -99,7 +99,7 @@ aufgerufen wurde ).
 Erkennung von Löchern
 ------------------
 
-Löcher - die Oberfläche eines Merkmals mit einer inneren Grenze, die nicht
+Löcher - die Oberfläche eines Features mit einer inneren Grenze, die nicht
 durch eine andere Oberfläche gefüllt ist - können mit der Funktion
 detect-holes() erkannt werden:
 
@@ -224,7 +224,7 @@ kann verschiedene Eigenschaften aufweisen, die im Folgenden beschrieben werden.
 
 
 Die Eigenschaften X und Y stehen immer für die Koordinaten X und Y. Alle
-anderen Eigenschaften (IS, CW, CCW) verweisen auf ein Merkmal und dessen
+anderen Eigenschaften (IS, CW, CCW) verweisen auf ein Feature und dessen
 Geometrie in der Datenbank. Wenn ein Fehler mehr als einmal für einen Punkt
 zurückgegeben wird, wird ein _p_-Attribut (für den vorherigen) zum nächsten
 Fehler hinzugefügt, was auf eine Fehlerausblendung hinweisen kann. Der Wert von
@@ -276,7 +276,7 @@ Kante verbunden ist.
 ### HOLE\_EMPTY\_INTERIOR
 
 Die Oberfläche eines Features mit einer inneren Grenze wird nicht durch
-die Oberfläche eines anderen Merkmals gefüllt. Die Eigenschaft *IS*
+die Oberfläche eines anderen Features gefüllt. Die Eigenschaft *IS*
 (und die Eigenschaften *X, Y*) verweist auf das Objekt, bei dem der Fehler
 erkannt wurde.
 
