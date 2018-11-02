@@ -302,14 +302,14 @@ Die Eigenschaft *IS* verweist auf das Objekt, bei dem der Fehler erkannt wurde.
 Eine Kante konnte nicht gefunden werden. Dies ist höchstwahrscheinlich ein
 Folgefehler, wenn andere aufgetreten sind und z.B. die Verbindung zwischen
 zwei Punkten in der Datenstruktur invalidiert wurde. Wenn dies die
-einzige Art von aufgetreten Fehler ist, dann kann dies auf einen 
+einzige gemeldete Fehlerart ist, dann kann dies auf einen 
 Fehler in der Software hinweisen.
 
 ### INVALID\_ANGLE
 Beim Verbinden einer zusätzlichen Kante mit einem Punkt ist ein Fehler
-aufgetreten. Der Versuch, die Winkel aller verbundenen Kanten zu überfahren,
-hat die maximale Anzahl der möglichen Schritte überschritten. Wenn dies die
-einzige Art von aufgetreten Fehler ist, dann kann dies auf einen 
+aufgetreten. Beim Versuch, die Winkel aller verbundenen Kanten zu prüfen,
+wurde die maximale Anzahl der möglichen Schritte überschritten. Wenn dies die
+einzige gemeldete Fehlerart ist, dann kann dies auf einen 
 Fehler in der Software hinweisen.
 
 **Hinweis:** Im Allgemeinen können die Fehler EDGE\_NOT\_FOUND und INVALID\_ANGLE ignoriert werden, wenn Fehler zuvor mit anderen Fehlercodes gemeldet wurden.
