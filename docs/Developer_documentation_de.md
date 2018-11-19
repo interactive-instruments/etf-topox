@@ -1,12 +1,9 @@
 Entwicklung von Tests mit TopoX
 ============================
 
-Die folgende exemplarische Vorgehensweise setzt eine funktionierende Installation
- von BaseX mit installiertem TopoX-Plugin voraus.
+Die folgende exemplarische Vorgehensweise setzt eine funktionierende Installation von BaseX mit installiertem TopoX-Plugin voraus.
 
-Bevor TopoX in einem Test verwendet werden kann, muss die Bibliothek mit dem
-Namen der Datenbank und der Anzahl der verwendeten Datenbanken initialisiert
-werden:
+Bevor TopoX in einem Test verwendet werden kann, muss die Bibliothek mit dem Namen der Datenbank und der Anzahl der verwendeten Datenbanken initialisiert werden:
 
 ```XQuery
 
@@ -16,7 +13,7 @@ Der erste Parameter ("MY-DB-000") ist der Datenbankname.
 
 Datenbanknamen müssen mit einem dreistelligen Index beginnend mit 000 versehen
 werden. Dies ist notwendig, da intern das Suffix zur Kodierung von
-Referenzen verwendet wird (Details siehe Architekturdokumentation).
+Referenzen verwendet wird ([Details siehe Architekturdokumentation](Architecture_documentation.md)).
 
 Als zweiter Parameter wird die Anzahl der Datenbanken übergeben.
 
@@ -30,7 +27,7 @@ let $surfaces := $db/adv:AX_Bestandsdatenauszug/adv:enthaelt/wfsAdv:FeatureColle
 
 Mehrere Topologien können für eine Reihe von Features eingerichtet und überprüft
 werden. Die Initialisierung eines neuen Topologieobjekts, das als ein topologisches
-Thema zusammengefasst werden, erfolgt mit:
+Thema zusammengefasst wird, erfolgt mit:
 
 ```XQuery
 
@@ -54,7 +51,7 @@ Wert von `1995000 * Anzahl der Datenbanken` erzielt.
 Der Aufruf gibt eine ganze Zahl als Kennung für das topologische Thema
 zurück, die in allen weiteren Funktionsaufrufen verwendet werden muss.
 
-Das Parsen und Validieren wird mit gestartet:
+Das Parsen und Validieren wird wie folgt gestartet:
 
 ```XQuery
 
@@ -84,7 +81,7 @@ order by $isFeatureId
 	return $isFeatureId || " : intersection at point " || $error/X/text() || " " $error/Y/text()
 
 ```
-Die Struktur, die die Funktion topological-errors() zurückgibt, wird im Abschnitt **Topologische Fehlertypen** beschrieben.
+Die Struktur, die die Funktion topological-errors() zurückgibt, wird im Abschnitt [**Topologische_Fehlerarten**](#topologische-fehlerarten) beschrieben.
 
 Ein komplettes Beispiel finden Sie [hier](../src/test/resources/ddt/queries/default.xq)..
 
@@ -260,7 +257,7 @@ Codes
 Es gibt zwei Features, die eine Kante an zwei Punkten definieren. Die
 Features liegen auf der gleichen Seite und überlappen sich daher. Die
 *IS*-Eigenschaft referenziert das erste Objekt, das sich am Rand befindet,
-die *O* referenziert das Objekt, das mit dem bestehenden kollidiert. Die
+die *O*-Eigenschaft referenziert das Objekt, das mit dem bestehenden kollidiert. Die
 Eigenschaften *X, Y* können sich entweder auf den Anfangs- oder den Endpunkt
 der Kante beziehen.
 
