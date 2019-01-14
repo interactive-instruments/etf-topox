@@ -1,24 +1,23 @@
 # etf-topox
 
-## Building the library
-Run the 'gradlew xar' command to build an EXPath package for BaseX.
+TopoX is a library to detect topological errors in the relations of spatial
+objects.
+
+The library operates on a [BaseX XML database](http://basex.org/) and thereby
+achieves very good performance.
 
 ## Installing in BaseX
-Download the file from [here](https://github.com/jonherrmann/etf-topox/releases/download/0.9.3/TopoX-0.9.3.xar).
+Download the file from [here](https://github.com/interactiv-instruments/etf-topox/releases/download/0.9.5/TopoX-0.9.5.xar).
 In the BaseX GUI, select _Options_ -> _Packages_ and select the file with _Install..._
 
 Or create an update XQuery script with
 
 ```XQuery
-
-
 import module namespace repo = 'http://basex.org/modules/repo';
 
-let $d :=
-try { repo:delete('ETF TopoX') ||  prof:dump('Uninstalled') }catch * { () }
-return repo:install('https://github.com/jonherrmann/etf-topox/releases/download/0.9.3/TopoX-0.9.3.xar'),
+try { repo:delete('ETF TopoX') ||  prof:dump('Uninstalled') }catch * { () },
+repo:install('https://github.com/interactiv-instruments/etf-topox/releases/download/0.9.5/TopoX-0.9.5.xar'),
 repo:list()
-
 ```
 
 ## Developer quick start guide
@@ -38,7 +37,14 @@ The developer documentation can be found [here](docs/Developer_documentation.md)
 
 The arc42 based architecture documentation can be found [here](docs/Architecture_documentation.md)
 
+## Building the library
+
+Run the `gradlew xar` command to build an EXPath package for BaseX.
+
+Note: do **not** run `gradlew jar` before, otherwise some important manifest
+information will be missing
+
 ## Todos:
 
+- Architecture documentation
 - Refactoring (ports, class visibility)
-- Test data

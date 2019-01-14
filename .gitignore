@@ -16,3 +16,4 @@ build
 .gradle
 .DS_Store
 /derby.log
+/out

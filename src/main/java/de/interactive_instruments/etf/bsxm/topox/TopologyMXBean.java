@@ -1,5 +1,5 @@
 /**
- * Copyright 2010-2018 interactive instruments GmbH
+ * Copyright 2010-2019 interactive instruments GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,21 +22,21 @@ package de.interactive_instruments.etf.bsxm.topox;
  */
 public interface TopologyMXBean {
 
-	String getName();
+    String getName();
 
-	int getCurrentObjectId();
+    int getCurrentObjectId();
 
-	int getObjectsProcessed();
+    int getObjectsProcessed();
 
-	int getEdgeSize();
+    int getEdgeSize();
 
-	int getCoordinatesSize();
+    int getCoordinatesSize();
 
-	int getLookupCollisions();
+    int getLookupCollisions();
 
-	int getLookupErrors();
+    int getLookupErrors();
 
-	String getEdgesAtPoint(double x, double y);
+    String getEdgesAtPoint(double x, double y);
 
-	String getEdge(double x1, double y1, double x2, double y2);
+    String getEdge(double x1, double y1, double x2, double y2);
 }

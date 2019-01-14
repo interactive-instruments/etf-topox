@@ -1,5 +1,5 @@
 /**
- * Copyright 2010-2018 interactive instruments GmbH
+ * Copyright 2010-2019 interactive instruments GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,58 +40,58 @@ import de.interactive_instruments.exceptions.ExcUtils;
  */
 public class TopoXTest {
 
-	private Context ctx = new Context();
+    private Context ctx = new Context();
 
-	private final static IFile ddtDirectory = new IFile("src/test/resources/ddt");
-	private final static IFile outputDirectory = new IFile("build/tmp/ddt/results");
-	private final static IFile tmpOutputDirectory = new IFile("build/tmp/ddt/tmp_outputs");
-	private final static String TOPOX_INSTALL_PATH = "build/libs/TopoX.xar";
-	private final static String DB_NAME = "TOPOX-JUNIT-TEST-DB-000";
+    private final static IFile ddtDirectory = new IFile("src/test/resources/ddt");
+    private final static IFile outputDirectory = new IFile("build/tmp/ddt/results");
+    private final static IFile tmpOutputDirectory = new IFile("build/tmp/ddt/tmp_outputs");
+    private final static String TOPOX_INSTALL_PATH = "build/libs/TopoX.xar";
+    private final static String DB_NAME = "TOPOX-JUNIT-TEST-DB-000";
 
-	@BeforeAll
-	static void setUp() throws QueryException, IOException {
-		final RepoManager repoManger = new RepoManager(new Context());
-		try {
-			repoManger.delete("ETF TopoX");
-		} catch (QueryException ign) {
-			ExcUtils.suppress(ign);
-		}
-		repoManger.install(TOPOX_INSTALL_PATH);
-		outputDirectory.ensureDir();
-		tmpOutputDirectory.ensureDir();
-	}
+    @BeforeAll
+    static void setUp() throws QueryException, IOException {
+        final RepoManager repoManger = new RepoManager(new Context());
+        try {
+            repoManger.delete("ETF TopoX");
+        } catch (QueryException ign) {
+            ExcUtils.suppress(ign);
+        }
+        repoManger.install(TOPOX_INSTALL_PATH);
+        outputDirectory.ensureDir();
+        tmpOutputDirectory.ensureDir();
+    }
 
-	@AfterEach
-	@BeforeEach
-	void dropDb() throws BaseXException {
-		new DropDB(DB_NAME).execute(ctx);
-	}
+    @AfterEach
+    @BeforeEach
+    void dropDb() throws BaseXException {
+        new DropDB(DB_NAME).execute(ctx);
+    }
 
-	private OutputStream outputStream(final IFile outputFile) {
-		try {
-			return new FileOutputStream(outputFile);
-		} catch (FileNotFoundException e) {
-			fail("Error writing to file", e);
-			return null;
-		}
-	}
+    private OutputStream outputStream(final IFile outputFile) {
+        try {
+            return new FileOutputStream(outputFile);
+        } catch (FileNotFoundException e) {
+            fail("Error writing to file", e);
+            return null;
+        }
+    }
 
-	@TestFactory
-	Stream<DynamicTest> createTests() {
-		return BsxDataDrivenTest.createDDT(ddtDirectory).stream()
-				.map(t -> DynamicTest.dynamicTest(
-						"Data Test: " + t.getName(),
-						() -> {
-							final IFile testTmpOutputDirectory = tmpOutputDirectory.secureExpandPathDown(t.getName())
-									.ensureDir();
-							new CreateDB(DB_NAME, t.getDataPath()).execute(ctx);
-							final XQuery xQuery = t.getQuery();
-							xQuery.bind("$tmpOutputDirectory", testTmpOutputDirectory.getAbsolutePath());
-							xQuery.bind("$dbname", DB_NAME);
-							final IFile outputFile = new IFile(outputDirectory, t.getName() + ".xml");
-							xQuery.execute(ctx, outputStream(outputFile));
-							t.compare(outputFile);
-						}));
-	}
+    @TestFactory
+    Stream<DynamicTest> createTests() {
+        return BsxDataDrivenTest.createDDT(ddtDirectory).stream()
+                .map(t -> DynamicTest.dynamicTest(
+                        "Data Test: " + t.getName(),
+                        () -> {
+                            final IFile testTmpOutputDirectory = tmpOutputDirectory.secureExpandPathDown(t.getName())
+                                    .ensureDir();
+                            new CreateDB(DB_NAME, t.getDataPath()).execute(ctx);
+                            final XQuery xQuery = t.getQuery();
+                            xQuery.bind("$tmpOutputDirectory", testTmpOutputDirectory.getAbsolutePath());
+                            xQuery.bind("$dbname", DB_NAME);
+                            final IFile outputFile = new IFile(outputDirectory, t.getName() + ".xml");
+                            xQuery.execute(ctx, outputStream(outputFile));
+                            t.compare(outputFile);
+                        }));
+    }
 
 }

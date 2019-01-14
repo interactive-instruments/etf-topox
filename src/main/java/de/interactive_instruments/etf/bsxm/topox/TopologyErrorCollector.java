@@ -1,5 +1,5 @@
 /**
- * Copyright 2010-2018 interactive instruments GmbH
+ * Copyright 2010-2019 interactive instruments GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@ import de.interactive_instruments.Releasable;
  */
 public interface TopologyErrorCollector extends Releasable {
 
-	void init();
+    void init();
 
-	void collectError(final TopologyErrorType topologyErrorType, final String... parameter);
+    void collectError(final TopologyErrorType topologyErrorType, final String... parameter);
 
-	void collectError(final TopologyErrorType topologyErrorType, final double x, final double y, final String... parameter);
+    void collectError(final TopologyErrorType topologyErrorType, final double x, final double y, final String... parameter);
 }

@@ -252,7 +252,7 @@
             featureOverlay.getSource().clear();
             map.forEachFeatureAtPixel(pixel, function (feature) {
                 var geometry = feature.getGeometry();
-                if (geometry.getType() === 'Polygon') {
+                if (geometry.getType() === 'Polygon' || geometry.getType() === 'LineString') {
                     featureOverlay.getSource().addFeature(feature);
                 }
             }, {
@@ -294,6 +294,7 @@
             var json = JSON.parse(this.responseText);
             var geoJson = (new ol.format.GeoJSON()).readFeatures(json);
             topoXSource.addFeatures(filterGeometry(geoJson, "Polygon"));
+            topoXSource.addFeatures(filterGeometry(geoJson, "LineString"));
             geoJsonErrorPoints = filterGeometry(geoJson, "Point");
             markerSource.addFeatures(geoJsonErrorPoints);
 

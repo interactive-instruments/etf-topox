@@ -109,7 +109,7 @@ declare function topox:dev-topology($topologyName as xs:string, $tempOutputDir a
 declare function topox:parse-surface($objects as node()*, $path as xs:string, $topologyId as xs:int) as empty-sequence() {
     for $object in $objects
     (: Todo dynamic path :)
-    for $geometry in topox:geometries( java:nextFeature($topologyId, $object)/*:position )
+    for $geometry in topox:surface-geometries( java:nextFeature($topologyId, $object)/*:position )
     return
         (
         java:nextGeometricObject($topologyId),
@@ -203,13 +203,13 @@ declare function topox:new-boundary-check($topologyId as xs:int) as xs:int {
 declare function topox:parse-boundary($objects as node()*, $path as xs:string, $boundaryId as xs:int) as empty-sequence() {
     for $object in $objects
     (: Todo dynamic path :)
-    for $geometry in java:nextFeature($boundaryId, $object)/*:position/gml:*
+    for $geometry in java:nextFeature($boundaryId, $object)/*:position
     return
     (
         java:nextBoundaryObject($boundaryId),
-        for $geo in $geometry//gml:posList/text()
+        for $geo in topox:curve-geometries($geometry)
         return
-            java:parseBoundary($boundaryId, $geo)
+            java:parseBoundary($boundaryId, $geo/gml:posList/text())
     )
 };
 
@@ -462,7 +462,7 @@ declare %private function topox:error-message($error as node()) as xs:string {
 declare %private function topox:export-error-points($topologyId as xs:int, $topoErrors as item()*) as empty-sequence() {
     for $e in $topoErrors
     return
-        java:writeGeoJsonPointFeature( $topologyId, string($e/@i), topox:error-message($e), string($e/X), string($e/Y) )
+        java:writeGeoJsonPOI( $topologyId, string($e/@i), topox:error-message($e), string($e/X), string($e/Y) )
 };
 
 (:~
@@ -477,18 +477,25 @@ declare %private function topox:export-features($topologyId as xs:int, $topoErro
     for $obj in $objects
     return (
         java:startGeoJsonFeature($topologyId, xs:string($obj/@gml:id)),
-        for $geometry in topox:geometries( $obj/*:position )
+        for $surfaceGemoetry in topox:surface-geometries( $obj/*:position )
         return (
-            for $segment in $geometry/gml:exterior/gml:Ring/gml:curveMember/gml:Curve/gml:segments/gml:*[local-name() = ('LineStringSegment', 'Arc')]/gml:posList/text()
+            for $segment in $surfaceGemoetry/gml:exterior/gml:Ring/gml:curveMember/gml:Curve/gml:segments/gml:*[local-name() = ('LineStringSegment', 'Arc')]/gml:posList/text()
                 return
-            java:addGeoJsonCoordinates($topologyId, $segment),
-            for $interior in $geometry/gml:interior
+            java:addGeoJsonPolygonCoordinates($topologyId, $segment),
+            for $interior in $surfaceGemoetry/gml:interior
             return
             (
-                java:nextGeoJsonInterior($topologyId),
+                java:nextGeoJsonPolygonInterior($topologyId),
                 for $segment in $interior/gml:Ring/gml:curveMember/gml:Curve/gml:segments/gml:*[local-name() = ('LineStringSegment', 'Arc')]/gml:posList/text()
                 return
-                java:addGeoJsonInteriorCoordinates($topologyId, $segment)
+                java:addGeoJsonPolygonCoordinates($topologyId, $segment)
+            )
+        ),(
+            for $curveGeometry in topox:curve-geometries( $obj/*:position )
+            return (
+                for $curve in $curveGeometry/gml:posList/text()
+                    return
+                java:addGeoJsonCurveCoordinates($topologyId, $curve)
             )
         )
     )
@@ -501,7 +508,7 @@ declare %private function topox:export-features($topologyId as xs:int, $topoErro
  : - PolyhedralSurface
  : - CompositeSurface
  :)
-declare %private function topox:geometries($obj as node()*) as node()* {
+declare %private function topox:surface-geometries($obj as node()*) as node()* {
     $obj/gml:*[local-name() = ('Surface', 'PolyhedralSurface')]/gml:patches/gml:PolygonPatch,
     $obj/gml:MultiSurface/gml:*[local-name() = ('surfaceMember', 'surfaceMembers')]/gml:Polygon,
     $obj/gml:MultiSurface/gml:*[local-name() = ('surfaceMember', 'surfaceMembers')]/gml:CompositeSurface/gml:surfaceMember//gml:*[local-name() = ('PolygonPatch', 'Polygon')],
@@ -511,4 +518,18 @@ declare %private function topox:geometries($obj as node()*) as node()* {
     $obj/gml:CompositeSurface/gml:surfaceMember/gml:CompositeSurface/gml:surfaceMember//gml:*[local-name() = ('PolygonPatch', 'Polygon')],
     $obj/gml:CompositeSurface/gml:surfaceMember/gml:Surface/gml:patches/gml:PolygonPatch,
     $obj/gml:CompositeSurface/gml:surfaceMember/gml:PolyhedralSurface/gml:patches/gml:PolygonPatch
+};
+
+(:~
+ : Returns all supported curve geometries of an object:
+ : - Curve
+ : - CompositeCurve
+ : - OrientableCurve
+ : - LineString
+ :)
+declare %private function topox:curve-geometries($obj as node()*) as node()* {
+    $obj/gml:Curve/gml:segments/gml:*[local-name() = ('LineStringSegment', 'Arc')],
+    $obj/gml:CompositeCurve/gml:CurveMember/gml:LineString,
+    $obj/gml:OrientableCurve/gml:baseCurve/gml:LineString,
+    $obj/gml:LineString
 };
