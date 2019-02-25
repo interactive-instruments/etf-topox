@@ -146,8 +146,9 @@ task xar(type: Jar, dependsOn: jar) {
 
 
 artifacts {
-	archives sourcesJar
 	archives xar
+	archives sourcesJar
 }
 
 junitPlatformTest.dependsOn xar
+xar.mustRunAfter jar
