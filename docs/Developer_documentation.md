@@ -1,7 +1,7 @@
 Developing tests with TopoX
 ============================
 
-The following walkthrough requires a working installation of BaseX with the TopoX plugin installed.
+This manual requires a working installation of BaseX with the TopoX plugin installed.
 
 Before TopoX can be used in a test, the library **must be initialized** with the
 name of the database and the number of databases that will be used:
@@ -199,7 +199,7 @@ let $geometryId := topox:geometric-object($feature/../../../../@gml:id)
 Even if multiple databases are used, the objects are automatically fetched from the corresponding database.
 
 
-Codes
+Error Codes
 -----
 
 ### RING\_OVERLAPPING\_EDGES

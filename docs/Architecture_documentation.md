@@ -6,7 +6,7 @@ TopoX Architecture
 This document is a working draft.
 
 
-Introduction and Goals 
+Introduction and Goals
 ======================
 
 TopoX is an extension module for the XML BaseX database and is used in the ETF for the testing of spatial data for topological issues. TopoX supports the parsing, validation and retrieval of topological information from spatial data in a BaseX database.
@@ -56,14 +56,14 @@ Show:
 
 Technical Context
 -----------------
-Todo 
+Todo
 
 Show:
 
 - BaseX database
 - TopoX
 - TopoX Parser
-- TopoX topological data structure 
+- TopoX topological data structure
 - TopoX error file
 - ETF ETS
 
@@ -79,7 +79,7 @@ Java-based prototypes that kept the data structure completely in memory showed m
 Building Block View
 ===================
 
-Todo 
+Todo
 
 Show:
 
@@ -108,7 +108,7 @@ The Topological Data Structure is based on the concept of a [doubly-connected ed
 
 The topological data structure (TDS) is manifested in one one-dimensional long array. Each date is stored with an index. If the date needs less than a long (64 bit), it is saved together with another small date under one common index. The TDS can hold a maximum of 1.3176246e+18 edges.
 
-The coordinates are stored in a separate double array. This saves one index in the TDS. Coordinate tuples are unique. 
+The coordinates are stored in a separate double array. This saves one index in the TDS. Coordinate tuples are unique.
 
 X and Y coordinates are mapped to exactly one edge with a hashing mechanism.
 
@@ -118,7 +118,7 @@ X and Y coordinates are mapped to exactly one edge with a hashing mechanism.
 
 Todo
 
-**Coordinate Index** : 
+**Coordinate Index** :
 
 **X coordinates**:
 
@@ -159,7 +159,7 @@ To bypass the Java Autoboxing, a [Trove HashMap](http://webcache.googleuserconte
 
 TODO
 
-### BaseX node reference 
+### BaseX node reference
 
 TODO
 
@@ -193,7 +193,7 @@ After each complete edge iteration, the first edge can be saved as a candiate fo
 
 Of course, if only one candidate is found at the end, then there is no free-standing surface, but a clearly defined boundary defined by one or more objects.
 
-If at least two candidates are found, then there are free-standing surfaces. In this case, the first edge of the freestanding surface, which possesses the fewest edges, is returned. 
+If at least two candidates are found, then there are free-standing surfaces. In this case, the first edge of the freestanding surface, which possesses the fewest edges, is returned.
 
 
 Testing
@@ -222,7 +222,7 @@ Geoemetry Parser
 
 TODO
 
-- avoid using external libraries like 
+- avoid using external libraries like
 
 
 Risks and Technical Debts
