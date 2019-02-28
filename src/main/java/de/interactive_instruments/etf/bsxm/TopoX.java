@@ -17,6 +17,7 @@ package de.interactive_instruments.etf.bsxm;
 
 import static de.interactive_instruments.etf.bsxm.topox.TopologyBuilder.compress;
 import static de.interactive_instruments.etf.bsxm.topox.TopologyBuilder.getRight;
+import static java.lang.Math.abs;
 
 import java.io.*;
 import java.lang.management.ManagementFactory;
@@ -141,7 +142,8 @@ public class TopoX {
             final File errorOutputFile = new File(errorOutputDir, themeName + ".xml");
             final XMLStreamWriter streamWriter = xof.createXMLStreamWriter(new FileOutputStream(errorOutputFile), "UTF-8");
             final TopologyErrorXmlWriter topologyErrorCollector = new TopologyErrorXmlWriter(themeName, streamWriter);
-            final TopologyBuilder topologyBuilder = new TopologyBuilder(themeName, topologyErrorCollector, initialEdgeCapacity);
+            final TopologyBuilder topologyBuilder = new TopologyBuilder(
+                    themeName, topologyErrorCollector, abs(initialEdgeCapacity + 1024));
             topologyErrorCollector.init();
 
             final Theme theme = new Theme(themeName, topologyErrorCollector, errorOutputFile.toString(), writer,

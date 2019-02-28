@@ -868,12 +868,13 @@ public class TopologyBuilder implements HashingSegmentHandler {
     }
 
     private boolean checkIfInteriorEdgeAndMark(final int edgeIndex) {
-        if (topology.getQuick(abs(edgeIndex) + RIGHT_LOCATION_INDEX) == 0) {
-            final long obj = topology.getQuick(edgeIndex + OBJ_OFFSET);
+        final int rEdgeIndex = abs(edgeIndex);
+        if (topology.getQuick(rEdgeIndex + RIGHT_LOCATION_INDEX) == 0) {
+            final long obj = topology.getQuick(rEdgeIndex + OBJ_OFFSET);
             // Check if this is an exterior edge
             if (getLeft(obj) < 0) {
                 // mark it
-                topology.setQuick(edgeIndex + RIGHT_LOCATION_INDEX, Integer.MIN_VALUE);
+                topology.setQuick(rEdgeIndex + RIGHT_LOCATION_INDEX, Integer.MIN_VALUE);
                 return true;
             }
         }
@@ -907,12 +908,13 @@ public class TopologyBuilder implements HashingSegmentHandler {
      * @return true if edge is an exterior edge without an object on the right side
      */
     private boolean checkIfOutsideExteriorEdgeAndMark(final int edgeIndex) {
-        if (topology.getQuick(abs(edgeIndex) + RIGHT_LOCATION_INDEX) == 0) {
-            final long obj = topology.getQuick(edgeIndex + OBJ_OFFSET);
+        final int rEdgeIndex = abs(edgeIndex);
+        if (topology.getQuick(rEdgeIndex + RIGHT_LOCATION_INDEX) == 0) {
+            final long obj = topology.getQuick(rEdgeIndex + OBJ_OFFSET);
             // Check if this is an exterior edge
             if (getLeft(obj) > 0) {
                 // mark it
-                topology.setQuick(edgeIndex + RIGHT_LOCATION_INDEX, Integer.MIN_VALUE);
+                topology.setQuick(rEdgeIndex + RIGHT_LOCATION_INDEX, Integer.MIN_VALUE);
                 return true;
             }
         }
