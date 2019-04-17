@@ -26,7 +26,7 @@ let $initialEdgeCapacity := xs:int($dbCount * 1995000)
 let $surfaces := $db/adv:AX_Bestandsdatenauszug/adv:enthaelt/wfsAdv:FeatureCollection/gml:featureMember/*[adv:modellart/adv:AA_Modellart[adv:advStandardModell = $modellart] and local-name() = ('AX_Fliessgewaesser', 'AX_Hafenbecken', 'AX_Meer', 'AX_StehendesGewaesser', 'AX_Bergbaubetrieb', 'AX_FlaecheBesondererFunktionalerPraegung', 'AX_FlaecheGemischterNutzung', 'AX_Friedhof', 'AX_Halde', 'AX_IndustrieUndGewerbeflaeche', 'AX_Siedlungsflaeche', 'AX_SportFreizeitUndErholungsflaeche', 'AX_TagebauGrubeSteinbruch', 'AX_Wohnbauflaeche', 'AX_FlaecheZurZeitUnbestimmbar', 'AX_Gehoelz', 'AX_Heide', 'AX_Landwirtschaft', 'AX_Moor', 'AX_Sumpf', 'AX_UnlandVegetationsloseFlaeche', 'AX_Wald', 'AX_Bahnverkehr', 'AX_Flugverkehr', 'AX_Platz', 'AX_Schiffsverkehr', 'AX_Strassenverkehr', 'AX_Weg') and not(adv:hatDirektUnten) and adv:position/gml:Surface]
 
 
-let $logMessage1 := local:log("Initializsing TopoX. This may take a while...")
+let $logMessage1 := local:log("Initializsing TopoX " || topox:detailed-version() || ". This may take a while...")
 let $initTime := prof:current-ms()
 
 let $topoId := topox:new-topology(
@@ -34,7 +34,6 @@ let $topoId := topox:new-topology(
   $tmpOutputDirectory,
   $initialEdgeCapacity
 )
-
 
 let $duration := prof:current-ms()-$initTime
 let $dummy := local:log("TopoX initialized in " || $duration || " ms" )

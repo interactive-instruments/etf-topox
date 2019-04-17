@@ -35,10 +35,8 @@ let $topoId := topox:new-topology(
   $initialEdgeCapacity
 )
 
-
 let $duration := prof:current-ms()-$initTime
 let $dummy := local:log("TopoX initialized in " || $duration || " ms" )
-
 
 let $initTime := prof:current-ms()
 let $dummy := topox:parse-surface($surfaces, 'adv:position/gml:Surface', $topoId)

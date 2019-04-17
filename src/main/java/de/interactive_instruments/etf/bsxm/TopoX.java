@@ -39,17 +39,18 @@ import org.basex.query.value.node.DBNode;
 
 import de.interactive_instruments.IFile;
 import de.interactive_instruments.etf.bsxm.topox.*;
+import de.interactive_instruments.etf.bsxm.topox.geojson.writer.GeoJsonWriter;
 import de.interactive_instruments.exceptions.ExcUtils;
 import de.interactive_instruments.properties.PropertyUtils;
 
 /**
- * TopoX facade.
+ * TopoX objects that realizes a facade and the CQRS command pattern.
  *
  * Not thread safe.
  *
  * @author Jon Herrmann ( herrmann aT interactive-instruments doT de )
  */
-public class TopoX {
+public class TopoX implements Serializable {
 
     // Used to check if a name already exists and to avoid file name conflicts.
     private final Set<String> themeNames = new HashSet();

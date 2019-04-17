@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.interactive_instruments.etf.bsxm.topox;
+package de.interactive_instruments.etf.bsxm.topox.geojson.writer;
 
 import java.io.*;
 
@@ -238,6 +238,7 @@ public class GeoJsonWriter implements Closeable, Releasable {
             throw new IllegalStateException("MODE: " + mode);
         case FEATURE:
             writer.write("LineString\",\"coordinates\":[");
+            break;
         case CURVE_COORDINATES:
             writer.write(",");
         }

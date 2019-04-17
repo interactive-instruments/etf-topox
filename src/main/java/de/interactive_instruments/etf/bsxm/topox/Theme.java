@@ -18,12 +18,16 @@ package de.interactive_instruments.etf.bsxm.topox;
 import static de.interactive_instruments.etf.bsxm.topox.TopologyErrorType.FREE_STANDING_SURFACE;
 import static de.interactive_instruments.etf.bsxm.topox.TopologyErrorType.HOLE_EMPTY_INTERIOR;
 
+import java.io.Serializable;
+
+import de.interactive_instruments.etf.bsxm.topox.geojson.writer.GeoJsonWriter;
+
 /**
  * The Theme object bundles all objects that are used to create topological information for one or multiple Features, including error handling, parsing and building topological data structure.
  *
  * @author Jon Herrmann ( herrmann aT interactive-instruments doT de )
  */
-public class Theme {
+public class Theme implements Serializable {
 
     public final String name;
     public final TopologyErrorCollector topologyErrorCollector;
