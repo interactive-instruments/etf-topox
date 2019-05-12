@@ -31,6 +31,8 @@ import org.basex.core.cmd.XQuery;
 import org.basex.query.QueryException;
 import org.basex.query.util.pkg.RepoManager;
 import org.junit.jupiter.api.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.interactive_instruments.IFile;
 import de.interactive_instruments.exceptions.ExcUtils;
@@ -47,6 +49,7 @@ public class TopoXTest {
     private final static IFile tmpOutputDirectory = new IFile("build/tmp/ddt/tmp_outputs");
     private final static String TOPOX_INSTALL_PATH = "build/libs/TopoX.xar";
     private final static String DB_NAME = "TOPOX-JUNIT-TEST-DB-000";
+    private final static Logger logger = LoggerFactory.getLogger(TopoXTest.class);
 
     @BeforeAll
     static void setUp() throws QueryException, IOException {
@@ -59,6 +62,8 @@ public class TopoXTest {
         repoManger.install(TOPOX_INSTALL_PATH);
         outputDirectory.ensureDir();
         tmpOutputDirectory.ensureDir();
+        logger.info("Output directory is: {}", outputDirectory.getAbsolutePath());
+        logger.info("Temporary directory is: {}", tmpOutputDirectory.getAbsolutePath());
     }
 
     @AfterEach
@@ -93,5 +98,4 @@ public class TopoXTest {
                             t.compare(outputFile);
                         }));
     }
-
 }

@@ -345,7 +345,9 @@ public class TopologyBuilder implements HashingSegmentHandler {
             // Left hand side of target edge
             final int cwObjectFromTargetEdge = getLeftOrRightByIndex(cwNext, OBJ_OFFSET);
             if (exterior) {
-                if (cwObjectFromTargetEdge != 0 && cwObjectFromTargetEdge != objectId) {
+                // check if there is already another object on that side.
+                if (cwObjectFromTargetEdge != 0
+                        && (cwObjectFromTargetEdge != objectId && !isInteriorBoundary(cwObjectFromTargetEdge))) {
                     final int sourceEdgeCoordIndex = getEdgeCoordIndex(sourceEdgeIndex);
                     errorCollector.collectError(
                             RING_INTERSECTION,
@@ -377,6 +379,10 @@ public class TopologyBuilder implements HashingSegmentHandler {
             }
             return setLeftOrRightCcwNextAndGetPrevious(cwNext, newTargetEdgeIndex);
         }
+    }
+
+    private static boolean isInteriorBoundary(final int objectId) {
+        return objectId < 0;
     }
 
     private String getLocationAsStr(final int loc) {
@@ -908,13 +914,13 @@ public class TopologyBuilder implements HashingSegmentHandler {
      * @return true if edge is an exterior edge without an object on the right side
      */
     private boolean checkIfOutsideExteriorEdgeAndMark(final int edgeIndex) {
-        final int rEdgeIndex = abs(edgeIndex);
-        if (topology.getQuick(rEdgeIndex + RIGHT_LOCATION_INDEX) == 0) {
-            final long obj = topology.getQuick(rEdgeIndex + OBJ_OFFSET);
+        if ((edgeIndex > 0 && topology.getQuick(edgeIndex + RIGHT_LOCATION_INDEX) == 0) ||
+                (edgeIndex < 0 && topology.getQuick(-edgeIndex + LEFT_LOCATION_INDEX) == 0)) {
+            final long obj = topology.getQuick(edgeIndex + OBJ_OFFSET);
             // Check if this is an exterior edge
             if (getLeft(obj) > 0) {
                 // mark it
-                topology.setQuick(rEdgeIndex + RIGHT_LOCATION_INDEX, Integer.MIN_VALUE);
+                topology.setQuick(edgeIndex + RIGHT_LOCATION_INDEX, Integer.MIN_VALUE);
                 return true;
             }
         }

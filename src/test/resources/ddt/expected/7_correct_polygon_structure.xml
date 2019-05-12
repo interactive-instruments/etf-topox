@@ -1,0 +1,8 @@
+<ete:TopologicalErrors xmlns:ete="http://www.interactive-instruments.de/etf/topology-error/1.0" name="Tatsaechliche_Nutzung">
+    <e i="1" t="RING_OVERLAPPING_EDGES">
+        <X>123736.4</X>
+        <Y>4563094.554</Y>
+        <IS>68719477323</IS>
+        <O>94489281379</O>
+    </e>
+</ete:TopologicalErrors>

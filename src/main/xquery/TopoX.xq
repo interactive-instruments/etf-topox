@@ -29,11 +29,16 @@ import module namespace java = 'java:de.interactive_instruments.etf.bsxm.TopoX';
 
 declare namespace gml='http://www.opengis.net/gml/3.2';
 declare namespace ete='http://www.interactive-instruments.de/etf/topology-error/1.0';
+
+declare variable $topox:ERROR_CODES_NON_VISUALIZABLE := (
+    'EDGE_NOT_FOUND', 'INVALID_SURFACE_STRUCTURE', 'INVALID_ANGLE'
+);
+
 declare variable $topox:ERROR_CODES := (
     'RING_OVERLAPPING_EDGES', 'RING_INTERSECTION',
     'HOLE_EMPTY_INTERIOR', 'FREE_STANDING_SURFACE',
     'BOUNDARY_POINT_DETACHED', 'BOUNDARY_EDGE_INVALID',
-    'EDGE_NOT_FOUND', 'INVALID_ANGLE'
+    $topox:ERROR_CODES_NON_VISUALIZABLE
 );
 
 (:~
@@ -275,7 +280,7 @@ declare function topox:feature($compressedValue as xs:long) as node() {
  : @return nothing
  :)
 declare function topox:export-erroneous-features-to-geojson($topologyId as xs:int, $geoJsonAttachmentId as xs:string, $errorCodes as xs:string*) as empty-sequence() {
-        let $topoErrors := topox:topological-errors($topologyId,  $errorCodes)[not(@t = ('EDGE_NOT_FOUND', 'INVALID_ANGLE'))]
+        let $topoErrors := topox:topological-errors($topologyId,  $errorCodes)[not(@t = $topox:ERROR_CODES_NON_VISUALIZABLE)]
         return (
             topox:export-error-points($topologyId, $topoErrors),
             topox:export-features($topologyId, $topoErrors),
@@ -293,6 +298,19 @@ declare function topox:export-erroneous-features-to-geojson($topologyId as xs:in
  :)
 declare function topox:export-erroneous-features-to-geojson($topologyId as xs:int, $geoJsonAttachmentId as xs:string) as empty-sequence() {
     topox:export-erroneous-features-to-geojson($topologyId, $geoJsonAttachmentId, ())
+};
+
+(:~
+ : Returns all supported curve geometries of an object:
+ : - Curve
+ : - CompositeCurve
+ : - OrientableCurve
+ : - LineString
+ :
+ : The geometries must have 3 coordinates
+ :)
+declare function topox:unsupported-curve-geometries($obj as node()*) as node()* {
+    topox:curve-geometries($obj)
 };
 
 (:~
@@ -526,10 +544,12 @@ declare %private function topox:surface-geometries($obj as node()*) as node()* {
  : - CompositeCurve
  : - OrientableCurve
  : - LineString
+ :
+ : The geometries must have 3 coordinates
  :)
 declare %private function topox:curve-geometries($obj as node()*) as node()* {
     $obj/gml:Curve/gml:segments/gml:*[local-name() = ('LineStringSegment', 'Arc')],
-    $obj/gml:CompositeCurve/gml:CurveMember/gml:LineString,
+    $obj/gml:CompositeCurve/gml:curveMember/gml:Curve/gml:segments/gml:*[local-name() = ('LineStringSegment', 'Arc')],
     $obj/gml:OrientableCurve/gml:baseCurve/gml:LineString,
     $obj/gml:LineString
 };
