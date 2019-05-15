@@ -31,14 +31,14 @@ declare namespace gml='http://www.opengis.net/gml/3.2';
 declare namespace ete='http://www.interactive-instruments.de/etf/topology-error/1.0';
 
 declare variable $topox:ERROR_CODES_NON_VISUALIZABLE := (
-    'EDGE_NOT_FOUND', 'INVALID_SURFACE_STRUCTURE',
-    'INVALID_ANGLE'
+    'EDGE_NOT_FOUND', 'INVALID_SURFACE_STRUCTURE', 'INVALID_ANGLE'
 );
 
 declare variable $topox:ERROR_CODES := (
     'RING_OVERLAPPING_EDGES', 'RING_INTERSECTION',
     'HOLE_EMPTY_INTERIOR', 'FREE_STANDING_SURFACE',
-    'BOUNDARY_POINT_DETACHED', 'BOUNDARY_EDGE_INVALID',
+    'FREE_STANDING_SURFACE_DETAILED', 'BOUNDARY_POINT_DETACHED',
+    'BOUNDARY_EDGE_INVALID',
     $topox:ERROR_CODES_NON_VISUALIZABLE
 );
 
