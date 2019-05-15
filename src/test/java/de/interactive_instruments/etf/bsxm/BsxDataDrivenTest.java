@@ -97,8 +97,8 @@ class BsxDataDrivenTest {
 
             if (diff.hasDifferences()) {
                 final Difference difference = diff.getDifferences().iterator().next();
-                assertEquals(formatter.getControlDetailDescription(difference.getComparison()),
-                        formatter.getTestDetailDescription(difference.getComparison()));
+                assertEquals(formatter.getTestDetailDescription(difference.getComparison()),
+                        formatter.getControlDetailDescription(difference.getComparison()));
             }
         }
 

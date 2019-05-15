@@ -15,10 +15,13 @@
  */
 package de.interactive_instruments.etf.bsxm.topox;
 
-import static de.interactive_instruments.etf.bsxm.topox.TopologyErrorType.FREE_STANDING_SURFACE;
-import static de.interactive_instruments.etf.bsxm.topox.TopologyErrorType.HOLE_EMPTY_INTERIOR;
+import static de.interactive_instruments.etf.bsxm.topox.TopologyErrorType.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import de.interactive_instruments.etf.bsxm.topox.geojson.writer.GeoJsonWriter;
 
@@ -34,6 +37,7 @@ public class Theme implements Serializable {
     public final String errorFile;
     public final GeoJsonWriter geoJsonWriter;
     public final PosListParser parser;
+    private boolean freeStandingSurfacesDetected = false;
 
     final Topology topology;
     private final TopologyBuilder topologyBuilder;
@@ -66,7 +70,15 @@ public class Theme implements Serializable {
         return count;
     }
 
+    private void checkFreeStandingSurfacesCalled() {
+        if (freeStandingSurfacesDetected) {
+            throw new IllegalStateException("Free-standing surface detection can only be called once");
+        }
+        freeStandingSurfacesDetected = true;
+    }
+
     public int detectFreeStandingSurfaces() {
+        checkFreeStandingSurfacesCalled();
         int count = 0;
         for (final Topology.Edge freeStandingSurface : topology.freeStandingSurfaces()) {
             count++;
@@ -75,6 +87,43 @@ public class Theme implements Serializable {
                     freeStandingSurface.source().y(),
                     "IS",
                     String.valueOf(freeStandingSurface.leftObject()));
+        }
+        return count;
+    }
+
+    public int detectFreeStandingSurfacesWithAllObjects() {
+        checkFreeStandingSurfacesCalled();
+        int count = 0;
+        for (final Topology.Edge freeStandingSurface : topology.freeStandingSurfaces()) {
+            count++;
+
+            Topology.Edge nextConnectedEdge = freeStandingSurface.targetCcwNext();
+            final int maxCount = 1_000_000;
+            int c = 0;
+            // compressed indexes of the geometric objects
+            final List<Long> compressedObjIds = new ArrayList<>();
+            // object ids
+            final Set<Integer> objIds = new HashSet<>();
+            while (!nextConnectedEdge.equals(freeStandingSurface) && c++ < maxCount) {
+                final long objId = nextConnectedEdge.leftObject();
+                if (objId != 0 && objIds.add(DataCompression.preObject(objId))) {
+                    compressedObjIds.add(objId);
+                }
+                nextConnectedEdge = nextConnectedEdge.targetCcwNext();
+            }
+
+            final String[] isIds = new String[objIds.size() * 2];
+            int i = 0;
+            for (final Long compressedObjId : compressedObjIds) {
+                isIds[i++] = "IS";
+                isIds[i++] = String.valueOf(compressedObjId);
+            }
+
+            topologyErrorCollector.collectError(
+                    FREE_STANDING_SURFACE_DETAILED,
+                    freeStandingSurface.source().x(),
+                    freeStandingSurface.source().y(),
+                    isIds);
         }
         return count;
     }

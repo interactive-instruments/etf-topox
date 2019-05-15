@@ -15,8 +15,7 @@
  */
 package de.interactive_instruments.etf.bsxm;
 
-import static de.interactive_instruments.etf.bsxm.topox.TopologyBuilder.compress;
-import static de.interactive_instruments.etf.bsxm.topox.TopologyBuilder.getRight;
+import static de.interactive_instruments.etf.bsxm.topox.DataCompression.*;
 import static java.lang.Math.abs;
 
 import java.io.*;
@@ -318,6 +317,18 @@ public class TopoX implements Serializable {
         return themes.get(id).detectFreeStandingSurfaces();
     }
 
+    /**
+     * Detect free-standing surfaces and output all object ids
+     *
+     * @param id
+     *            ID of Topology Builder
+     */
+    @Deterministic
+    @Requires(Permission.NONE)
+    public int detectFreeStandingSurfacesWithAllObjects(final int id) {
+        return themes.get(id).detectFreeStandingSurfacesWithAllObjects();
+    }
+
     // Border parsing
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -546,7 +557,7 @@ public class TopoX implements Serializable {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Get the pre ID from a compressed long TopoX index
+     * Get the pre ID from a compressed long TopoX index for a geometric object
      *
      * @param compressedIndex
      *            TopoX index
@@ -559,7 +570,7 @@ public class TopoX implements Serializable {
     }
 
     /**
-     * Get the pre ID from a compressed long TopoX index
+     * Get the pre ID from a compressed long TopoX index for the object
      *
      * @param compressedIndex
      *            TopoX index
@@ -568,8 +579,7 @@ public class TopoX implements Serializable {
     @Deterministic
     @Requires(Permission.NONE)
     public static int preObject(final long compressedIndex) {
-        return getRight(compressedIndex) -
-                objectIndex(compressedIndex);
+        return DataCompression.preObject(compressedIndex);
     }
 
     /**
@@ -612,18 +622,6 @@ public class TopoX implements Serializable {
                 dbIndex(compressedIndex) << 24,
                 getRight(compressedIndex) -
                         objectIndex(compressedIndex));
-    }
-
-    private static int makeCompressedNodeIndex(final byte dbIndex, final int objectGeoDiffIndex) {
-        return (((dbIndex) << 24) | objectGeoDiffIndex & 0xFFFFFF);
-    }
-
-    private static int dbIndex(final long compressedIndex) {
-        return (int) (compressedIndex >>> 56);
-    }
-
-    private static int objectIndex(final long compressedIndex) {
-        return ((int) (compressedIndex >>> 32) & 0xFFFFFF);
     }
 
     private long genIndex(final DBNode node) {

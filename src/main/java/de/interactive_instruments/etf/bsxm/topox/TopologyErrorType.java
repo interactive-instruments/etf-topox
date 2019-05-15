@@ -55,6 +55,13 @@ enum TopologyErrorType {
     FREE_STANDING_SURFACE,
 
     /**
+     * Free standing surface with all object IDs
+     *
+     * Outputs: - X, Y for the point of failure - multiple IS for all the objects where the free standing surface has been detected
+     */
+    FREE_STANDING_SURFACE_DETAILED,
+
+    /**
      * Detached boundary point
      *
      * A boundary point was defined that could not be found in the topological data.

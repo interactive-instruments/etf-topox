@@ -15,6 +15,8 @@
  */
 package de.interactive_instruments.etf.bsxm.topox;
 
+import static de.interactive_instruments.etf.bsxm.topox.DataCompression.getLeft;
+import static de.interactive_instruments.etf.bsxm.topox.DataCompression.getRight;
 import static de.interactive_instruments.etf.bsxm.topox.TopologyBuilder.*;
 import static java.lang.Math.abs;
 
@@ -159,7 +161,7 @@ class TopologyStore implements Topology, TopologyMXBean {
 
     private TopologyBuilder builder;
 
-    public TopologyStore(final TopologyBuilder builder) {
+    TopologyStore(final TopologyBuilder builder) {
         this.builder = builder;
     }
 

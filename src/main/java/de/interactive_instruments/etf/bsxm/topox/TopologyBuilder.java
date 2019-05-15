@@ -15,6 +15,7 @@
  */
 package de.interactive_instruments.etf.bsxm.topox;
 
+import static de.interactive_instruments.etf.bsxm.topox.DataCompression.*;
 import static de.interactive_instruments.etf.bsxm.topox.TopologyErrorType.*;
 import static java.lang.Math.abs;
 import static java.lang.Math.atan2;
@@ -928,7 +929,7 @@ public class TopologyBuilder implements HashingSegmentHandler {
     }
 
     /**
-     * Find free standing edges in the topological data strcuture
+     * Find free standing edges in the topological data structure
      *
      * @param firstFoundFreeStandingSurfaceEdges
      *            array for adding the first edge of the free standing surface
@@ -974,26 +975,6 @@ public class TopologyBuilder implements HashingSegmentHandler {
         } else {
             return getTargetAngle(this.topology, -index);
         }
-    }
-
-    public static int getLeft(final long compressedValue) {
-        return (int) (compressedValue >> 32);
-    }
-
-    public static int getRight(final long compressedValue) {
-        return (int) compressedValue;
-    }
-
-    public static long compress(final int left, final int right) {
-        return toLeft(left) | toRight(right);
-    }
-
-    public static long toLeft(final int left) {
-        return (((long) left) << 32);
-    }
-
-    public static long toRight(final int right) {
-        return (right & 0xFFFFFFFFL);
     }
 
     static void setRight(final TLongArrayList topology, final int index, final int right) {

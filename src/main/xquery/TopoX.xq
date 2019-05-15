@@ -31,7 +31,8 @@ declare namespace gml='http://www.opengis.net/gml/3.2';
 declare namespace ete='http://www.interactive-instruments.de/etf/topology-error/1.0';
 
 declare variable $topox:ERROR_CODES_NON_VISUALIZABLE := (
-    'EDGE_NOT_FOUND', 'INVALID_SURFACE_STRUCTURE', 'INVALID_ANGLE'
+    'EDGE_NOT_FOUND', 'INVALID_SURFACE_STRUCTURE',
+    'INVALID_ANGLE'
 );
 
 declare variable $topox:ERROR_CODES := (
@@ -136,7 +137,11 @@ declare function topox:parse-surface($objects as node()*, $path as xs:string, $t
  : Checks the topology for free-standing surfaces.
  :
  : Must be called after the parse-surface() function.
- : Errors can be retrieved by calling the topological-errors() function.
+ : Errors of the type FREE_STANDING_SURFACE can be retrieved by
+ : calling the topological-errors() function.
+ :
+ : The error includes only the first found coordinate and the object
+ : of the the free-standing surface.
  :
  : Throws BaseXException if the $topologyId is unknown
  :
@@ -146,6 +151,29 @@ declare function topox:parse-surface($objects as node()*, $path as xs:string, $t
 declare function topox:detect-free-standing-surfaces($topologyId as xs:int) as xs:int {
         let $initTime := prof:current-ms()
         let $freeStandingSurfacesCount := java:detectFreeStandingSurfaces($topologyId)
+        let $duration := prof:current-ms()-$initTime
+        let $logDummy := prof:dump($freeStandingSurfacesCount || " free-standing surfaces detected in " || $duration || "ms")
+        return $freeStandingSurfacesCount
+};
+
+(:~
+ : Checks the topology for free-standing surfaces.
+ :
+ : Must be called after the parse-surface() function.
+ : Errors of the type FREE_STANDING_SURFACE_DETAILED can be retrieved by
+ : calling the topological-errors() function.
+ :
+ : The difference to the detect-free-standing-surfaces() function is
+ : that the objects at the outer edges of the free-standing surfaces are output as errors.
+ :
+ : Throws BaseXException if the $topologyId is unknown
+ :
+ : @param   $topologyId ID of the topology to check
+ : @returns the number of free-standing surfaces found or 0 if there is only one outer border
+ :)
+declare function topox:detect-free-standing-surfaces-detailed($topologyId as xs:int) as xs:int {
+        let $initTime := prof:current-ms()
+        let $freeStandingSurfacesCount := java:detectFreeStandingSurfacesWithAllObjects($topologyId)
         let $duration := prof:current-ms()-$initTime
         let $logDummy := prof:dump($freeStandingSurfacesCount || " free-standing surfaces detected in " || $duration || "ms")
         return $freeStandingSurfacesCount
