@@ -449,7 +449,7 @@ declare %private function topox:error-message($error as node()) as xs:string {
                              else ""
                  return $mesg1 || $mesg2
 
-    else if( $error/@t = 'FREE_STANDING_SURFACE') then
+    else if( $error/@t = ('FREE_STANDING_SURFACE', 'FREE_STANDING_SURFACE_DETAILED') ) then
                  "Freistehende Fl\u00E4che bei Punkt <br/>" || $error/X || " " || $error/Y ||
                      "<br/> am Objekt '" ||
                      $isFeatureId || "' <br/> bei Geometrie <br/> '" || $isGmlId  || "' erkannt. "
