@@ -82,7 +82,7 @@ Detection of holes
 
 Holes -the surface of a Feature with an inner boundary that is not filled by another surface- can be detected by using the detect-holes() function:
 
-```
+```XQuery
 let $holeCount := topox:detect-holes($topoId)
 ```
 
@@ -94,7 +94,7 @@ Detection of free-standing surfaces
 
 Free-standing surfaces can be detected by using the detect-free-standing-surfaces() function:
 
-```
+```XQuery
 let $freeStandingSurfaceCount := topox:detect-free-standing-surfaces($topoId)
 ```
 
@@ -110,7 +110,7 @@ areas. With TopoX it can be tested whether the boundaries of the administrative 
 
 Boundaries can be condensed like topological themes and must be created with:
 
-```
+```XQuery
 (: Create the validator object :)
 let $validatorId := topox:new-validator($topoId)
 ```
@@ -119,7 +119,7 @@ where the parameter references a topological theme as basis for checks.
 
 The second call to start the parsing of boundaries, is very similar to the parse-surface() function.
 
-```
+```XQuery
 (: Start border validation :)
 let $borderParsingDummy := topox:parse-boundary($borders, 'adv:position/gml:*', $validatorId)
 ```
@@ -135,8 +135,7 @@ With TopoX you can walk along a topological axis -e.g. a road axis or boundaries
 and check whether the points are defined and whether the objects on the left
 and/or right side meet certain requirements.
 
-```
-
+```XQuery
 (:
 : Define a higher-order function to check the objects on the right and left side
 :
@@ -181,7 +180,7 @@ Create issue map (experimental)
 
 This function will export a map with the topological errors as HTML file to the temp folder. This feature is still very experimental and intended for developers until now.
 
-```
+```XQuery
 let $dummyMap := topox:export-erroneous-features-to-geojson($topoId, "Map")
 ```
 
