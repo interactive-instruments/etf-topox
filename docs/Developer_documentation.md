@@ -111,7 +111,8 @@ areas. With TopoX it can be tested whether the boundaries of the administrative 
 Boundaries can be condensed like topological themes and must be created with:
 
 ```
-let $boundaryId := topox:new-boundary-check($topoId)
+(: Create the validator object :)
+let $validatorId := topox:new-validator($topoId)
 ```
 
 where the parameter references a topological theme as basis for checks.
@@ -119,11 +120,60 @@ where the parameter references a topological theme as basis for checks.
 The second call to start the parsing of boundaries, is very similar to the parse-surface() function.
 
 ```
-let $borderParsingDummy := topox:parse-boundary($borders, 'adv:position/gml:*', $boundaryId)
+(: Start border validation :)
+let $borderParsingDummy := topox:parse-boundary($borders, 'adv:position/gml:*', $validatorId)
 ```
 
 If the points or edges of the boundaries do not overlap exactly with the basis
-data, BOUNDARY\_POINT\_DETACHED and BOUNDARY\_EDGE\_INVALID errors are reported in the error file.
+data, POINT\_DETACHED and EDGE\_POINTS\_INVALID errors are reported in the error file.
+
+
+Validate objects along an axis on the left and right side.
+----------------
+
+With TopoX you can walk along a topological axis -e.g. a road axis or boundaries-
+and check whether the points are defined and whether the objects on the left
+and/or right side meet certain requirements.
+
+```
+
+(:
+: Define a higher-order function to check the objects on the right and left side
+:
+: 0 no error
+: @returns 0 no error, 1 error on the right, 2 error on the left, 3 error on both sides
+:)
+let $assertion := function($right as xs:long, $left as xs:long) {
+	if(not($right eq 0)) then
+		let $rightFeature := topox:feature($right)
+		(: right feature is set, no error :)
+		return xs:int(0)
+	(: report an error on the right :)
+	else xs:int(1)
+}
+
+(: Create the validator object :)
+let $validatorId := topox:new-validator($topoId)
+
+(: Start axis parsing :)
+let $axisParsingDummy := topox:parse-axis($borders, 'adv:position/gml:*', $validatorId, $assertion)
+```
+
+If the points or edges of the axis do not overlap exactly with the basis
+data, POINT\_DETACHED and EDGE\_POINTS\_INVALID errors are reported in the
+error file.
+
+The assertion function must return one of four integer codes:
+
+- 0 if the assertion passes
+- 1 if the right side violates the assertion. This reports either an
+EDGE\_INVALID\_RIGHT error or an EDGE\_MISSING\_RIGHT depending on whether
+the object exists.
+- 2 if the left side violates the assertion. This reports either an
+EDGE\_INVALID\_LEFT error or an EDGE\_MISSING\_LEFT depending on whether
+the object exists.
+- 3 if both sides violate the assertion. EDGE\_INVALID will be reported.
+
 
 
 Create issue map (experimental)
@@ -218,13 +268,38 @@ The surface of a Feature with an inner boundary is not filled by the surface of 
 
 There are at least two free-standing surfaces. All surfaces except the largest, with the most edges, are reported. The *IS* property (and *X, Y* properties) references the object where the error has been detected.
 
-### BOUNDARY\_POINT\_DETACHED
+### POINT\_DETACHED
 
-A boundary point (*X, Y* properties) was defined that could not be found in the topological basis data. The *IS* property references the object where the error has been detected.
+A point (*X, Y* properties) was defined that could not be found in the topological basis data. The *IS* property references the object where the error has been detected.
 
-### BOUNDARY\_EDGE\_INVALID
+### EDGE\_POINTS\_INVALID
 
 An edge (*X, Y* reference start point of the edge, *X2, Y2* the end point) was defined that could not be found in the topological basis data. The *IS* property references the object where the error has been detected.
+
+
+### EDGE\_MISSING\_LEFT
+
+The validation for the left side of an edge (*X, Y* reference start point of the edge, *X2, Y2* the end point) failed due to a missing object.
+
+### EDGE\_MISSING\_RIGHT
+
+The validation for the right side of an edge (*X, Y* reference start point of the edge, *X2, Y2* the end point) failed due to a missing object.
+
+### EDGE\_INVALID\_LEFT
+
+The left side of an edge (*X, Y* reference start point of the edge, *X2, Y2* the end point) violates an assertion. The *IS* property references the object
+where the error has been detected.
+
+### EDGE\_INVALID\_RIGHT
+
+The right side of an edge (*X, Y* reference start point of the edge, *X2, Y2* the end point) violates an assertion. The *IS* property references the object
+where the error has been detected.
+
+### EDGE\_INVALID
+
+The right and left side of an edge (*X, Y* reference start point of the edge, *X2, Y2* the end point) violate an assertion. The *R* property references the object on the right
+side, the *L* property references the object on the left side where the errors
+have been detected.
 
 ### EDGE\_NOT\_FOUND
 An edge could not be found. This is most likely a consequential error if others occurred and for instance the connection between two points has been invalidated in the data structure. If this is the only type of error that occurred, then this may indicate a bug in the software.

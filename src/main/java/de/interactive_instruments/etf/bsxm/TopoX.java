@@ -52,12 +52,12 @@ import de.interactive_instruments.properties.PropertyUtils;
 public class TopoX implements Serializable {
 
     // Used to check if a name already exists and to avoid file name conflicts.
-    private final Set<String> themeNames = new HashSet();
-    private final List<Theme> themes = new ArrayList();
+    private final Set<String> themeNames = new HashSet<>();
+    private final List<Theme> themes = new ArrayList<>();
 
-    // Used to avoid conflicts between the Theme and BoundaryBuilder IDs
+    // Used to avoid conflicts between the Theme and EdgeValidator IDs
     private final static int BOUNDARY_ID_OFFSET = 4096;
-    private final List<BoundaryBuilder> boundaries = new ArrayList();
+    private final List<EdgeValidator> boundaries = new ArrayList<>();
 
     // For example "DB-"
     private String dbnamePrefix;
@@ -222,12 +222,12 @@ public class TopoX implements Serializable {
      *             if the $topologyId is unknown
      */
     @Requires(Permission.CREATE)
-    public int newBoundaryBuilder(final int topologyId)
+    public int newEdgeValidator(final int topologyId)
             throws BaseXException {
         if (topologyId < 0 || topologyId >= themes.size()) {
             throw new BaseXException("Unknown topology ID: " + String.valueOf(topologyId));
         }
-        this.boundaries.add(new BoundaryBuilder(themes.get(topologyId)));
+        this.boundaries.add(new EdgeValidator(themes.get(topologyId)));
         return this.boundaries.size() - 1 + BOUNDARY_ID_OFFSET;
     }
 
@@ -329,35 +329,72 @@ public class TopoX implements Serializable {
         return themes.get(id).detectFreeStandingSurfacesWithAllObjects();
     }
 
-    // Border parsing
+    // Validator parsing
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Switch the Boundary Builder to the next geometric object
      *
      * @param id
-     *            ID of Boundary Builder
+     *            ID of Validator object
      */
     @Requires(Permission.NONE)
-    public void nextBoundaryObject(final int id) {
+    public void nextValidatorObject(final int id) {
         boundaries.get(id - BOUNDARY_ID_OFFSET).parser.nextGeometricObject();
     }
 
     /**
-     * Parse the geometry of a boundary object
+     * Parse the geometry of an object
      *
      * Requires that the current object was previously set by calling {@link #nextFeature(int, DBNode)}
      *
      * @param id
-     *            ID of Boundary Builder
+     *            ID of Validator object
      * @param geo
      *            gml geometry
      */
     @Requires(Permission.READ)
-    public void parseBoundary(final int id, final DBNode geo) {
+    public void parseEdgeToValidate(final int id, final DBNode geo) {
         // geotype 2: use pass through handler
         boundaries.get(id - BOUNDARY_ID_OFFSET).parser.parseDirectPositions(geo.data().text(geo.pre(), true), false,
                 genIndex(geo), 2);
+    }
+
+    /**
+     * Reports an error for a failed assertion result
+     *
+     * @param id
+     *            ID of Validator object
+     * @param result
+     *            the assertion result
+     */
+    @Requires(Permission.READ)
+    public void reportValidationResult(final int id, final int result) {
+        if (result != 0) {
+            boundaries.get(id - BOUNDARY_ID_OFFSET).report(result);
+        }
+    }
+
+    /**
+     * Get the right side of the edge
+     *
+     * @param id
+     *            ID of Validator object
+     */
+    @Requires(Permission.NONE)
+    public long validatorGetEdgeRight(final int id) {
+        return boundaries.get(id - BOUNDARY_ID_OFFSET).getRight();
+    }
+
+    /**
+     * Get the left side of the edge
+     *
+     * @param id
+     *            ID of Validator object
+     */
+    @Requires(Permission.NONE)
+    public long validatorGetEdgeLeft(final int id) {
+        return boundaries.get(id - BOUNDARY_ID_OFFSET).getLeft();
     }
 
     // Error output

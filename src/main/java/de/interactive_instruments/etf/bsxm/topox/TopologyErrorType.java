@@ -62,25 +62,61 @@ enum TopologyErrorType {
     FREE_STANDING_SURFACE_DETAILED,
 
     /**
-     * Detached boundary point
+     * Detached point
      *
-     * A boundary point was defined that could not be found in the topological data.
+     * A point was used that could not be found in the topological data.
      *
      * Outputs: - X, Y for the point of failure - IS for the object that defined the boundary
      */
-    BOUNDARY_POINT_DETACHED,
+    POINT_DETACHED,
 
     /**
-     * Invalid boundary edge
+     * Points are invalid
      *
      * Edge points have been found but the points are not connected.
      *
-     * Outputs: - X, Y for the point of failure - IS for the object that defined the boundary - X2, Y2 for the second point of failure
+     * Outputs: - X, Y for the point of failure - IS for the object that has been parsed and defined the points - X2, Y2 for the second point of failure
      */
-    BOUNDARY_EDGE_INVALID,
+    EDGE_POINTS_INVALID,
+
+    /**
+     * The validation for the left side failed due to a missing object.
+     *
+     * Outputs: - X, Y for the point of failure - X2, Y2 for the second point of failure
+     */
+    EDGE_MISSING_LEFT,
+
+    /**
+     * The validation for the right side failed due to a missing object.
+     *
+     * Outputs: - X, Y for the point of failure - X2, Y2 for the second point of failure
+     */
+    EDGE_MISSING_RIGHT,
+
+    /**
+     * The object on the left side violates an assertion.
+     *
+     * Outputs: - X, Y for the point of failure - IS for the object in the topological data - X2, Y2 for the second point of failure
+     */
+    EDGE_INVALID_LEFT,
+
+    /**
+     * The object on the right side violates an assertion.
+     *
+     * Outputs: - X, Y for the point of failure - IS for the object in the topological data - X2, Y2 for the second point of failure
+     */
+    EDGE_INVALID_RIGHT,
+
+    /**
+     * Right and left side violate an assertion.
+     *
+     * Outputs: - X, Y for the point of failure - L, if available, for the left object in the topological data - R, if available, for the right object in the topological data - X2, Y2 for the second point of failure
+     */
+    EDGE_INVALID,
 
     //////////////////////////////////////////////////////////////////////////
     // Deprecated and removed later
+
     /**
      * The curve orientation of the outer ring is invalid
      */

@@ -31,14 +31,24 @@ declare namespace gml='http://www.opengis.net/gml/3.2';
 declare namespace ete='http://www.interactive-instruments.de/etf/topology-error/1.0';
 
 declare variable $topox:ERROR_CODES_NON_VISUALIZABLE := (
-    'EDGE_NOT_FOUND', 'INVALID_SURFACE_STRUCTURE', 'INVALID_ANGLE'
+    'EDGE_NOT_FOUND',
+    'INVALID_SURFACE_STRUCTURE',
+    'INVALID_ANGLE',
+    'EDGE_INVALID',
+    'EDGE_MISSING_LEFT',
+    'EDGE_MISSING_RIGHT'
 );
 
 declare variable $topox:ERROR_CODES := (
-    'RING_OVERLAPPING_EDGES', 'RING_INTERSECTION',
-    'HOLE_EMPTY_INTERIOR', 'FREE_STANDING_SURFACE',
-    'FREE_STANDING_SURFACE_DETAILED', 'BOUNDARY_POINT_DETACHED',
-    'BOUNDARY_EDGE_INVALID',
+    'RING_OVERLAPPING_EDGES',
+    'RING_INTERSECTION',
+    'HOLE_EMPTY_INTERIOR',
+    'FREE_STANDING_SURFACE',
+    'FREE_STANDING_SURFACE_DETAILED',
+    'POINT_DETACHED',
+    'EDGE_POINTS_INVALID',
+    'EDGE_INVALID_LEFT',
+    'EDGE_INVALID_RIGHT',
     $topox:ERROR_CODES_NON_VISUALIZABLE
 );
 
@@ -199,50 +209,120 @@ declare function topox:detect-holes($topologyId as xs:int) as xs:int {
 };
 
 (:~
- : Creates a new object for checking boundaries and their overlapping.
+ : Creates a new object to validate edges basically the overlapping of boundaries.
  :
  : A boundary is exactly on an edge. There must be no overlap with another boundary
  : otherwise an error is reported. In order to lay several boundaries over one edge,
  : several independent boundary checking objects must be created.
  :
+ : The edge can be validated against additional criteria, for example to check
+ : which objects exist on the left and the right side. See
+ :
  : Requires an initialized topology object that has already
  : captured topological information with the parse-surface() function.
  : Errors can be retrieved by calling the topological-errors() function.
  :
- : Throws BaseXException if the $boundaryId is unknown
+ : Throws BaseXException if the topologyId is unknown
  :
  : @param  $topologyId ID of the topology
  : @return ID of the boundary check object
  :)
-declare function topox:new-boundary-check($topologyId as xs:int) as xs:int {
-    java:newBoundaryBuilder($topologyId)
+declare function topox:new-validator($topologyId as xs:int) as xs:int {
+    java:newEdgeValidator($topologyId)
 };
 
 (:~
- : Parses an object as boundary.
+ : Parses an object and validates.
  :
  : If there is another object with the same boundary, an error is reported.
  :
- : Requires an initialized boundary check object.
- : Errors can be retrieved by calling the topological-errors() function.
+ : Requires an initialized validator object.
+ : Errors can be retrieved by calling the topological-errors() function:
+ : - POINT_DETACHED
+ : - EDGE_POINTS_INVALID
  :
  : Throws BaseXException if the $boundaryId is unknown
  :
  : @param   $objects that possess gml surfaces with LineStringSegments and Arcs
  : @param   $path not used yet
- : @param   $boundaryId ID of the boundary
+ : @param   $validatorId ID of the validator
  : @returns nothing
  :)
-declare function topox:parse-boundary($objects as node()*, $path as xs:string, $boundaryId as xs:int) as empty-sequence() {
+declare function topox:parse-boundary($objects as node()*, $path as xs:string, $validatorId as xs:int) as empty-sequence() {
     for $object in $objects
     (: Todo dynamic path :)
-    for $geometry in java:nextFeature($boundaryId, $object)/*:position
+    for $geometry in java:nextFeature($validatorId, $object)/*:position
     return
     (
-        java:nextBoundaryObject($boundaryId),
+        java:nextValidatorObject($validatorId),
         for $geo in topox:curve-geometries($geometry)
         return
-            java:parseBoundary($boundaryId, $geo/gml:posList/text())
+            java:parseEdgeToValidate($validatorId, $geo/gml:posList/text())
+    )
+};
+
+(:~
+ : Parses an object and validates the left and the right side with an assertion.
+ :
+ : If there is another object with the same boundary, an error is reported.
+ :
+ : Requires an initialized validator object.
+ :
+ : Errors can be retrieved by calling the topological-errors() function:
+ : - POINT_DETACHED
+ : - EDGE_POINTS_INVALID
+ : - EDGE_INVALID_LEFT
+ : - EDGE_INVALID_RIGHT
+ : - EDGE_MISSING_LEFT
+ : - EDGE_MISSING_RIGHT
+ : - EDGE_INVALID
+ :
+ : The validation functions must accept two xs:long parameters for the
+ : right and the left side of the parsed axis. Each parameter represents
+ : the geometric object (can be resolved with the topox:geometric-object()
+ : function) and the feature (can be resolved with
+ : the topox:feature() function). The passed values can be 0!
+ :
+ : The function must return:
+ : - 0 if the validation passes
+ : - 1 if the right side violates the assertion, so
+ :   EDGE_INVALID_RIGHT and EDGE_MISSING_RIGHT errors will be reported
+ : - 2 if the left side violates the assertion, so
+ :   EDGE_INVALID_LEFT and EDGE_MISSING_LEFT will be reported
+ : - 3 if both side violate the assertion, so
+ :   EDGE_INVALID will be reported
+ :
+ : Throws BaseXException if the $boundaryId is unknown
+ :
+ : @param   $objects that possess gml surfaces with LineStringSegments and Arcs
+ : @param   $path not used yet
+ : @param   $validatorId ID of the validator
+ : @param   $assertion function to validate the left and the right side
+ : @returns nothing
+ :)
+declare function topox:parse-axis(
+    $objects as node()*,
+    $path as xs:string,
+    $validatorId as xs:int,
+    (: right and left :)
+    $assertion as function(xs:long, xs:long) as xs:int
+) as empty-sequence() {
+    for $object in $objects
+    (: Todo dynamic path :)
+    for $geometry in java:nextFeature($validatorId, $object)/*:position
+    return
+    (
+        java:nextValidatorObject($validatorId),
+        for $geo in topox:curve-geometries($geometry)
+        return
+        (
+            java:parseEdgeToValidate($validatorId, $geo/gml:posList/text()),
+            java:reportValidationResult(
+                $validatorId, $assertion(
+                    java:validatorGetEdgeRight($validatorId),
+                    java:validatorGetEdgeLeft($validatorId))
+            )
+        )
     )
 };
 
@@ -326,19 +406,6 @@ declare function topox:export-erroneous-features-to-geojson($topologyId as xs:in
  :)
 declare function topox:export-erroneous-features-to-geojson($topologyId as xs:int, $geoJsonAttachmentId as xs:string) as empty-sequence() {
     topox:export-erroneous-features-to-geojson($topologyId, $geoJsonAttachmentId, ())
-};
-
-(:~
- : Returns all supported curve geometries of an object:
- : - Curve
- : - CompositeCurve
- : - OrientableCurve
- : - LineString
- :
- : The geometries must have 3 coordinates
- :)
-declare function topox:unsupported-curve-geometries($obj as node()*) as node()* {
-    topox:curve-geometries($obj)
 };
 
 (:~
@@ -459,18 +526,32 @@ declare %private function topox:error-message($error as node()) as xs:string {
                          "<br/> am Objekt '" ||
                          $isFeatureId || "' <br/> bei Geometrie <br/> '" || $isGmlId  || "' erkannt. "
 
-    else if( $error/@t = 'BOUNDARY_POINT_DETACHED') then
-                     "Der Grenzpunkt <br/>" || $error/X || " " || $error/Y ||
+    else if( $error/@t = 'POINT_DETACHED') then
+                     "Der Punkt <br/>" || $error/X || " " || $error/Y ||
                          "<br/> am Objekt '" ||
                          $isFeatureId || "' <br/> bei Geometrie <br/> '" || $isGmlId  ||
-                         "' liegt nicht auf dem Rand eines Gebiets. "
+                         "' liegt topologisch nicht auf einem anderen Objekt. "
 
-    else if( $error/@t = 'BOUNDARY_EDGE_INVALID') then
-                     "Die Grenzpunkte <br/>" || $error/X || " " || $error/Y ||
+    else if( $error/@t = 'EDGE_POINTS_INVALID') then
+                     "Die Punkte <br/>" || $error/X || " " || $error/Y ||
                          "<br/> und " || $error/X2 || " " || $error/Y2 ||
                          "<br/> am Objekt '" ||
                          $isFeatureId || "' <br/> bei Geometrie <br/> '" || $isGmlId  ||
-                         "' liegen nicht auf dem Rand eines Gebiets. "
+                         "' sind topologisch nicht direkt verbunden."
+
+    else if( $error/@t = 'EDGE_INVALID_LEFT') then
+                     "An den Punkten <br/>" || $error/X || " " || $error/Y ||
+                         "<br/> und " || $error/X2 || " " || $error/Y2 ||
+                         "<br/> am Objekt '" ||
+                         $isFeatureId || "' <br/> bei Geometrie <br/> '" || $isGmlId  ||
+                         "' verletzt das Objekt auf der linken Seite eine Bedingung. "
+
+    else if( $error/@t = 'EDGE_INVALID_RIGHT') then
+                     "An den Punkten <br/>" || $error/X || " " || $error/Y ||
+                         "<br/> und " || $error/X2 || " " || $error/Y2 ||
+                         "<br/> am Objekt '" ||
+                         $isFeatureId || "' <br/> bei Geometrie <br/> '" || $isGmlId  ||
+                         "' verletzt das Objekt auf der rechten Seite eine Bedingung. "
 
     else
         let $mesg1 := "\u00DCberlappung oder \u00DCberschneidung im Linienverlauf zu Punkt <br/>" || $error/X || " " || $error/Y ||
