@@ -16,7 +16,7 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath group: 'de.interactive_instruments.bda', name: 'etf-bda', version: '[1.0.30,1.0.99]'
+		classpath group: 'de.interactive_instruments.bda', name: 'etf-bda', version: '[2.0.3,2.0.99]'
 		classpath ("org.junit.platform:junit-platform-gradle-plugin:1.2.0")
 	}
 	dependencies {
@@ -32,7 +32,7 @@ apply plugin: 'org.junit.platform.gradle.plugin'
 group = 'de.interactive_instruments.etf.testdriver.bsxm'
 description = "Extension module for the ETF Basex testdriver to create topological graph structures"
 
-ext.basexVersion = '9.0.2'
+ext.basexVersion = '9.2.4'
 
 configurations {
 	umlDoclet
@@ -51,7 +51,7 @@ dependencies {
 
 	umlDoclet "nl.talsmasoftware:umldoclet:1.0.16"
 
-  	testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.3.1'
+	testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.3.1'
 	testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.3.1'
 	testCompile 'com.tngtech.archunit:archunit-junit5-api:0.9.1'
 	testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.9.1'
