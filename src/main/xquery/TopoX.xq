@@ -460,7 +460,7 @@ declare %private function topox:check-error-code($errorCodes as xs:string*) {
   if (empty($errorCodes)) then
     true()
   else if (not(every $errCode in $errorCodes satisfies $errCode = $topox:ERROR_CODES)) then
-    error(xs:QName('ete:INVALID_ERROR_CODE'), 'invalid error codes ' || $errorCodes)
+    error(xs:QName('ete:INVALID_ERROR_CODE'), 'invalid error codes ' || string-join($errorCodes, ' '))
   else
     false()
 };
