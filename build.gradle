@@ -46,7 +46,7 @@ repositories {
 }
 
 dependencies {
-	compile group: 'de.interactive_instruments', name: 'ii-commons-util', version: '3.0.0' + project.snapshotSuffix
+	compile group: 'de.interactive_instruments', name: 'ii-commons-util', version: '3.2.0' + project.snapshotSuffix
 	compile group: 'org.jetbrains.intellij.deps', name: 'trove4j', version: '1.0.20160824'
 
 	umlDoclet "nl.talsmasoftware:umldoclet:1.0.16"
@@ -141,9 +141,31 @@ task xar(type: Jar, dependsOn: jar) {
 		from file("$projectDir/src/packaging/expath-pkg.xml")
 		filter{ it.replaceAll('@@libVersion@@', project.version)}
 	}
-	from file("$projectDir/src/packaging/basex.xml")
+	from file("$buildDir/generated/basex.xml")
 }
 
+def allLibs = configurations.runtime -
+		configurations.compile.filter { it.name.startsWith('etf-') } -
+		configurations.compile.filter { it.name.startsWith('tika-') } -
+		configurations.compile.filter { it.name.startsWith('slf4j-api') } -
+		configurations.compile.filter { it.name.startsWith('log4j') && !it.name.startsWith('log4j-over-slf4j') } -
+		configurations.compile.filter { it.name.startsWith('jetty') } -
+		configurations.compile.filter { it.name.startsWith('xml-apis') } -
+		configurations.compile.filter { it.name.startsWith('commons-') } -
+		configurations.compile.filter { it.name.startsWith('xercesImpl') }
+
+task ('generateBaseXPackagingFile') {
+	doLast {
+		def dependencies = allLibs.collect{c -> ('<jar>'+c.name+'</jar>')}
+
+		new File("$buildDir/generated", "basex.xml").text = """\
+			<package xmlns="http://www.basex.org/modules/pkg">
+				<jar>topox.jar</jar>
+				${dependencies.join(System.getProperty("line.separator"))}
+                <class>de.interactive_instruments.etf.bsxm.TopoX</class>
+            </package>"""
+	}
+}
 
 artifacts {
 	archives xar
@@ -151,4 +173,5 @@ artifacts {
 }
 
 junitPlatformTest.dependsOn xar
+xar.dependsOn generateBaseXPackagingFile
 xar.mustRunAfter jar
