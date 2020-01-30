@@ -1,0 +1,12 @@
+<ete:TopologicalErrors xmlns:ete="http://www.interactive-instruments.de/etf/topology-error/1.0" name="AX_KlassifizierungNachStrassenrecht">
+  <e i="1" t="HOLE_EMPTY_INTERIOR">
+    <X>671305.67</X>
+    <Y>5615438.37</Y>
+    <IS>1511828490556</IS>
+  </e>
+  <e i="2" t="FREE_STANDING_SURFACE">
+    <X>671218.946</X>
+    <Y>5615473.953</Y>
+    <IS>120259086328</IS>
+  </e>
+</ete:TopologicalErrors>

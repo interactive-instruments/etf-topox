@@ -119,8 +119,7 @@ class HashingPosListParser implements PosListParser {
     public HashingPosListParser(final HashingSegmentHandler hashingSegmentHandler) {
         geoTypeHandlerStrategies = new HashingSegmentHandler[3];
         geoTypeHandlerStrategies[0] = hashingSegmentHandler;
-        // geoTypeHandlerStrategies[1] = new BufferedGeoArcHandlerStrategy(hashingSegmentHandler);
-        geoTypeHandlerStrategies[1] = new HashingPassThroughHandlerStrategy(hashingSegmentHandler);
+        geoTypeHandlerStrategies[1] = new BufferedGeoArcHandlerStrategy(hashingSegmentHandler);
         geoTypeHandlerStrategies[2] = new HashingPassThroughHandlerStrategy(hashingSegmentHandler);
     }
 

@@ -78,7 +78,7 @@ public class TopologyBuilder implements HashingSegmentHandler {
     /**
      * Topological Data Structure
      *
-     * Array containing topology edges. Each edge contains 10 values which are compressed into 7 longs: - Origin coordinate index: X0 coordinate | - Target coordinate index: Y0 coordinate - Origin angle: the atan2(Y0-Y1, X0-X1) as long bits - Target angle - Ccw next index from origin | - Ccw next index from end - Face left object | - Face right object - Left object geometry location - Right object geometry location
+     * Array containing topology edges. Each edge contains 10 values which are compressed into 7 longs: - Origin coordinate index: X0 coordinate | - Target coordinate index: X0 coordinate - Origin angle: the atan2(Y0-Y1, X0-X1) as long bits - Target angle - Ccw next index from origin | - Ccw next index from end - Face left object | - Face right object - Left object geometry location - Right object geometry location
      *
      * Edge index concept: To reduce memory, the direction of edges are encoded into the sign of the edge index. The edge index is used in the coordinate to edge mapping {@link #coordinateHashToEdgeMap} and the ccw next index from origin / end {@link #CCWI_OFFSET}. Requesting the edge index for a coordinate, a positive index means that the coordinate is the origin of the edge and a negative index means that the coordinate is the end point of the edge. The same applies to the ccw next indexes {@link #CCWI_OFFSET} that are persisted for the start and the end point of an edge. A positive index means that the corresponding start point of the other edge is connected to the edge, a negative index means that the edge is connected to the end point of another edge. Zero means that the start or the end point is not connected to any other edge.
      *
@@ -439,23 +439,92 @@ public class TopologyBuilder implements HashingSegmentHandler {
         createEdgeOrSetArcObject(coordinates, hashesAndLocations);
     }
 
+    private static class Arc {
+        private final double sx;
+        private final double sy;
+        private final double mx;
+        private final double my;
+        private final double ex;
+        private final double ey;
+        private double centerX;
+        private double centerY;
+        private boolean cw;
+
+        Arc(final double[] coordinates) {
+            this.sx = coordinates[0];
+            this.sy = coordinates[1];
+            this.mx = coordinates[2];
+            this.my = coordinates[3];
+            this.ex = coordinates[4];
+            this.ey = coordinates[5];
+            setCenterFromArcCoordinates();
+            setCw();
+        }
+
+        private void setCenterFromArcCoordinates() {
+            final double ms = (my - sy) / (mx - sx);
+            final double mm = (ey - my) / (ex - mx);
+            this.centerX = (ms * mm * (sy - ey) + mm * (sx + mx) - ms * (mx + ex)) / (2 * (mm - ms));
+            this.centerY = -1 * (centerX - (sx + mx) / 2) / ms + (sy + my) / 2;
+        }
+
+        private void setCw() {
+            this.cw = (my - sy) * (ex - mx) - (mx - sx) * (ey - my) > 0;
+        }
+
+        /**
+         * Computes and returns two tangents of this arc as an array. The first tangent starts at the given source and points toward the target. The second tangent starts at the given target and points toward the source.
+         *
+         * @param targetX
+         *            as the end point of an edge that the TopologyBuilder is processing (x value)
+         * @param targetY
+         *            as the end point of an edge that the TopologyBuilder is processing (y value)
+         * @param sourceX
+         *            as the starting point of an edge that the TopologyBuilder is processing (x value)
+         * @param sourceY
+         *            as the starting point of an edge that the TopologyBuilder is processing (y value)
+         * @return array containing four values: - x value of the source tangent | - y value of the source tangent | - x value of the target tangent | - y value of the target tangent
+         */
+        private double[] retrieveTangents(final double targetX, final double targetY, final double sourceX,
+                final double sourceY) {
+            final double sourceTangentX;
+            final double sourceTangentY;
+            final double targetTangentX;
+            final double targetTangentY;
+
+            // First compute a source tangent.
+            // The 90Degree cw rotated vector(center to source) defines one of the tangents
+            // at the source
+            final double cwTangentAtSourceX = sourceY - centerY;
+            final double cwTangentAtSourceY = -(sourceX - centerX);
+
+            // Second compute a target tangent. The target tangent starts at the current
+            // target and points in the direction of the current source.
+            // The 90Degree cw rotated vector(center to target) defines one of the tangents
+            // at the current target
+            final double cwTangentAtTargetX = targetY - centerY;
+            final double cwTangentAtTargetY = -(targetX - centerX);
+
+            if (cw) {
+                // The input coordinates are ordered clockwise on the circle that defines the arc.
+                sourceTangentX = cwTangentAtSourceX;
+                sourceTangentY = cwTangentAtSourceY;
+                // The targetTangent must point in the opposite direction (towards the source)
+                targetTangentX = -cwTangentAtTargetX;
+                targetTangentY = -cwTangentAtTargetY;
+            } else {
+                sourceTangentX = -cwTangentAtSourceX;
+                sourceTangentY = -cwTangentAtSourceY;
+                targetTangentX = cwTangentAtTargetX;
+                targetTangentY = cwTangentAtTargetY;
+            }
+            final double[] tangents = {sourceTangentX, sourceTangentY, targetTangentX, targetTangentY};
+            return tangents;
+        }
+    }
+
     private void createEdgeOrSetArcObject(final double[] coordinates, final long hashesAndLocations[]) {
-        final double sx = coordinates[0];
-        final double sy = coordinates[1];
-        final double mx = coordinates[2];
-        final double my = coordinates[3];
-        final double ex = coordinates[4];
-        final double ey = coordinates[5];
-        final double xys = mx * mx + my * my;
-        final double bc = (sx * sx + sy * sy - xys) / 2.0;
-        final double cd = (xys - ex * ex - ey * ey) / 2.0;
-        final double smx = sx - mx;
-        final double mex = mx - ex;
-        final double mey = my - ey;
-        final double smy = sy - my;
-        final double determinant = 1.0 / (smx * mey - mex * smy);
-        final double centerX = (bc * mey - cd * smy) * determinant;
-        final double centerY = (smx * cd - mex * bc) * determinant;
+        final Arc currentArc = new Arc(coordinates);
 
         for (int i = 2; i < coordinates.length; i += 2) {
             ++objectsProcessed;
@@ -508,7 +577,7 @@ public class TopologyBuilder implements HashingSegmentHandler {
                         // Add indices for source and target coordinates
                         this.topology.add(compress(previousTargetCoordinateIndex, newIndexCoordIndex));
 
-                        addAnglesArc(x, y, centerX, centerY);
+                        addAnglesForArc(currentArc, x, y);
 
                         if (targetEdgeIndex != this.previousEdgeIndex) {
                             // the edge is connected to an existing edge
@@ -537,7 +606,7 @@ public class TopologyBuilder implements HashingSegmentHandler {
                         // Add coordinates
                         this.topology.add(compress(previousTargetCoordinateIndex, targetEdgeCoordIndex));
 
-                        addAnglesArc(x, y, centerX, centerY);
+                        addAnglesForArc(currentArc, x, y);
 
                         // Adjust the ccw-nexts
                         final int sourceCcwNext = adjustCcwNexts(previousEdgeIndex, current, compressedLocation);
@@ -562,7 +631,7 @@ public class TopologyBuilder implements HashingSegmentHandler {
                     // Add source coordinates which were the target in the previous edge
                     this.topology.add(compress(previousTargetCoordinateIndex, getEdgeCoordIndex(targetEdgeIndex)));
 
-                    addAnglesArc(x, y, centerX, centerY);
+                    addAnglesForArc(currentArc, x, y);
 
                     // Adjust the ccw-next of the previous edge node target
                     connectCurrentEdge(targetEdgeIndex, compressedLocation);
@@ -801,35 +870,35 @@ public class TopologyBuilder implements HashingSegmentHandler {
     }
 
     private void addAnglesForLineSegment(final double targetX, final double targetY) {
-        addAngles(targetX, targetY,
-                coordinates.getQuick(previousTargetCoordinateIndex),
-                coordinates.getQuick(previousTargetCoordinateIndex + 1));
+        final double currentSourceX = coordinates.getQuick(previousTargetCoordinateIndex);
+        final double currentSourceY = coordinates.getQuick(previousTargetCoordinateIndex + 1);
+        addAngles(targetX - currentSourceX,
+                targetY - currentSourceY,
+                currentSourceX - targetX,
+                currentSourceY - targetY);
     }
 
-    private void addAngles(final double targetX, final double targetY, final double sourceX, final double sourceY) {
-        topology.add(
-                Double.doubleToLongBits(
-                        atan2(
-                                targetY - sourceY,
-                                targetX - sourceX)));
-        topology.add(
-                Double.doubleToLongBits(
-                        atan2(
-                                sourceY - targetY,
-                                sourceX - targetX)));
+    public void addAnglesForArc(final Arc arc, final double targetX, final double targetY) {
+        final double currentSourceX = coordinates.getQuick(previousTargetCoordinateIndex);
+        final double currentSourceY = coordinates.getQuick(previousTargetCoordinateIndex + 1);
+        final double[] tangents = arc.retrieveTangents(targetX, targetY, currentSourceX, currentSourceY);
+        addAngles(tangents[0], tangents[1], tangents[2], tangents[3]);
     }
 
-    private void addAnglesArc(final double targetX, final double targetY, final double sourceX, final double sourceY) {
+    private void addAngles(final double sourceToTargetX, final double sourceToTargetY, final double targetToSourceX,
+            final double targetToSourceY) {
+        // Add origin angle
         topology.add(
                 Double.doubleToLongBits(
                         atan2(
-                                targetY - sourceY,
-                                targetX - sourceX)));
+                                sourceToTargetY,
+                                sourceToTargetX)));
+        // Add target angle
         topology.add(
                 Double.doubleToLongBits(
                         atan2(
-                                sourceY - targetY,
-                                sourceX - targetX)));
+                                targetToSourceY,
+                                targetToSourceX)));
     }
 
     private int getEdgeCoordIndex(final int edgeIndex) {

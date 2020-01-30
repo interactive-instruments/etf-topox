@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ete:TopologicalErrors xmlns:ete="http://www.interactive-instruments.de/etf/topology-error/1.0" name="Tatsaechliche_Nutzung">
+    <e i="1" t="RING_INTERSECTION">
+        <X>632455.421</X>
+        <Y>5647933.063</Y>
+        <IS>154618822868</IS>
+        <CW>214748364889</CW>
+        <CCW>244813135968</CCW>
+    </e>
+    <e i="2" t="RING_INTERSECTION">
+        <X>632454.691</X>
+        <Y>5647930.518</Y>
+        <IS>184683593947</IS>
+        <CW>154618822731</CW>
+        <CCW>184683593810</CCW>
+    </e>
+</ete:TopologicalErrors>

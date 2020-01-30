@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--TEST-->
+<AX_Bestandsdatenauszug xsi:schemaLocation="http://www.adv-online.de/namespaces/adv/gid/6.0 NAS-Operationen.xsd"
+    xmlns="http://www.adv-online.de/namespaces/adv/gid/6.0"
+    xmlns:gsr="http://www.isotc211.org/2005/gsr"
+    xmlns:gmd="http://www.isotc211.org/2005/gmd"
+    xmlns:fc="http://www.adv-online.de/namespaces/adv/gid/fc/6.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:gml="http://www.opengis.net/gml/3.2"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:wfsext="http://www.adv-online.de/namespaces/adv/gid/wfsext"
+    xmlns:gco="http://www.isotc211.org/2005/gco"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:gts="http://www.isotc211.org/2005/gts"
+    xmlns:ogc="http://www.adv-online.de/namespaces/adv/gid/ogc"
+    xmlns:wfs="http://www.adv-online.de/namespaces/adv/gid/wfs"
+    xmlns:gss="http://www.isotc211.org/2005/gss">
+    <erlaeuterung>TEST</erlaeuterung>
+    <erfolgreich>true</erfolgreich>
+    <antragsnummer>TEST</antragsnummer>
+    <allgemeineAngaben>
+        <AX_K_Benutzungsergebnis>
+            <folgeverarbeitung>
+                <AX_FOLGEVA>
+                    <datenformat>1000</datenformat>
+                </AX_FOLGEVA>
+            </folgeverarbeitung>
+            <empfaenger>
+                <AA_Empfaenger>
+                    <direkt>true</direkt>
+                </AA_Empfaenger>
+            </empfaenger>
+        </AX_K_Benutzungsergebnis>
+    </allgemeineAngaben>
+    <koordinatenangaben>
+        <AA_Koordinatenreferenzsystemangaben>
+            <crs xlink:href="urn:adv:crs:ETRS89_UTM32" />
+            <anzahlDerNachkommastellen>3</anzahlDerNachkommastellen>
+            <standard>true</standard>
+        </AA_Koordinatenreferenzsystemangaben>
+    </koordinatenangaben>
+    <enthaelt>
+        <wfs:FeatureCollection gml:id="TESTCOLLECTION1">
+            <gml:boundedBy>
+                <gml:Envelope srsName="urn:adv:crs:ETRS89_UTM32">
+                    <gml:lowerCorner>316027.546 5577679.220</gml:lowerCorner>
+                    <gml:upperCorner>330555.572 5598093.988</gml:upperCorner>
+                </gml:Envelope>
+            </gml:boundedBy>
+
+
+			<gml:featureMember>
+				<AX_Flurstueck gml:id="FS1">
+					<gml:identifier codeSpace="http://www.adv-online.de/">urn:adv:oid:FS1</gml:identifier>
+					<lebenszeitintervall>
+						<AA_Lebenszeitintervall>
+							<beginnt>2015-06-11T06:40:33Z</beginnt>
+						</AA_Lebenszeitintervall>
+					</lebenszeitintervall>
+					<modellart>
+						<AA_Modellart>
+							<advStandardModell>DLKM</advStandardModell>
+						</AA_Modellart>
+					</modellart>
+					<anlass>000000</anlass>
+					<zeigtAufExternes>
+						<AA_Fachdatenverbindung>
+							<art>TestArt</art>
+							<fachdatenobjekt>
+								<AA_Fachdatenobjekt>
+									<name>TestName1</name>
+								</AA_Fachdatenobjekt>
+							</fachdatenobjekt>
+						</AA_Fachdatenverbindung>
+					</zeigtAufExternes>
+					<position>
+						<gml:Surface gml:id="GJE">
+							<gml:patches>
+								<gml:PolygonPatch>
+									<gml:exterior>
+										<gml:Ring>
+											<gml:curveMember>
+												<gml:Curve gml:id="GJF">
+													<gml:segments>
+														<gml:Arc>
+															<gml:posList>632456.782 5647937.936 632454.103 5647934.688 632454.691 5647930.518</gml:posList>
+														</gml:Arc>
+													</gml:segments>
+												</gml:Curve>
+											</gml:curveMember>
+											<gml:curveMember>
+												<gml:Curve gml:id="GJG">
+													<gml:segments>
+														<gml:LineStringSegment>
+															<gml:posList>632454.691 5647930.518 632454.531 5647931.289</gml:posList>
+														</gml:LineStringSegment>
+													</gml:segments>
+												</gml:Curve>
+											</gml:curveMember>
+											<gml:curveMember>
+												<gml:Curve gml:id="GJH">
+													<gml:segments>
+														<gml:LineStringSegment>
+															<gml:posList>632454.531 5647931.289 632455.421 5647933.063</gml:posList>
+														</gml:LineStringSegment>
+													</gml:segments>
+												</gml:Curve>
+											</gml:curveMember>
+											<gml:curveMember>
+												<gml:Curve gml:id="GJI">
+													<gml:segments>
+														<gml:LineStringSegment>
+															<gml:posList>632455.421 5647933.063 632493.324 5647940.534</gml:posList>
+														</gml:LineStringSegment>
+													</gml:segments>
+												</gml:Curve>
+											</gml:curveMember>
+											<gml:curveMember>
+												<gml:Curve gml:id="GJJ">
+													<gml:segments>
+														<gml:LineStringSegment>
+															<gml:posList>632493.324 5647940.534 632492.005 5647945.243</gml:posList>
+														</gml:LineStringSegment>
+													</gml:segments>
+												</gml:Curve>
+											</gml:curveMember>
+											<gml:curveMember>
+												<gml:Curve gml:id="GJK">
+													<gml:segments>
+														<gml:LineStringSegment>
+															<gml:posList>632492.005 5647945.243 632475.332 5647941.784</gml:posList>
+														</gml:LineStringSegment>
+													</gml:segments>
+												</gml:Curve>
+											</gml:curveMember>
+											<gml:curveMember>
+												<gml:Curve gml:id="GJL">
+													<gml:segments>
+														<gml:LineStringSegment>
+															<gml:posList>632475.332 5647941.784 632456.782 5647937.936</gml:posList>
+														</gml:LineStringSegment>
+													</gml:segments>
+												</gml:Curve>
+											</gml:curveMember>
+										</gml:Ring>
+									</gml:exterior>
+								</gml:PolygonPatch>
+							</gml:patches>
+						</gml:Surface>
+					</position>
+					<gemarkung>
+						<AX_Gemarkung_Schluessel>
+							<land>00</land>
+							<gemarkungsnummer>0000</gemarkungsnummer>
+						</AX_Gemarkung_Schluessel>
+					</gemarkung>
+					<flurstuecksnummer>
+						<AX_Flurstuecksnummer>
+							<zaehler>121</zaehler>
+							<nenner>1</nenner>
+						</AX_Flurstuecksnummer>
+					</flurstuecksnummer>
+					<flurstueckskennzeichen>0000</flurstueckskennzeichen>
+					<amtlicheFlaeche uom="urn:adv:uom:m2">181.00</amtlicheFlaeche>
+					<flurnummer>4</flurnummer>
+					<sonstigeEigenschaften>
+						<AX_SonstigeEigenschaften_Flurstueck>
+							<kennungSchluessel>0000</kennungSchluessel>
+							<angabenZumAbschnittNummerAktenzeichen>00</angabenZumAbschnittNummerAktenzeichen>
+							<angabenZumAbschnittBemerkung>Flurstücksfolge</angabenZumAbschnittBemerkung>
+						</AX_SonstigeEigenschaften_Flurstueck>
+					</sonstigeEigenschaften>
+					<sonstigeEigenschaften>
+						<AX_SonstigeEigenschaften_Flurstueck>
+							<kennungSchluessel>0000</kennungSchluessel>
+							<angabenZumAbschnittNummerAktenzeichen>Grundbuchstand</angabenZumAbschnittNummerAktenzeichen>
+							<angabenZumAbschnittBemerkung>Flurstücksstatus</angabenZumAbschnittBemerkung>
+						</AX_SonstigeEigenschaften_Flurstueck>
+					</sonstigeEigenschaften>
+					<zeitpunktDerEntstehung>2000-00-00</zeitpunktDerEntstehung>
+					<gemeindezugehoerigkeit>
+						<AX_Gemeindekennzeichen>
+							<land>00</land>
+							<regierungsbezirk>0</regierungsbezirk>
+							<kreis>00</kreis>
+							<gemeinde>000</gemeinde>
+						</AX_Gemeindekennzeichen>
+					</gemeindezugehoerigkeit>
+					<zustaendigeStelle>
+						<AX_Dienststelle_Schluessel>
+							<land>00</land>
+							<stelle>0000</stelle>
+						</AX_Dienststelle_Schluessel>
+					</zustaendigeStelle>
+					<istGebucht xlink:href="urn:adv:oid:DETHL51P000070NQ"/>
+					<zeigtAuf xlink:href="urn:adv:oid:DETHL51P00006XlZ"/>
+				</AX_Flurstueck>
+			</gml:featureMember>
+
+			<gml:featureMember>
+				<AX_Flurstueck gml:id="FS2">
+					<gml:identifier codeSpace="http://www.adv-online.de/">urn:adv:oid:FS2</gml:identifier>
+					<lebenszeitintervall>
+						<AA_Lebenszeitintervall>
+							<beginnt>2017-01-11T11:24:54Z</beginnt>
+						</AA_Lebenszeitintervall>
+					</lebenszeitintervall>
+					<modellart>
+						<AA_Modellart>
+							<advStandardModell>DLKM</advStandardModell>
+						</AA_Modellart>
+					</modellart>
+					<anlass>010403</anlass>
+					<zeigtAufExternes>
+						<AA_Fachdatenverbindung>
+							<art>TestArt</art>
+							<fachdatenobjekt>
+								<AA_Fachdatenobjekt>
+									<name>TestName2</name>
+								</AA_Fachdatenobjekt>
+							</fachdatenobjekt>
+						</AA_Fachdatenverbindung>
+					</zeigtAufExternes>
+					<position>
+						<gml:Surface gml:id="GGN">
+							<gml:patches>
+								<gml:PolygonPatch>
+									<gml:exterior>
+										<gml:Ring>
+											<gml:curveMember>
+												<gml:Curve gml:id="GGO">
+													<gml:segments>
+														<gml:LineStringSegment>
+															<gml:posList>632455.421 5647933.063 632454.231 5647931.289</gml:posList>
+														</gml:LineStringSegment>
+													</gml:segments>
+												</gml:Curve>
+											</gml:curveMember>
+											<gml:curveMember>
+												<gml:Curve gml:id="GGP">
+													<gml:segments>
+														<gml:LineStringSegment>
+															<gml:posList>632454.231 5647931.289 632454.691 5647930.518</gml:posList>
+														</gml:LineStringSegment>
+													</gml:segments>
+												</gml:Curve>
+											</gml:curveMember>
+											<gml:curveMember>
+												<gml:Curve gml:id="GGQ">
+													<gml:segments>
+														<gml:LineStringSegment>
+															<gml:posList>632454.691 5647930.518 632463.228 5647907.892</gml:posList>
+														</gml:LineStringSegment>
+													</gml:segments>
+												</gml:Curve>
+											</gml:curveMember>
+											<gml:curveMember>
+												<gml:Curve gml:id="GGR">
+													<gml:segments>
+														<gml:LineStringSegment>
+															<gml:posList>632463.228 5647907.892 632464.351 5647910.038</gml:posList>
+														</gml:LineStringSegment>
+													</gml:segments>
+												</gml:Curve>
+											</gml:curveMember>
+											<gml:curveMember>
+												<gml:Curve gml:id="GGS">
+													<gml:segments>
+														<gml:LineStringSegment>
+															<gml:posList>632464.351 5647910.038 632499.907 5647917.028</gml:posList>
+														</gml:LineStringSegment>
+													</gml:segments>
+												</gml:Curve>
+											</gml:curveMember>
+											<gml:curveMember>
+												<gml:Curve gml:id="GGT">
+													<gml:segments>
+														<gml:LineStringSegment>
+															<gml:posList>632499.907 5647917.028 632493.324 5647940.534</gml:posList>
+														</gml:LineStringSegment>
+													</gml:segments>
+												</gml:Curve>
+											</gml:curveMember>
+											<gml:curveMember>
+												<gml:Curve gml:id="GGU">
+													<gml:segments>
+														<gml:LineStringSegment>
+															<gml:posList>632493.324 5647940.534 632455.421 5647933.063</gml:posList>
+														</gml:LineStringSegment>
+													</gml:segments>
+												</gml:Curve>
+											</gml:curveMember>
+										</gml:Ring>
+									</gml:exterior>
+								</gml:PolygonPatch>
+							</gml:patches>
+						</gml:Surface>
+					</position>
+					<gemarkung>
+						<AX_Gemarkung_Schluessel>
+							<land>00</land>
+							<gemarkungsnummer>0000</gemarkungsnummer>
+						</AX_Gemarkung_Schluessel>
+					</gemarkung>
+					<flurstuecksnummer>
+						<AX_Flurstuecksnummer>
+							<zaehler>000</zaehler>
+							<nenner>0</nenner>
+						</AX_Flurstuecksnummer>
+					</flurstuecksnummer>
+					<flurstueckskennzeichen>0000</flurstueckskennzeichen>
+					<amtlicheFlaeche uom="urn:adv:uom:m2">953.00</amtlicheFlaeche>
+					<flurnummer>0</flurnummer>
+					<sonstigeEigenschaften>
+						<AX_SonstigeEigenschaften_Flurstueck>
+							<kennungSchluessel>0000</kennungSchluessel>
+							<angabenZumAbschnittNummerAktenzeichen>00</angabenZumAbschnittNummerAktenzeichen>
+							<angabenZumAbschnittBemerkung>Flurstücksfolge</angabenZumAbschnittBemerkung>
+						</AX_SonstigeEigenschaften_Flurstueck>
+					</sonstigeEigenschaften>
+					<sonstigeEigenschaften>
+						<AX_SonstigeEigenschaften_Flurstueck>
+							<kennungSchluessel>0000</kennungSchluessel>
+							<angabenZumAbschnittNummerAktenzeichen>Grundbuchstand</angabenZumAbschnittNummerAktenzeichen>
+							<angabenZumAbschnittBemerkung>Flurstücksstatus</angabenZumAbschnittBemerkung>
+						</AX_SonstigeEigenschaften_Flurstueck>
+					</sonstigeEigenschaften>
+					<zeitpunktDerEntstehung>2007-05-11</zeitpunktDerEntstehung>
+					<gemeindezugehoerigkeit>
+						<AX_Gemeindekennzeichen>
+							<land>00</land>
+							<regierungsbezirk>0</regierungsbezirk>
+							<kreis>00</kreis>
+							<gemeinde>000</gemeinde>
+						</AX_Gemeindekennzeichen>
+					</gemeindezugehoerigkeit>
+					<zustaendigeStelle>
+						<AX_Dienststelle_Schluessel>
+							<land>00</land>
+							<stelle>0000</stelle>
+						</AX_Dienststelle_Schluessel>
+					</zustaendigeStelle>
+					<istGebucht xlink:href="urn:adv:oid:DETHL51P000070NJ"/>
+					<zeigtAuf xlink:href="urn:adv:oid:DETHL51P00006Xmc"/>
+				</AX_Flurstueck>
+			</gml:featureMember>
+        </wfs:FeatureCollection>
+    </enthaelt>
+</AX_Bestandsdatenauszug>
