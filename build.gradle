@@ -16,16 +16,13 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath group: 'de.interactive_instruments.bda', name: 'etf-bda', version: '[2.0.3,2.0.99]'
-		classpath ("org.junit.platform:junit-platform-gradle-plugin:1.2.0")
+		classpath group: 'de.interactive_instruments.bda', name: 'etf-bda', version: '[2.0.5,2.0.99]'
 	}
 	dependencies {
 		ant.unjar src: configurations.classpath.files.find {it.path.contains('etf')}, dest: 'build/gradle'
 	}
 }
 apply from: 'build/gradle/ii-bda.gradle'
-apply plugin: 'org.junit.platform.gradle.plugin'
-
 
 ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -51,8 +48,8 @@ dependencies {
 
 	umlDoclet "nl.talsmasoftware:umldoclet:1.0.16"
 
-	testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.3.1'
-	testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.3.1'
+	testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: etf_junitTestVersion
+	testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: etf_junitTestVersion
 	testCompile 'com.tngtech.archunit:archunit-junit5-api:0.9.1'
 	testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.9.1'
 	testCompile group: 'ch.qos.logback', name: 'logback-classic', version: etf_logbackVersion
@@ -65,20 +62,17 @@ dependencies {
 	testCompile "org.basex:basex-api:$basexVersion"
 }
 
-// Support JUnit 5 in gradle < 4.6
 test {
+	dependsOn = ["xar"]
+
+	useJUnitPlatform()
 	testLogging {
-		events 'PASSED', 'FAILED', 'SKIPPED'
+		events "passed", "skipped", "failed"
 	}
 
-	afterSuite { desc, result ->
-		if (!desc.parent) {
-			println "\nTest result: ${result.resultType}"
-			println "Test summary: ${result.testCount} tests, " +
-					"${result.successfulTestCount} succeeded, " +
-					"${result.failedTestCount} failed, " +
-					"${result.skippedTestCount} skipped"
-		}
+	// Workaround for issue https://github.com/gradle/gradle/issues/5975
+	afterTest { descriptor, result ->
+		println "\n$descriptor.className [$descriptor.classDisplayName] > $descriptor.name [$descriptor.displayName]: $result.resultType"
 	}
 }
 
@@ -121,6 +115,7 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 
 
 task xar(type: Jar, dependsOn: jar) {
+	dependsOn = ["generateBaseXPackagingFile", "jar"]
 	doFirst {
 		manifest {
 			attributes(
@@ -172,6 +167,6 @@ artifacts {
 	archives sourcesJar
 }
 
-junitPlatformTest.dependsOn xar
-xar.dependsOn generateBaseXPackagingFile
-xar.mustRunAfter jar
+install {
+	dependsOn = ["xar", "sourcesJar"]
+}

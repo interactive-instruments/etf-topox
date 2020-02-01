@@ -117,7 +117,7 @@ class BsxDataDrivenTest {
     }
 
     private BsxDataDrivenTest(final IFile ddtDirectory) {
-        final MultiFileFilter xmlFileFilter = GmlAndXmlFilter.instance().filename();
+        final MultiFileFilter xmlFileFilter = GmlAndXmlFilter.instance().filenameFilter().get();
         final FilenameExtensionFilter zipFileFilter = new FilenameExtensionFilter(".zip");
         final MultiFileFilter fileFilter = xmlFileFilter.or(zipFileFilter);
         dataFiles = ddtDirectory.secureExpandPathDown("data").listIFiles(fileFilter);
