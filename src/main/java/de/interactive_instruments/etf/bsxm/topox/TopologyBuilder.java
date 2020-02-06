@@ -439,7 +439,8 @@ public class TopologyBuilder implements HashingSegmentHandler {
         createEdgeOrSetArcObject(coordinates, hashesAndLocations);
     }
 
-    private static class Arc {
+    private static final class Arc {
+        private static final double TOLERANCE = 0.0000001; // Coordinate-delta's smaller than the tolerance are treated as vertical/horizontal lines.
         private final double sx;
         private final double sy;
         private final double mx;
@@ -448,7 +449,8 @@ public class TopologyBuilder implements HashingSegmentHandler {
         private final double ey;
         private double centerX;
         private double centerY;
-        private boolean cw;
+        private boolean clockwise;
+        private boolean collinear;
 
         Arc(final double[] coordinates) {
             this.sx = coordinates[0];
@@ -457,19 +459,108 @@ public class TopologyBuilder implements HashingSegmentHandler {
             this.my = coordinates[3];
             this.ex = coordinates[4];
             this.ey = coordinates[5];
-            setCenterFromArcCoordinates();
-            setCw();
+            setCenter();
+            setClockwise();
         }
 
-        private void setCenterFromArcCoordinates() {
-            final double ms = (my - sy) / (mx - sx);
-            final double mm = (ey - my) / (ex - mx);
-            this.centerX = (ms * mm * (sy - ey) + mm * (sx + mx) - ms * (mx + ex)) / (2 * (mm - ms));
-            this.centerY = -1 * (centerX - (sx + mx) / 2) / ms + (sy + my) / 2;
+        private void setClockwise() {
+            this.clockwise = (my - sy) * (ex - mx) - (mx - sx) * (ey - my) > 0;
         }
 
-        private void setCw() {
-            this.cw = (my - sy) * (ex - mx) - (mx - sx) * (ey - my) > 0;
+        private void setCenter() {
+            // see http://paulbourke.net/geometry/circlesphere/
+
+            if (centerIsPossibleFromCoordinates(sx, sy, mx, my, ex, ey)) {
+                this.collinear = false;
+                this.centerX = calculateCenter(sx, sy, mx, my, ex, ey)[0];
+                this.centerY = calculateCenter(sx, sy, mx, my, ex, ey)[1];
+
+            } else if (centerIsPossibleFromCoordinates(sx, sy, ex, ey, mx, my)) {
+                this.collinear = false;
+                this.centerX = calculateCenter(sx, sy, ex, ey, mx, my)[0];
+                this.centerY = calculateCenter(sx, sy, ex, ey, mx, my)[1];
+
+            } else if (centerIsPossibleFromCoordinates(mx, my, sx, sy, ex, ey)) {
+                this.collinear = false;
+                this.centerX = calculateCenter(mx, my, sx, sy, ex, ey)[0];
+                this.centerY = calculateCenter(mx, my, sx, sy, ex, ey)[1];
+
+            } else if (centerIsPossibleFromCoordinates(mx, my, ex, ey, sx, sy)) {
+                this.collinear = false;
+                this.centerX = calculateCenter(mx, my, ex, ey, sx, sy)[0];
+                this.centerY = calculateCenter(mx, my, ex, ey, sx, sy)[1];
+
+            } else if (centerIsPossibleFromCoordinates(ex, ey, sx, sy, mx, my)) {
+                this.collinear = false;
+                this.centerX = calculateCenter(ex, ey, sx, sy, mx, my)[0];
+                this.centerY = calculateCenter(ex, ey, sx, sy, mx, my)[1];
+
+            } else if (centerIsPossibleFromCoordinates(ex, ey, mx, my, sx, sy)) {
+                this.collinear = false;
+                this.centerX = calculateCenter(ex, ey, mx, my, sx, sy)[0];
+                this.centerY = calculateCenter(ex, ey, mx, my, sx, sy)[1];
+
+            } else {
+                this.collinear = true;
+            }
+        }
+
+        /**
+         * Checks if the lines p1-p2 and p2-p3 are perpendicular to the x or y axis, using a certain tolerance. Takes into account that there is a simple solution (for calculating the center of the circle) for the case of p1-p2 being vertical and p2-p3 being horizontal.
+         *
+         * @return <code>true</code> if p1-p2 is vertical and p2-p3 is horizontal (then there is a simple solution) or if none of the two lines is vertical or horizontal, else <code>false</code>
+         */
+        private static boolean centerIsPossibleFromCoordinates(final double p1x, final double p1y, final double p2x,
+                final double p2y, final double p3x, final double p3y) {
+
+            final double yDelta_a = p2y - p1y;
+            final double xDelta_a = p2x - p1x;
+            final double yDelta_b = p3y - p2y;
+            final double xDelta_b = p3x - p2x;
+
+            if (Math.abs(xDelta_a) <= TOLERANCE && Math.abs(yDelta_b) <= TOLERANCE) {
+                // line c1-c2 is vertical, line c2-c3 is horizontal
+                return true;
+            }
+
+            // one of the lines c1-c2, c2-c3 is perpendicular to x or y axis
+            final boolean perpendicularLineExists = Math.abs(yDelta_a) <= TOLERANCE || Math.abs(xDelta_a) <= TOLERANCE
+                    || Math.abs(yDelta_b) <= TOLERANCE || Math.abs(xDelta_b) <= TOLERANCE;
+            return !perpendicularLineExists;
+        }
+
+        private double[] calculateCenter(final double p1x, final double p1y, final double p2x, final double p2y,
+                final double p3x, final double p3y) {
+
+            final double yDelta_a = p2y - p1y;
+            final double xDelta_a = p2x - p1x;
+            final double yDelta_b = p3y - p2y;
+            final double xDelta_b = p3x - p2x;
+
+            if (Math.abs(xDelta_a) <= TOLERANCE
+                    && Math.abs(yDelta_b) <= TOLERANCE) {
+
+                // line c1-c2 is vertical, line c2-c3 is horizontal
+                final double centerX = 0.5 * (p2x + p3x);
+                final double centerY = 0.5 * (p1y + p2y);
+                final double[] center = {centerX, centerY};
+                return center;
+
+            } else {
+
+                final double aSlope = yDelta_a / xDelta_a;
+                final double bSlope = yDelta_b / xDelta_b;
+
+                if (Math.abs(aSlope - bSlope) <= TOLERANCE) {
+                    this.collinear = true;
+                }
+
+                final double centerX = (aSlope * bSlope * (p1y - p3y) + bSlope * (p1x + p2x) - aSlope * (p2x + p3x))
+                        / (2 * (bSlope - aSlope));
+                final double centerY = -1 * (centerX - (p1x + p2x) / 2) / aSlope + (p1y + p2y) / 2;
+                final double[] center = {centerX, centerY};
+                return center;
+            }
         }
 
         /**
@@ -485,13 +576,21 @@ public class TopologyBuilder implements HashingSegmentHandler {
          *            as the starting point of an edge that the TopologyBuilder is processing (y value)
          * @return array containing four values: - x value of the source tangent | - y value of the source tangent | - x value of the target tangent | - y value of the target tangent
          */
-        private double[] retrieveTangents(final double targetX, final double targetY, final double sourceX,
-                final double sourceY) {
+        private double[] getTangents(final double targetX, final double targetY, final double sourceX, final double sourceY) {
             final double sourceTangentX;
             final double sourceTangentY;
             final double targetTangentX;
             final double targetTangentY;
 
+            if (this.collinear) {
+                // Treat the Arc as a line and return the edge which is defined by the given target and source.
+                sourceTangentX = targetX - sourceX;
+                sourceTangentY = targetY - sourceY;
+                targetTangentX = sourceX - targetX;
+                targetTangentY = sourceY - targetY;
+                final double[] tangents = {sourceTangentX, sourceTangentY, targetTangentX, targetTangentY};
+                return tangents;
+            }
             // First compute a source tangent.
             // The 90Degree cw rotated vector(center to source) defines one of the tangents
             // at the source
@@ -505,7 +604,7 @@ public class TopologyBuilder implements HashingSegmentHandler {
             final double cwTangentAtTargetX = targetY - centerY;
             final double cwTangentAtTargetY = -(targetX - centerX);
 
-            if (cw) {
+            if (clockwise) {
                 // The input coordinates are ordered clockwise on the circle that defines the arc.
                 sourceTangentX = cwTangentAtSourceX;
                 sourceTangentY = cwTangentAtSourceY;
@@ -881,7 +980,7 @@ public class TopologyBuilder implements HashingSegmentHandler {
     public void addAnglesForArc(final Arc arc, final double targetX, final double targetY) {
         final double currentSourceX = coordinates.getQuick(previousTargetCoordinateIndex);
         final double currentSourceY = coordinates.getQuick(previousTargetCoordinateIndex + 1);
-        final double[] tangents = arc.retrieveTangents(targetX, targetY, currentSourceX, currentSourceY);
+        final double[] tangents = arc.getTangents(targetX, targetY, currentSourceX, currentSourceY);
         addAngles(tangents[0], tangents[1], tangents[2], tangents[3]);
     }
 
