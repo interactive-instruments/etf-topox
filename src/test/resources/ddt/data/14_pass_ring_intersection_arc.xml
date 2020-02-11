@@ -1,0 +1,673 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--TEST-->
+<AX_Bestandsdatenauszug xsi:schemaLocation="http://www.adv-online.de/namespaces/adv/gid/6.0 NAS-Operationen.xsd" xmlns="http://www.adv-online.de/namespaces/adv/gid/6.0" xmlns:gsr="http://www.isotc211.org/2005/gsr" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:fc="http://www.adv-online.de/namespaces/adv/gid/fc/6.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:wfsext="http://www.adv-online.de/namespaces/adv/gid/wfsext" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:ogc="http://www.adv-online.de/namespaces/adv/gid/ogc" xmlns:wfs="http://www.adv-online.de/namespaces/adv/gid/wfs" xmlns:gss="http://www.isotc211.org/2005/gss">
+  <erlaeuterung>&lt;?xml version="1.0" encoding="utf-8"?&gt;&lt;Protocol xmlns="http://www.aed-sicad.de/namespaces/va" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;&lt;auftragsid&gt;AMGR000000002866&lt;/auftragsid&gt;&lt;profilkennung&gt;P#AAA-DB#fleischh&lt;/profilkennung&gt;&lt;antragsnummer&gt;BASNRW#L#QUARTALSABGABE NRW&lt;/antragsnummer&gt;&lt;nasoperation&gt;Bestandsdatenauszug&lt;/nasoperation&gt;&lt;status&gt;beendet&lt;/status&gt;&lt;startzeitreal&gt;2018-06-27T17:57:55.8287725+02:00&lt;/startzeitreal&gt;&lt;endzeitreal&gt;2018-06-27T17:57:56.0783725+02:00&lt;/endzeitreal&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Das Ergebnis wurde mit der FI-Version 6.4.3.17504 erstellt.&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:55.8287725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 1 für AX_Bahnstrecke&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 77 für AX_BauwerkImGewaesserbereich&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 32 für AX_BauwerkImVerkehrsbereich&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 50 für AX_BauwerkOderAnlageFuerIndustrieUndGewerbe&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 2 für AX_BauwerkOderAnlageFuerSportFreizeitUndErholung&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 20 für AX_Fahrbahnachse&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 648 für AX_Fahrwegachse&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 3 für AX_FlaecheBesondererFunktionalerPraegung&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 47 für AX_FlaecheGemischterNutzung&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 2 für AX_Friedhof&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 2 für AX_Gebietsgrenze&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 139 für AX_Gehoelz&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 200 für AX_Gewaesserachse&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 3 für AX_Gewaesserstationierungsachse&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 11 für AX_IndustrieUndGewerbeflaeche&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 1 für AX_KommunalesGebiet&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 333 für AX_Landwirtschaft&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 9 für AX_Leitung&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 28 für AX_NaturUmweltOderBodenschutzrecht&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 7 für AX_Ortslage&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 1 für AX_Platz&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 2 für AX_SonstigesBauwerkOderSonstigeEinrichtung&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 6 für AX_SportFreizeitUndErholungsflaeche&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 3 für AX_StehendesGewaesser&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 107 für AX_Strasse&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 302 für AX_Strassenachse&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 30 für AX_Strassenverkehr&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 1 für AX_TagebauGrubeSteinbruch&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 2 für AX_UnlandVegetationsloseFlaeche&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 68 für AX_Vegetationsmerkmal&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 186 für AX_Wald&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 35 für AX_Wasserlauf&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 1 für AX_Wasserspiegelhoehe&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 28 für AX_WegPfadSteig&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;Message&gt;&lt;Category&gt;NOTHING&lt;/Category&gt;&lt;MessageLevel&gt;Info&lt;/MessageLevel&gt;&lt;MessageText&gt;Bestandsdatenauszug: Anzahl gefundener Features für Portion 5: 85 für AX_Wohnbauflaeche&lt;/MessageText&gt;&lt;ProcessingTime&gt;2018-06-27T17:57:56.0783725+02:00&lt;/ProcessingTime&gt;&lt;StateSpecified&gt;false&lt;/StateSpecified&gt;&lt;MapCategorySpecified&gt;false&lt;/MapCategorySpecified&gt;&lt;/Message&gt;&lt;portionskennung&gt;&lt;profilkennung&gt;P#AAA-DB#fleischh&lt;/profilkennung&gt;&lt;datum&gt;2018-06-27T15:57:40Z&lt;/datum&gt;&lt;laufendeNummerVonGesamtzahl&gt;5&lt;/laufendeNummerVonGesamtzahl&gt;&lt;gesamtzahl&gt;676&lt;/gesamtzahl&gt;&lt;suedwestEcke xsi:type="q1:DirectPositionType" srsName="urn:adv:crs:ETRS89_UTM32" xmlns:q1="http://www.opengis.net/gml/3.2"&gt;316000.000 5574000.000&lt;/suedwestEcke&gt;&lt;/portionskennung&gt;&lt;/Protocol&gt;</erlaeuterung>
+  <erfolgreich>true</erfolgreich>
+  <antragsnummer>BASNRW#L#QUARTALSABGABE NRW</antragsnummer>
+  <allgemeineAngaben>
+    <AX_K_Benutzungsergebnis>
+      <folgeverarbeitung>
+        <AX_FOLGEVA>
+          <datenformat>1000</datenformat>
+        </AX_FOLGEVA>
+      </folgeverarbeitung>
+      <empfaenger>
+        <AA_Empfaenger>
+          <direkt>true</direkt>
+        </AA_Empfaenger>
+      </empfaenger>
+    </AX_K_Benutzungsergebnis>
+  </allgemeineAngaben>
+  <koordinatenangaben>
+    <AA_Koordinatenreferenzsystemangaben>
+      <crs xlink:href="urn:adv:crs:ETRS89_UTM32" />
+      <anzahlDerNachkommastellen>3</anzahlDerNachkommastellen>
+      <standard>true</standard>
+    </AA_Koordinatenreferenzsystemangaben>
+  </koordinatenangaben>
+  <enthaelt>
+    <wfs:FeatureCollection gml:id="FC21">
+      <gml:boundedBy>
+        <gml:Envelope srsName="urn:adv:crs:ETRS89_UTM32">
+          <gml:lowerCorner>316027.546 5577679.220</gml:lowerCorner>
+          <gml:upperCorner>330555.572 5598093.988</gml:upperCorner>
+        </gml:Envelope>
+      </gml:boundedBy>
+
+      <gml:featureMember xmlns:gml="http://www.opengis.net/gml/3.2" xmlns="http://www.adv-online.de/namespaces/adv/gid/6.0" xmlns:adv="http://www.adv-online.de/namespaces/adv/gid/6.0" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:ogc="http://www.adv-online.de/namespaces/adv/gid/ogc" xmlns:wfs="http://www.adv-online.de/namespaces/adv/gid/wfs" xmlns:wfsext="http://www.adv-online.de/namespaces/adv/gid/wfsext" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <AX_Flurstueck gml:id="FS1">
+        <gml:identifier codeSpace="http://www.adv-online.de/">urn:adv:oid:FS1</gml:identifier>
+        <lebenszeitintervall>
+          <AA_Lebenszeitintervall>
+            <beginnt>2011-05-15T16:12:58Z</beginnt>
+          </AA_Lebenszeitintervall>
+        </lebenszeitintervall>
+        <modellart>
+          <AA_Modellart>
+            <advStandardModell>DLKM</advStandardModell>
+          </AA_Modellart>
+        </modellart>
+        <position>
+          <gml:Surface gml:id="A8WQ2">
+            <gml:patches>
+              <gml:PolygonPatch>
+                <gml:exterior>
+                  <gml:Ring>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8WQ3">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582906.892 6030265.782 582907.346 6030264.012 582907.931 6030262.283</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8WQ4">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582907.931 6030262.283 582908.685 6030260.606 582909.570 6030258.994</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8WQ5">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582909.570 6030258.994 582910.596 6030257.476 582911.729 6030256.035</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8WQ6">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582911.729 6030256.035 582912.782 6030255.016 582913.728 6030253.896</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8WQ7">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582913.728 6030253.896 582914.534 6030252.693 582915.217 6030251.417</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8WQ8">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582915.217 6030251.417 582915.751 6030250.080 582916.157 6030248.698</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8WQ9">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582916.157 6030248.698 582916.412 6030247.277 582916.536 6030245.839</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8WQA">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582916.536 6030245.839 582916.576 6030245.300 582916.586 6030244.760</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8WQB">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582916.586 6030244.760 582916.546 6030244.22 582916.506 6030243.680</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8WQC">
+                        <gml:segments>
+                          <gml:LineStringSegment>
+                            <gml:posList>582916.506 6030243.680 582955.498 6030243.628</gml:posList>
+                          </gml:LineStringSegment>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8WQD">
+                        <gml:segments>
+                          <gml:LineStringSegment>
+                            <gml:posList>582955.498 6030243.628 582991.731 6030243.586</gml:posList>
+                          </gml:LineStringSegment>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8WQE">
+                        <gml:segments>
+                          <gml:LineStringSegment>
+                            <gml:posList>582991.731 6030243.586 582991.322 6030245.526</gml:posList>
+                          </gml:LineStringSegment>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8WQF">
+                        <gml:segments>
+                          <gml:LineStringSegment>
+                            <gml:posList>582991.322 6030245.526 582986.725 6030266.337</gml:posList>
+                          </gml:LineStringSegment>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8WQG">
+                        <gml:segments>
+                          <gml:LineStringSegment>
+                            <gml:posList>582986.725 6030266.337 582986.165 6030268.876</gml:posList>
+                          </gml:LineStringSegment>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8WQH">
+                        <gml:segments>
+                          <gml:LineStringSegment>
+                            <gml:posList>582986.165 6030268.876 582906.462 6030269.420</gml:posList>
+                          </gml:LineStringSegment>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8WQI">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582906.462 6030269.420 582906.607 6030267.593 582906.892 6030265.782</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                  </gml:Ring>
+                </gml:exterior>
+              </gml:PolygonPatch>
+            </gml:patches>
+          </gml:Surface>
+        </position>
+        <gemarkung>
+          <AX_Gemarkung_Schluessel>
+            <land>00</land>
+            <gemarkungsnummer>0000</gemarkungsnummer>
+          </AX_Gemarkung_Schluessel>
+        </gemarkung>
+        <flurstuecksnummer>
+          <AX_Flurstuecksnummer>
+            <zaehler>00</zaehler>
+            <nenner>00</nenner>
+          </AX_Flurstuecksnummer>
+        </flurstuecksnummer>
+        <flurstueckskennzeichen>0000</flurstueckskennzeichen>
+        <amtlicheFlaeche uom="urn:adv:uom:m2">1972.00</amtlicheFlaeche>
+        <flurnummer>3</flurnummer>
+        <abweichenderRechtszustand>false</abweichenderRechtszustand>
+        <gemeindezugehoerigkeit>
+          <AX_Gemeindekennzeichen>
+            <land>00</land>
+            <regierungsbezirk>0</regierungsbezirk>
+            <kreis>00</kreis>
+            <gemeinde>000</gemeinde>
+          </AX_Gemeindekennzeichen>
+        </gemeindezugehoerigkeit>
+      </AX_Flurstueck>
+    </gml:featureMember>
+    <gml:featureMember xmlns:gml="http://www.opengis.net/gml/3.2" xmlns="http://www.adv-online.de/namespaces/adv/gid/6.0" xmlns:adv="http://www.adv-online.de/namespaces/adv/gid/6.0" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:ogc="http://www.adv-online.de/namespaces/adv/gid/ogc" xmlns:wfs="http://www.adv-online.de/namespaces/adv/gid/wfs" xmlns:wfsext="http://www.adv-online.de/namespaces/adv/gid/wfsext" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <AX_Flurstueck gml:id="FS2">
+        <gml:identifier codeSpace="http://www.adv-online.de/">urn:adv:oid:FS2</gml:identifier>
+        <lebenszeitintervall>
+          <AA_Lebenszeitintervall>
+            <beginnt>2011-05-15T16:12:58Z</beginnt>
+          </AA_Lebenszeitintervall>
+        </lebenszeitintervall>
+        <modellart>
+          <AA_Modellart>
+            <advStandardModell>DLKM</advStandardModell>
+          </AA_Modellart>
+        </modellart>
+        <position>
+          <gml:Surface gml:id="A8YD6">
+            <gml:patches>
+              <gml:PolygonPatch>
+                <gml:exterior>
+                  <gml:Ring>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YD7">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582890.168 6030241.582 582890.964 6030239.343 582892.147 6030237.284</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YD8">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582892.147 6030237.284 582893.584 6030235.596 582895.276 6030234.165</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YD9">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582895.276 6030234.165 582897.207 6030233.050 582899.294 6030232.266</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDA">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582899.294 6030232.266 582900.815 6030232.011 582902.352 6030231.906</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDB">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582902.352 6030231.906 582903.874 6030231.961 582905.381 6030232.165</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDC">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582905.381 6030232.165 582906.731 6030232.501 582908.050 6030232.945</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDD">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582908.050 6030232.945 582909.301 6030233.511 582910.499 6030234.184</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDE">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582910.499 6030234.184 582911.798 6030235.190 582912.968 6030236.343</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDF">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582912.968 6030236.343 582913.974 6030237.627 582914.817 6030239.022</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDG">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582914.817 6030239.022 582915.425 6030240.108 582915.917 6030241.251</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDH">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582915.917 6030241.251 582916.271 6030242.451 582916.506 6030243.680</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDI">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582916.506 6030243.680 582916.546 6030244.22 582916.586 6030244.760</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDJ">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582916.586 6030244.760 582916.576 6030245.300 582916.536 6030245.839</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDK">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582916.536 6030245.839 582916.412 6030247.277 582916.157 6030248.698</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDL">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582916.157 6030248.698 582915.751 6030250.080 582915.217 6030251.417</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDM">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582915.217 6030251.417 582914.534 6030252.693 582913.728 6030253.896</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDN">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582913.728 6030253.896 582912.782 6030255.016 582911.729 6030256.035</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDO">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582911.729 6030256.035 582910.596 6030257.476 582909.570 6030258.994</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDP">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582909.570 6030258.994 582908.685 6030260.606 582907.931 6030262.283</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDQ">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582907.931 6030262.283 582907.346 6030264.012 582906.892 6030265.782</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDR">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582906.892 6030265.782 582906.607 6030267.593 582906.462 6030269.420</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDS">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582906.462 6030269.420 582906.462 6030270.416 582906.512 6030271.409</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDT">
+                        <gml:segments>
+                          <gml:LineStringSegment>
+                            <gml:posList>582906.512 6030271.409 582907.612 6030272.159</gml:posList>
+                          </gml:LineStringSegment>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDU">
+                        <gml:segments>
+                          <gml:LineStringSegment>
+                            <gml:posList>582907.612 6030272.159 582907.713 6030299.878</gml:posList>
+                          </gml:LineStringSegment>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDV">
+                        <gml:segments>
+                          <gml:LineStringSegment>
+                            <gml:posList>582907.713 6030299.878 582905.724 6030302.877</gml:posList>
+                          </gml:LineStringSegment>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDW">
+                        <gml:segments>
+                          <gml:LineStringSegment>
+                            <gml:posList>582905.724 6030302.877 582905.234 6030304.926</gml:posList>
+                          </gml:LineStringSegment>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDX">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582905.234 6030304.926 582905.254 6030305.448 582905.314 6030305.965</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDY">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582905.314 6030305.965 582905.414 6030306.475 582905.554 6030306.975</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YDZ">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582905.554 6030306.975 582905.725 6030307.467 582905.934 6030307.945</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YE0">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582905.934 6030307.945 582906.175 6030308.405 582906.454 6030308.844</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YE1">
+                        <gml:segments>
+                          <gml:LineStringSegment>
+                            <gml:posList>582906.454 6030308.844 582898.347 6030309.214</gml:posList>
+                          </gml:LineStringSegment>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YE2">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582898.347 6030309.214 582898.526 6030308.659 582898.677 6030308.095</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YE3">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582898.677 6030308.095 582898.808 6030307.522 582898.917 6030306.945</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YE4">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582898.917 6030306.945 582898.997 6030306.357 582899.057 6030305.766</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YE5">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582899.057 6030305.766 582899.097 6030305.177 582899.107 6030304.586</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YE6">
+                        <gml:segments>
+                          <gml:LineStringSegment>
+                            <gml:posList>582899.107 6030304.586 582899.085 6030268.631</gml:posList>
+                          </gml:LineStringSegment>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YE7">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582899.085 6030268.631 582899.070 6030266.717 582898.885 6030264.812</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YE8">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582898.885 6030264.812 582898.511 6030262.927 582897.966 6030261.084</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YE9">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582897.966 6030261.084 582897.231 6030259.317 582896.336 6030257.626</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YEA">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582896.336 6030257.626 582895.271 6030256.026 582894.057 6030254.537</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YEB">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582894.057 6030254.537 582892.456 6030252.800 582891.198 6030250.799</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YEC">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582891.198 6030250.799 582890.324 6030248.609 582889.849 6030246.300</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                    <gml:curveMember>
+                      <gml:Curve gml:id="A8YED">
+                        <gml:segments>
+                          <gml:Arc>
+                            <gml:posList>582889.849 6030246.300 582889.794 6030243.926 582890.168 6030241.582</gml:posList>
+                          </gml:Arc>
+                        </gml:segments>
+                      </gml:Curve>
+                    </gml:curveMember>
+                  </gml:Ring>
+                </gml:exterior>
+              </gml:PolygonPatch>
+            </gml:patches>
+          </gml:Surface>
+        </position>
+        <gemarkung>
+          <AX_Gemarkung_Schluessel>
+            <land>00</land>
+            <gemarkungsnummer>0000</gemarkungsnummer>
+          </AX_Gemarkung_Schluessel>
+        </gemarkung>
+        <flurstuecksnummer>
+          <AX_Flurstuecksnummer>
+            <zaehler>00</zaehler>
+            <nenner>00</nenner>
+          </AX_Flurstuecksnummer>
+        </flurstuecksnummer>
+        <flurstueckskennzeichen>0000</flurstueckskennzeichen>
+        <amtlicheFlaeche uom="urn:adv:uom:m2">1009.00</amtlicheFlaeche>
+        <flurnummer>3</flurnummer>
+        <abweichenderRechtszustand>false</abweichenderRechtszustand>
+        <gemeindezugehoerigkeit>
+          <AX_Gemeindekennzeichen>
+            <land>00</land>
+            <regierungsbezirk>0</regierungsbezirk>
+            <kreis>00</kreis>
+            <gemeinde>000</gemeinde>
+          </AX_Gemeindekennzeichen>
+        </gemeindezugehoerigkeit>
+      </AX_Flurstueck>
+    </gml:featureMember>
+    </wfs:FeatureCollection>
+  </enthaelt>
+</AX_Bestandsdatenauszug>
+<!-- TEST -->
