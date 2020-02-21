@@ -1,5 +1,5 @@
 /**
- * Copyright 2010-2019 interactive instruments GmbH
+ * Copyright 2010-2020 interactive instruments GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,7 +67,9 @@ public class GeoJsonWriter implements Closeable, Releasable {
     /**
      * Write a Point of Interest as a single feature which possesses: - a point geometry and - a text property
      *
-     * The feature is persisted after this call, no further calls are required. After calling this method, a new POI feature can be created by calling this method again, or a feature with a Polygon or a LineString geometry can be created with the {@link #startFeature(String)} method.
+     * The feature is persisted after this call, no further calls are required. After calling this method, a new POI feature
+     * can be created by calling this method again, or a feature with a Polygon or a LineString geometry can be created with
+     * the {@link #startFeature(String)} method.
      *
      * @param id
      *            ID of the feature
@@ -113,9 +115,12 @@ public class GeoJsonWriter implements Closeable, Releasable {
     /**
      * Start writing a feature to add a polygon or a curve geometry.
      *
-     * There is NO endPolygonFeature() method, the Feature definition is automatically completed by calling any other method of this object. However, this means that at least the {@link #close()} method must be called, to complete the last feature.
+     * There is NO endPolygonFeature() method, the Feature definition is automatically completed by calling any other method
+     * of this object. However, this means that at least the {@link #close()} method must be called, to complete the last
+     * feature.
      *
-     * Note: after this call {@link #addPolygonCoordinates(byte[])} or {@link #addPolygonCoordinates(byte[])} must be called.
+     * Note: after this call {@link #addPolygonCoordinates(byte[])} or {@link #addPolygonCoordinates(byte[])} must be
+     * called.
      *
      * @param id
      * @throws IOException

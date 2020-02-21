@@ -1,5 +1,5 @@
 /**
- * Copyright 2010-2019 interactive instruments GmbH
+ * Copyright 2010-2020 interactive instruments GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,8 +46,16 @@ public class ArchTest {
         }
     }
 
-    /* TODO
+    /*
+     * TODO
      *
-     * @Test public void testAccessPorts() { final ArchRule rule = classes().that().haveModifier(JavaModifier.PUBLIC).should() .haveFullyQualifiedName("de.interactive_instruments.etf.bsxm.TopoX") .orShould() .haveFullyQualifiedName("de.interactive_instruments.etf.bsxm.topox.Theme") .orShould() .haveFullyQualifiedName("de.interactive_instruments.etf.bsxm.topox.BoundaryBuilder") .because("The TopoX, Theme and Boundary classes should be the only " + "entry points for this module."); rule.check(gmlgeoxClasses); } */
+     * @Test public void testAccessPorts() { final ArchRule rule =
+     * classes().that().haveModifier(JavaModifier.PUBLIC).should()
+     * .haveFullyQualifiedName("de.interactive_instruments.etf.bsxm.TopoX") .orShould()
+     * .haveFullyQualifiedName("de.interactive_instruments.etf.bsxm.topox.Theme") .orShould()
+     * .haveFullyQualifiedName("de.interactive_instruments.etf.bsxm.topox.BoundaryBuilder")
+     * .because("The TopoX, Theme and Boundary classes should be the only " + "entry points for this module.");
+     * rule.check(gmlgeoxClasses); }
+     */
 
 }

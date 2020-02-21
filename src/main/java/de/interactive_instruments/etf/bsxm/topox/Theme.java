@@ -1,5 +1,5 @@
 /**
- * Copyright 2010-2019 interactive instruments GmbH
+ * Copyright 2010-2020 interactive instruments GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,8 @@ import java.util.Set;
 import de.interactive_instruments.etf.bsxm.topox.geojson.writer.GeoJsonWriter;
 
 /**
- * The Theme object bundles all objects that are used to create topological information for one or multiple Features, including error handling, parsing and building topological data structure.
+ * The Theme object bundles all objects that are used to create topological information for one or multiple Features,
+ * including error handling, parsing and building topological data structure.
  *
  * @author Jon Herrmann ( herrmann aT interactive-instruments doT de )
  */

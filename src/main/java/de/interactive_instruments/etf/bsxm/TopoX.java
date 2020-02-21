@@ -1,5 +1,5 @@
 /**
- * Copyright 2010-2019 interactive instruments GmbH
+ * Copyright 2010-2020 interactive instruments GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,7 +118,8 @@ public class TopoX implements Serializable {
      * @param themeName
      *            name of the topological name
      * @param initialEdgeCapacity
-     *            xpected number of edges. This value should be about 1995000 * number of databases (experience value from tests). The number is used to allocate the data structures accordingly and to increase the performance.
+     *            xpected number of edges. This value should be about 1995000 * number of databases (experience value from
+     *            tests). The number is used to allocate the data structures accordingly and to increase the performance.
      * @param outputDir
      *            directory for storing error information
      * @return ID of the topology name
@@ -173,7 +174,8 @@ public class TopoX implements Serializable {
      * @param themeName
      *            name of the topological name
      * @param initialEdgeCapacity
-     *            xpected number of edges. This value should be about 1995000 * number of databases (experience value from tests). The number is used to allocate the data structures accordingly and to increase the performance.
+     *            xpected number of edges. This value should be about 1995000 * number of databases (experience value from
+     *            tests). The number is used to allocate the data structures accordingly and to increase the performance.
      * @param outputDir
      *            directory for storing error information
      * @return ID of the topology name
@@ -237,7 +239,8 @@ public class TopoX implements Serializable {
     /**
      * Switch the Topology Builder to the next Feature
      *
-     * This means that the object pre value is temporary saved for other parsing operations in this features context (and avoids passing the value as argument).
+     * This means that the object pre value is temporary saved for other parsing operations in this features context (and
+     * avoids passing the value as argument).
      *
      * @param id
      *            ID of Topology Builder
@@ -462,7 +465,8 @@ public class TopoX implements Serializable {
     /**
      * Write coordinates for a polygon geometry.
      *
-     * Must be called after the {@link #startGeoJsonFeature(int, String)} or the {@link #nextGeoJsonPolygonInterior(int)} method. Depending on the previous calls, exterior or interior coordinates are written.
+     * Must be called after the {@link #startGeoJsonFeature(int, String)} or the {@link #nextGeoJsonPolygonInterior(int)}
+     * method. Depending on the previous calls, exterior or interior coordinates are written.
      *
      * @param id
      *            ID of Topology Builder
