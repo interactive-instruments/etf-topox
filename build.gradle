@@ -65,6 +65,9 @@ dependencies {
 test {
 	dependsOn = ["xar"]
 
+    minHeapSize = "1024m"
+    maxHeapSize = "2048m"
+
 	useJUnitPlatform()
 	testLogging {
 		events "passed", "skipped", "failed"

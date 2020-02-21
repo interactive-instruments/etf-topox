@@ -30,18 +30,22 @@ public class EdgeValidator {
     private final InternalHandler handler;
     private final TopologyErrorCollector errorCollector;
 
-    public EdgeValidator(final Theme theme) {
-        this.handler = new InternalHandler(theme, theme.topologyErrorCollector);
+    public EdgeValidator(final Theme theme, int handlerType) {
+        if (handlerType == 1) {
+            this.handler = new SingleBoundaryHandler(theme, theme.topologyErrorCollector);
+        } else {
+            this.handler = new MultipleBoundaryHandler(theme, theme.topologyErrorCollector);
+        }
         this.parser = new HashingPosListParser(handler);
         this.errorCollector = theme.topologyErrorCollector;
     }
 
-    private static class InternalHandler implements HashingSegmentHandler {
+    private static abstract class InternalHandler implements HashingSegmentHandler {
         private final Theme theme;
         private final TopologyErrorCollector errorCollector;
 
-        private Topology.Node previousNode;
-        private Topology.Edge previousEdge;
+        protected Topology.Node previousNode;
+        protected Topology.Edge previousEdge;
 
         InternalHandler(final Theme theme, final TopologyErrorCollector errorCollector) {
             this.theme = theme;
@@ -80,13 +84,33 @@ public class EdgeValidator {
             }
         }
 
+        private Topology.Edge getPreviousEdge() {
+            return this.previousEdge;
+        }
+    }
+
+    private static class MultipleBoundaryHandler extends InternalHandler {
+
+        MultipleBoundaryHandler(Theme theme, TopologyErrorCollector errorCollector) {
+            super(theme, errorCollector);
+        }
+
         @Override
         public void nextGeometricObject() {
             previousEdge = null;
+            previousNode = null;
+        }
+    }
+
+    private static class SingleBoundaryHandler extends InternalHandler {
+
+        SingleBoundaryHandler(Theme theme, TopologyErrorCollector errorCollector) {
+            super(theme, errorCollector);
         }
 
-        private Topology.Edge getPreviousEdge() {
-            return this.previousEdge;
+        @Override
+        public void nextGeometricObject() {
+            previousEdge = null;
         }
     }
 

@@ -210,9 +210,10 @@ public class TopoX implements Serializable {
     }
 
     /**
-     * Creates a new object for checking boundaries and their overlapping.
+     * Creates a new object for checking a single boundary object and its overlapping.
      *
-     * A boundary is exactly on an edge. There must be no overlap with another boundary otherwise an error is reported. In order to lay several boundaries over one edge, several independent boundary checking objects must be created.
+     * A boundary is exactly on an edge. There must be no overlap with another boundary otherwise an error is reported. In
+     * order to lay several boundaries over one edge, several independent boundary checking objects must be created.
      *
      * Requires an initialized topology object that has already captured topological information.
      *
@@ -229,7 +230,34 @@ public class TopoX implements Serializable {
         if (topologyId < 0 || topologyId >= themes.size()) {
             throw new BaseXException("Unknown topology ID: " + String.valueOf(topologyId));
         }
-        this.boundaries.add(new EdgeValidator(themes.get(topologyId)));
+        // handlerType 1: singleBoundaryHandler
+        this.boundaries.add(new EdgeValidator(themes.get(topologyId), 1));
+        return this.boundaries.size() - 1 + BOUNDARY_ID_OFFSET;
+    }
+
+    /**
+     * Creates a new object for checking multiple boundary Objects and their overlapping.
+     *
+     * A boundary is exactly on an edge. There must be no overlap with another boundary otherwise an error is reported. In
+     * order to lay several boundaries over one edge, several independent boundary checking objects must be created.
+     *
+     * Requires an initialized topology object that has already captured topological information.
+     *
+     * @param topologyId
+     *            ID of the topology
+     *
+     * @return ID of the boundary check object
+     * @throws BaseXException
+     *             if the $topologyId is unknown
+     */
+    @Requires(Permission.CREATE)
+    public int newEdgeValidatorMultipleBoundaries(final int topologyId)
+            throws BaseXException {
+        if (topologyId < 0 || topologyId >= themes.size()) {
+            throw new BaseXException("Unknown topology ID: " + String.valueOf(topologyId));
+        }
+        // handlerType 2: multipleBoundaryHandler
+        this.boundaries.add(new EdgeValidator(themes.get(topologyId), 2));
         return this.boundaries.size() - 1 + BOUNDARY_ID_OFFSET;
     }
 
