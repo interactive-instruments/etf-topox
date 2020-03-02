@@ -1,5 +1,5 @@
 /**
- * Copyright 2010-2019 interactive instruments GmbH
+ * Copyright 2010-2020 interactive instruments GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,8 @@ enum TopologyErrorType {
     /**
      * Duplicate edges in two features
      *
-     * Outputs: - X, Y for the point of failure - IS for the existing object that is on the edge - O for the object that collides with the existing one
+     * Outputs: - X, Y for the point of failure - IS for the existing object that is on the edge - O for the object that
+     * collides with the existing one
      *
      * TODO rename to TOPO_OVERLAPPING_EDGES
      */
@@ -34,7 +35,8 @@ enum TopologyErrorType {
     /**
      * Ring intersection
      *
-     * Outputs: - X, Y for the point of failure - IS for the object where the intersection has been detected - CW for the object which is clockwise from the error - CCW for the object which is counter-clockwise from the error
+     * Outputs: - X, Y for the point of failure - IS for the object where the intersection has been detected - CW for the
+     * object which is clockwise from the error - CCW for the object which is counter-clockwise from the error
      *
      * TODO rename to TOPO_INTERSECTION
      */
@@ -57,7 +59,8 @@ enum TopologyErrorType {
     /**
      * Free standing surface with all object IDs
      *
-     * Outputs: - X, Y for the point of failure - multiple IS for all the objects where the free standing surface has been detected
+     * Outputs: - X, Y for the point of failure - multiple IS for all the objects where the free standing surface has been
+     * detected
      */
     FREE_STANDING_SURFACE_DETAILED,
 
@@ -75,7 +78,8 @@ enum TopologyErrorType {
      *
      * Edge points have been found but the points are not connected.
      *
-     * Outputs: - X, Y for the point of failure - IS for the object that has been parsed and defined the points - X2, Y2 for the second point of failure
+     * Outputs: - X, Y for the point of failure - IS for the object that has been parsed and defined the points - X2, Y2 for
+     * the second point of failure
      */
     EDGE_POINTS_INVALID,
 
@@ -96,21 +100,24 @@ enum TopologyErrorType {
     /**
      * The object on the left side violates an assertion.
      *
-     * Outputs: - X, Y for the point of failure - IS for the object in the topological data - X2, Y2 for the second point of failure
+     * Outputs: - X, Y for the point of failure - IS for the object in the topological data - X2, Y2 for the second point of
+     * failure
      */
     EDGE_INVALID_LEFT,
 
     /**
      * The object on the right side violates an assertion.
      *
-     * Outputs: - X, Y for the point of failure - IS for the object in the topological data - X2, Y2 for the second point of failure
+     * Outputs: - X, Y for the point of failure - IS for the object in the topological data - X2, Y2 for the second point of
+     * failure
      */
     EDGE_INVALID_RIGHT,
 
     /**
      * Right and left side violate an assertion.
      *
-     * Outputs: - X, Y for the point of failure - L, if available, for the left object in the topological data - R, if available, for the right object in the topological data - X2, Y2 for the second point of failure
+     * Outputs: - X, Y for the point of failure - L, if available, for the left object in the topological data - R, if
+     * available, for the right object in the topological data - X2, Y2 for the second point of failure
      */
     EDGE_INVALID,
 
@@ -149,12 +156,16 @@ enum TopologyErrorType {
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * An edge could not be found. This is most likely a consequential error if others occurred and for instance the connection between two points has been invalidated in the data structure. If this is the only type of error that occurred, then this may indicate a bug in the software.
+     * An edge could not be found. This is most likely a consequential error if others occurred and for instance the
+     * connection between two points has been invalidated in the data structure. If this is the only type of error that
+     * occurred, then this may indicate a bug in the software.
      */
     EDGE_NOT_FOUND,
 
     /**
-     * An error occurred while connecting an additional edge to a point. Attempting to traverse the angles of all connected edges has exceeded the maximum number of possible steps. If this is the only type of error that occurred, then this may indicate a bug in the software.
+     * An error occurred while connecting an additional edge to a point. Attempting to traverse the angles of all connected
+     * edges has exceeded the maximum number of possible steps. If this is the only type of error that occurred, then this
+     * may indicate a bug in the software.
      */
     INVALID_ANGLE
 

@@ -210,13 +210,14 @@ declare function topox:detect-holes($topologyId as xs:int) as xs:int {
 
 (:~
  : Creates a new object to validate edges basically the overlapping of boundaries.
+ : Only validates correctly if a single boundary object will be parsed.
  :
  : A boundary is exactly on an edge. There must be no overlap with another boundary
  : otherwise an error is reported. In order to lay several boundaries over one edge,
  : several independent boundary checking objects must be created.
  :
  : The edge can be validated against additional criteria, for example to check
- : which objects exist on the left and the right side. See
+ : which objects exist on the left and the right side.
  :
  : Requires an initialized topology object that has already
  : captured topological information with the parse-surface() function.
@@ -229,6 +230,30 @@ declare function topox:detect-holes($topologyId as xs:int) as xs:int {
  :)
 declare function topox:new-validator($topologyId as xs:int) as xs:int {
     java:newEdgeValidator($topologyId)
+};
+
+(:~
+ : Creates a new object to validate edges. Checks if boundaries overlap with the topology.
+ : Also validates correctly if multiple boundary objects will be parsed.
+ :
+ : A boundary is exactly on an edge. There must be no overlap with another boundary
+ : otherwise an error is reported. In order to lay several boundaries over one edge,
+ : several independent boundary checking objects must be created.
+ :
+ : The edge can be validated against additional criteria, for example to check
+ : which objects exist on the left and the right side.
+ :
+ : Requires an initialized topology object that has already
+ : captured topological information with the parse-surface() function.
+ : Errors can be retrieved by calling the topological-errors() function.
+ :
+ : Throws BaseXException if the topologyId is unknown
+ :
+ : @param  $topologyId ID of the topology
+ : @return ID of the boundary check object
+ :)
+declare function topox:new-validator-multiple-boundaries($topologyId as xs:int) as xs:int {
+    java:newEdgeValidatorMultipleBoundaries($topologyId)
 };
 
 (:~

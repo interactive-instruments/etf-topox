@@ -1,5 +1,5 @@
 /**
- * Copyright 2010-2019 interactive instruments GmbH
+ * Copyright 2010-2020 interactive instruments GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,8 @@ public class TopologyBuilder implements HashingSegmentHandler {
     /**
      * Coordinates
      *
-     * Array containing coordinates referenced from the topology edges. First index is the X, second one always the Y coordinate.
+     * Array containing coordinates referenced from the topology edges. First index is the X, second one always the Y
+     * coordinate.
      */
     private final TDoubleArrayList coordinates;
 
@@ -54,7 +55,8 @@ public class TopologyBuilder implements HashingSegmentHandler {
     private int objectsProcessed = 0;
 
     /**
-     * Maps a coordinate hash to an edge index. The 0 edge index indicates that the edge does not exist. The coordinate hash is always mapped to edges where the coordinates are the origin.
+     * Maps a coordinate hash to an edge index. The 0 edge index indicates that the edge does not exist. The coordinate hash
+     * is always mapped to edges where the coordinates are the origin.
      *
      * The data store is very fast but it can not handle collisions due to the use of a primitive data type.
      */
@@ -78,13 +80,25 @@ public class TopologyBuilder implements HashingSegmentHandler {
     /**
      * Topological Data Structure
      *
-     * Array containing topology edges. Each edge contains 10 values which are compressed into 7 longs: - Origin coordinate index: X0 coordinate | - Target coordinate index: X0 coordinate - Origin angle: the atan2(Y0-Y1, X0-X1) as long bits - Target angle - Ccw next index from origin | - Ccw next index from end - Face left object | - Face right object - Left object geometry location - Right object geometry location
+     * Array containing topology edges. Each edge contains 10 values which are compressed into 7 longs: - Origin coordinate
+     * index: X0 coordinate | - Target coordinate index: X0 coordinate - Origin angle: the atan2(Y0-Y1, X0-X1) as long bits
+     * - Target angle - Ccw next index from origin | - Ccw next index from end - Face left object | - Face right object -
+     * Left object geometry location - Right object geometry location
      *
-     * Edge index concept: To reduce memory, the direction of edges are encoded into the sign of the edge index. The edge index is used in the coordinate to edge mapping {@link #coordinateHashToEdgeMap} and the ccw next index from origin / end {@link #CCWI_OFFSET}. Requesting the edge index for a coordinate, a positive index means that the coordinate is the origin of the edge and a negative index means that the coordinate is the end point of the edge. The same applies to the ccw next indexes {@link #CCWI_OFFSET} that are persisted for the start and the end point of an edge. A positive index means that the corresponding start point of the other edge is connected to the edge, a negative index means that the edge is connected to the end point of another edge. Zero means that the start or the end point is not connected to any other edge.
+     * Edge index concept: To reduce memory, the direction of edges are encoded into the sign of the edge index. The edge
+     * index is used in the coordinate to edge mapping {@link #coordinateHashToEdgeMap} and the ccw next index from origin /
+     * end {@link #CCWI_OFFSET}. Requesting the edge index for a coordinate, a positive index means that the coordinate is
+     * the origin of the edge and a negative index means that the coordinate is the end point of the edge. The same applies
+     * to the ccw next indexes {@link #CCWI_OFFSET} that are persisted for the start and the end point of an edge. A
+     * positive index means that the corresponding start point of the other edge is connected to the edge, a negative index
+     * means that the edge is connected to the end point of another edge. Zero means that the start or the end point is not
+     * connected to any other edge.
      *
-     * Exterior/interior objects: An edge that defines an object from exterior has a positive object index on the corresponding side and a negative for an interior boundary.
+     * Exterior/interior objects: An edge that defines an object from exterior has a positive object index on the
+     * corresponding side and a negative for an interior boundary.
      *
-     * Object geometry location: The logic for encoding and decoding the geometry + object location and the db index is implemented in the TopoX facade {@link TopoX#genIndex(org.basex.query.value.node.DBNode)}
+     * Object geometry location: The logic for encoding and decoding the geometry + object location and the db index is
+     * implemented in the TopoX facade {@link TopoX#genIndex(org.basex.query.value.node.DBNode)}
      *
      * The order of the array values are optimized for edge creation
      *
@@ -200,7 +214,8 @@ public class TopologyBuilder implements HashingSegmentHandler {
     }
 
     /**
-     * Find a node by the hash of the previous coordinates. If found the previousEdgeIndex will be set. Otherwise the coordinates are added and the previousEdgeIndex is set to 0.
+     * Find a node by the hash of the previous coordinates. If found the previousEdgeIndex will be set. Otherwise the
+     * coordinates are added and the previousEdgeIndex is set to 0.
      */
     private void findOrCreateFirstNode() {
         final long hashCode = calcCoordHashCode(this.previousX, this.previousY);
@@ -440,7 +455,8 @@ public class TopologyBuilder implements HashingSegmentHandler {
     }
 
     private static final class Arc {
-        private static final double TOLERANCE = 0.0000001; // Coordinate-delta's smaller than the tolerance are treated as vertical/horizontal lines.
+        private static final double TOLERANCE = 0.0000001; // Coordinate-delta's smaller than the tolerance are treated as
+                                                           // vertical/horizontal lines.
         private final double sx;
         private final double sy;
         private final double mx;
@@ -506,9 +522,12 @@ public class TopologyBuilder implements HashingSegmentHandler {
         }
 
         /**
-         * Checks if the lines p1-p2 and p2-p3 are perpendicular to the x or y axis, using a certain tolerance. Takes into account that there is a simple solution (for calculating the center of the circle) for the case of p1-p2 being vertical and p2-p3 being horizontal.
+         * Checks if the lines p1-p2 and p2-p3 are perpendicular to the x or y axis, using a certain tolerance. Takes into
+         * account that there is a simple solution (for calculating the center of the circle) for the case of p1-p2 being
+         * vertical and p2-p3 being horizontal.
          *
-         * @return <code>true</code> if p1-p2 is vertical and p2-p3 is horizontal (then there is a simple solution) or if none of the two lines is vertical or horizontal, else <code>false</code>
+         * @return <code>true</code> if p1-p2 is vertical and p2-p3 is horizontal (then there is a simple solution) or if none
+         *         of the two lines is vertical or horizontal, else <code>false</code>
          */
         private static boolean centerIsPossibleFromCoordinates(final double p1x, final double p1y, final double p2x,
                 final double p2y, final double p3x, final double p3y) {
@@ -564,7 +583,8 @@ public class TopologyBuilder implements HashingSegmentHandler {
         }
 
         /**
-         * Computes and returns two tangents of this arc as an array. The first tangent starts at the given source and points toward the target. The second tangent starts at the given target and points toward the source.
+         * Computes and returns two tangents of this arc as an array. The first tangent starts at the given source and points
+         * toward the target. The second tangent starts at the given target and points toward the source.
          *
          * @param targetX
          *            as the end point of an edge that the TopologyBuilder is processing (x value)
@@ -574,7 +594,8 @@ public class TopologyBuilder implements HashingSegmentHandler {
          *            as the starting point of an edge that the TopologyBuilder is processing (x value)
          * @param sourceY
          *            as the starting point of an edge that the TopologyBuilder is processing (y value)
-         * @return array containing four values: - x value of the source tangent | - y value of the source tangent | - x value of the target tangent | - y value of the target tangent
+         * @return array containing four values: - x value of the source tangent | - y value of the source tangent | - x value
+         *         of the target tangent | - y value of the target tangent
          */
         private double[] getTangents(final double targetX, final double targetY, final double sourceX, final double sourceY) {
             final double sourceTangentX;
@@ -924,10 +945,17 @@ public class TopologyBuilder implements HashingSegmentHandler {
 
                 // TODO distinguish with an OUTER_RING_INVALID_CURVE_ORIENTATION error ?
                 collectErrorOverlappingEdges(compressedLocation, reqIndex + LEFT_LOCATION_INDEX);
-                /* errorCollector.collectError( // OUTER_RING_INVALID_CURVE_ORIENTATION, RING_OVERLAPPING_EDGES, "E1", String.valueOf(compressedLocation), "E2", String.valueOf(topology.getQuick(reqIndex + LEFT_LOCATION_INDEX)) ); */
+                /*
+                 * errorCollector.collectError( // OUTER_RING_INVALID_CURVE_ORIENTATION, RING_OVERLAPPING_EDGES, "E1",
+                 * String.valueOf(compressedLocation), "E2", String.valueOf(topology.getQuick(reqIndex + LEFT_LOCATION_INDEX))
+                 * );
+                 */
             } else if (rightObj != 0) {
                 // there is also inner or outer ring on the the right side
-                /* errorCollector.collectError( RING_OVERLAPPING_EDGES, "E1", String.valueOf(compressedLocation), "E2", String.valueOf(topology.getQuick(reqIndex + RIGHT_LOCATION_INDEX))); */
+                /*
+                 * errorCollector.collectError( RING_OVERLAPPING_EDGES, "E1", String.valueOf(compressedLocation), "E2",
+                 * String.valueOf(topology.getQuick(reqIndex + RIGHT_LOCATION_INDEX)));
+                 */
                 collectErrorOverlappingEdges(compressedLocation, reqIndex + RIGHT_LOCATION_INDEX);
             } else {
                 // Set on right side
@@ -939,11 +967,17 @@ public class TopologyBuilder implements HashingSegmentHandler {
             if (!this.exterior && previousEdgeIndex < 0) {
                 // the negative previousEdgeIndex indicates that the edge has been created
                 // by the inner ring on the left side.
-                /* errorCollector.collectError( RING_OVERLAPPING_EDGES, "E1", String.valueOf(compressedLocation), "E2", String.valueOf(topology.getQuick(reqIndex + LEFT_LOCATION_INDEX))); */
+                /*
+                 * errorCollector.collectError( RING_OVERLAPPING_EDGES, "E1", String.valueOf(compressedLocation), "E2",
+                 * String.valueOf(topology.getQuick(reqIndex + LEFT_LOCATION_INDEX)));
+                 */
                 collectErrorOverlappingEdges(compressedLocation, reqIndex + LEFT_LOCATION_INDEX);
             } else if (rightObj != 0) {
                 // there is also inner or outer ring on the the right side
-                /* errorCollector.collectError( RING_OVERLAPPING_EDGES, "E1", String.valueOf(compressedLocation), "E2", String.valueOf(topology.getQuick(reqIndex + RIGHT_LOCATION_INDEX))); */
+                /*
+                 * errorCollector.collectError( RING_OVERLAPPING_EDGES, "E1", String.valueOf(compressedLocation), "E2",
+                 * String.valueOf(topology.getQuick(reqIndex + RIGHT_LOCATION_INDEX)));
+                 */
                 collectErrorOverlappingEdges(compressedLocation, reqIndex + RIGHT_LOCATION_INDEX);
             } else {
                 // Set on right side
@@ -955,7 +989,10 @@ public class TopologyBuilder implements HashingSegmentHandler {
             // Left side is free. If this is an inner ring, check on other side that no other inner
             // ring is intersecting with this one
             if (!this.exterior && rightObj < 0) {
-                /* errorCollector.collectError( INNER_RING_SELF_INTERSECTION, "t", String.valueOf(compressedLocation), "o", String.valueOf(topology.getQuick(reqIndex + RIGHT_LOCATION_INDEX))); */
+                /*
+                 * errorCollector.collectError( INNER_RING_SELF_INTERSECTION, "t", String.valueOf(compressedLocation), "o",
+                 * String.valueOf(topology.getQuick(reqIndex + RIGHT_LOCATION_INDEX)));
+                 */
 
                 collectErrorInnerRingSelfIntersection(compressedLocation, reqIndex + RIGHT_LOCATION_INDEX);
                 this.previousEdgeIndex = 0;
@@ -1076,7 +1113,8 @@ public class TopologyBuilder implements HashingSegmentHandler {
     }
 
     /**
-     * Check if edge is an exterior edge without an object on the right side and mark the edge by setting a max value on the right side.
+     * Check if edge is an exterior edge without an object on the right side and mark the edge by setting a max value on the
+     * right side.
      *
      * @param edgeIndex
      *            edge index

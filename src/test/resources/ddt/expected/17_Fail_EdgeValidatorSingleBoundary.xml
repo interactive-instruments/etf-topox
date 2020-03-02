@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ete:TopologicalErrors xmlns:ete="http://www.interactive-instruments.de/etf/topology-error/1.0" name="Tatsaechliche_Nutzung">
+    <e i="1" t="POINT_DETACHED">
+        <X>673988.4</X>
+        <Y>5664161.651</Y>
+        <IS>188978561107</IS>
+    </e>
+    <e i="2" t="EDGE_POINTS_INVALID">
+        <X>673879.98</X>
+        <Y>5664745.71</Y>
+        <IS>317827580017</IS>
+        <X2>673902.07</X2>
+        <Y2>5664613.82</Y2>
+    </e>
+</ete:TopologicalErrors>

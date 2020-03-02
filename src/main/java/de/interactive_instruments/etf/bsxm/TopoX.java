@@ -1,5 +1,5 @@
 /**
- * Copyright 2010-2019 interactive instruments GmbH
+ * Copyright 2010-2020 interactive instruments GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,7 +118,8 @@ public class TopoX implements Serializable {
      * @param themeName
      *            name of the topological name
      * @param initialEdgeCapacity
-     *            xpected number of edges. This value should be about 1995000 * number of databases (experience value from tests). The number is used to allocate the data structures accordingly and to increase the performance.
+     *            xpected number of edges. This value should be about 1995000 * number of databases (experience value from
+     *            tests). The number is used to allocate the data structures accordingly and to increase the performance.
      * @param outputDir
      *            directory for storing error information
      * @return ID of the topology name
@@ -173,7 +174,8 @@ public class TopoX implements Serializable {
      * @param themeName
      *            name of the topological name
      * @param initialEdgeCapacity
-     *            xpected number of edges. This value should be about 1995000 * number of databases (experience value from tests). The number is used to allocate the data structures accordingly and to increase the performance.
+     *            xpected number of edges. This value should be about 1995000 * number of databases (experience value from
+     *            tests). The number is used to allocate the data structures accordingly and to increase the performance.
      * @param outputDir
      *            directory for storing error information
      * @return ID of the topology name
@@ -208,9 +210,10 @@ public class TopoX implements Serializable {
     }
 
     /**
-     * Creates a new object for checking boundaries and their overlapping.
+     * Creates a new object for checking a single boundary object and its overlapping.
      *
-     * A boundary is exactly on an edge. There must be no overlap with another boundary otherwise an error is reported. In order to lay several boundaries over one edge, several independent boundary checking objects must be created.
+     * A boundary is exactly on an edge. There must be no overlap with another boundary otherwise an error is reported. In
+     * order to lay several boundaries over one edge, several independent boundary checking objects must be created.
      *
      * Requires an initialized topology object that has already captured topological information.
      *
@@ -227,7 +230,34 @@ public class TopoX implements Serializable {
         if (topologyId < 0 || topologyId >= themes.size()) {
             throw new BaseXException("Unknown topology ID: " + String.valueOf(topologyId));
         }
-        this.boundaries.add(new EdgeValidator(themes.get(topologyId)));
+        // handlerType 1: singleBoundaryHandler
+        this.boundaries.add(new EdgeValidator(themes.get(topologyId), 1));
+        return this.boundaries.size() - 1 + BOUNDARY_ID_OFFSET;
+    }
+
+    /**
+     * Creates a new object for checking multiple boundary Objects and their overlapping.
+     *
+     * A boundary is exactly on an edge. There must be no overlap with another boundary otherwise an error is reported. In
+     * order to lay several boundaries over one edge, several independent boundary checking objects must be created.
+     *
+     * Requires an initialized topology object that has already captured topological information.
+     *
+     * @param topologyId
+     *            ID of the topology
+     *
+     * @return ID of the boundary check object
+     * @throws BaseXException
+     *             if the $topologyId is unknown
+     */
+    @Requires(Permission.CREATE)
+    public int newEdgeValidatorMultipleBoundaries(final int topologyId)
+            throws BaseXException {
+        if (topologyId < 0 || topologyId >= themes.size()) {
+            throw new BaseXException("Unknown topology ID: " + String.valueOf(topologyId));
+        }
+        // handlerType 2: multipleBoundaryHandler
+        this.boundaries.add(new EdgeValidator(themes.get(topologyId), 2));
         return this.boundaries.size() - 1 + BOUNDARY_ID_OFFSET;
     }
 
@@ -237,7 +267,8 @@ public class TopoX implements Serializable {
     /**
      * Switch the Topology Builder to the next Feature
      *
-     * This means that the object pre value is temporary saved for other parsing operations in this features context (and avoids passing the value as argument).
+     * This means that the object pre value is temporary saved for other parsing operations in this features context (and
+     * avoids passing the value as argument).
      *
      * @param id
      *            ID of Topology Builder
@@ -462,7 +493,8 @@ public class TopoX implements Serializable {
     /**
      * Write coordinates for a polygon geometry.
      *
-     * Must be called after the {@link #startGeoJsonFeature(int, String)} or the {@link #nextGeoJsonPolygonInterior(int)} method. Depending on the previous calls, exterior or interior coordinates are written.
+     * Must be called after the {@link #startGeoJsonFeature(int, String)} or the {@link #nextGeoJsonPolygonInterior(int)}
+     * method. Depending on the previous calls, exterior or interior coordinates are written.
      *
      * @param id
      *            ID of Topology Builder
